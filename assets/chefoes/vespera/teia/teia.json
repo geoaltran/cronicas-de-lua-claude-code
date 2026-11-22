@@ -1,0 +1,62 @@
+{
+ "centro_da_teia_no_png": [
+  14,
+  14
+ ],
+ "quadros_giro": 4,
+ "teias_por_vista": {
+  "vespera_01.png": [
+   [
+    14,
+    12
+   ],
+   [
+    88,
+    12
+   ]
+  ],
+  "vespera_02.png": [
+   [
+    16,
+    16
+   ],
+   [
+    88,
+    12
+   ]
+  ],
+  "vespera_03.png": [
+   [
+    16,
+    12
+   ]
+  ],
+  "vespera_04.png": [
+   [
+    18,
+    16
+   ],
+   [
+    84,
+    12
+   ]
+  ],
+  "vespera_05.png": [
+   [
+    14,
+    12
+   ],
+   [
+    90,
+    12
+   ]
+  ],
+  "vespera_06.png": [
+   [
+    84,
+    12
+   ]
+  ]
+ },
+ "uso": "desenhe <vista>_sem_teia.png e, em cada centro, teia_giro_N.png com o centro_da_teia_no_png alinhado ao centro; alterne N para girar"
+}

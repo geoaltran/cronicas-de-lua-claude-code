@@ -1,0 +1,117 @@
+{
+ "tipos": {
+  "comando": "comando no terminal (Bash)",
+  "edicao": "editar ou escrever arquivo (Edit, Write, MultiEdit, NotebookEdit)",
+  "leitura": "ler arquivo (Read)",
+  "web": "página da web (WebFetch)"
+ },
+ "trofeus": {
+  "comando": {
+   "arquivo": "trofeu_comando.png",
+   "w": 19,
+   "h": 29,
+   "grande": "trofeu_comando_grande.png",
+   "gw": 34,
+   "gh": 59
+  },
+  "edicao": {
+   "arquivo": "trofeu_edicao.png",
+   "w": 17,
+   "h": 28,
+   "grande": "trofeu_edicao_grande.png",
+   "gw": 32,
+   "gh": 54
+  },
+  "leitura": {
+   "arquivo": "trofeu_leitura.png",
+   "w": 17,
+   "h": 28,
+   "grande": "trofeu_leitura_grande.png",
+   "gw": 30,
+   "gh": 56
+  },
+  "web": {
+   "arquivo": "trofeu_web.png",
+   "w": 23,
+   "h": 26,
+   "grande": "trofeu_web_grande.png",
+   "gw": 36,
+   "gh": 50
+  }
+ },
+ "uso_grande": "o grande (tamanho nativo) aparece na faixa quando o elite cai; o pequeno vai na estante",
+ "estante": {
+  "arquivo": "estante.png",
+  "w": 180,
+  "h": 148,
+  "vagas": [
+   [
+    [
+     29,
+     58
+    ],
+    [
+     59,
+     58
+    ],
+    [
+     89,
+     58
+    ],
+    [
+     120,
+     58
+    ],
+    [
+     150,
+     58
+    ]
+   ],
+   [
+    [
+     29,
+     96
+    ],
+    [
+     59,
+     96
+    ],
+    [
+     89,
+     96
+    ],
+    [
+     120,
+     96
+    ],
+    [
+     150,
+     96
+    ]
+   ],
+   [
+    [
+     29,
+     134
+    ],
+    [
+     59,
+     134
+    ],
+    [
+     89,
+     134
+    ],
+    [
+     120,
+     134
+    ],
+    [
+     150,
+     134
+    ]
+   ]
+  ],
+  "uso": "vaga = [x do centro, y do chão]: o troféu pisa com a última linha em y"
+ }
+}

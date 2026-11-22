@@ -1,0 +1,33 @@
+# ============================================================
+# NUNCA PUBLICAR: arquivos brutos e de autoria (regra fixa do autor)
+# Ficam só no iCloud, como prova do trabalho. Nem em commit privado.
+# ============================================================
+assets-brutos/
+prompt_*.md
+referencia_*.png
+PROMPT_NOVA_SESSAO.md
+
+# Notas internas e provas de desenvolvimento (não públicas)
+PROXIMA_SESSAO.md
+CLAUDE.md
+previa_faixa/
+previa_*_antes_depois*
+comparacao_*
+conferencia_*
+
+# Backups e versões antigas
+mod/_backup/
+*_backup.png
+!assets/lua/poses/lua_andar_8f_backup.png
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# macOS / iCloud
+.DS_Store
+*.icloud
+
+# Configuração local do Claude Code
+.claude/settings.local.json

@@ -1,0 +1,26 @@
+{
+ "estrela": {
+  "arquivo": "estrela_4f.png",
+  "quadro_px": 7,
+  "quadros": 4,
+  "ms_por_quadro": 220
+ },
+ "vagalume": {
+  "arquivo": "vagalume_4f.png",
+  "quadro_px": 5,
+  "quadros": 4,
+  "ms_por_quadro": 180
+ },
+ "faisca": {
+  "arquivo": "faisca_4f.png",
+  "quadro_px": 5,
+  "quadros": 4,
+  "ms_por_quadro": 80
+ },
+ "folha": {
+  "arquivo": "folha_4f.png",
+  "quadro_px": 5,
+  "quadros": 4,
+  "ms_por_quadro": 160
+ }
+}

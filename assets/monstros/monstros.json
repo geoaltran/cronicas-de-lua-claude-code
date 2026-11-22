@@ -1,0 +1,123 @@
+{
+ "obs": "monstros comuns reaproveitam os sprites dos chefões, no MESMO tamanho; nenhuma imagem nova. Quando um papel tem mais de um personagem, eles se alternam a cada luta.",
+ "so_chefao": [
+  "malakor"
+ ],
+ "janela_compacta_px": 139,
+ "monstros": {
+  "ler": {
+   "gatilho": "Claude lendo ou procurando arquivos",
+   "emoji": "🕷️",
+   "personagens": [
+    {
+     "personagem": "vespera",
+     "sprite": "../chefoes/vespera/vespera_02.png",
+     "espelhar": true,
+     "w": 110,
+     "h": 92,
+     "abre_arena": false
+    }
+   ]
+  },
+  "editar": {
+   "gatilho": "Claude editando ou escrevendo código",
+   "emoji": "⚙️☀️",
+   "personagens": [
+    {
+     "personagem": "relojoeiro",
+     "sprite": "../chefoes/relojoeiro/relojoeiro_02.png",
+     "espelhar": true,
+     "w": 114,
+     "h": 123,
+     "abre_arena": false
+    },
+    {
+     "personagem": "sir_solis",
+     "sprite": "../chefoes/sir_solis/sir_solis_02.png",
+     "espelhar": true,
+     "w": 65,
+     "h": 73,
+     "abre_arena": false
+    }
+   ]
+  },
+  "terminal": {
+   "gatilho": "Claude rodando um comando no terminal",
+   "emoji": "🔥",
+   "personagens": [
+    {
+     "personagem": "ignis",
+     "sprite": "../chefoes/ignis/ignis_02.png",
+     "espelhar": true,
+     "w": 94,
+     "h": 112,
+     "abre_arena": false
+    }
+   ]
+  },
+  "web": {
+   "gatilho": "Claude pesquisando ou lendo na internet",
+   "emoji": "🌊✨",
+   "personagens": [
+    {
+     "personagem": "leviata",
+     "sprite": "../chefoes/leviata/leviata_02.png",
+     "espelhar": true,
+     "w": 122,
+     "h": 138,
+     "abre_arena": false
+    },
+    {
+     "personagem": "nebula",
+     "sprite": "../chefoes/nebula/nebula_05.png",
+     "espelhar": false,
+     "w": 158,
+     "h": 184,
+     "abre_arena": true
+    }
+   ]
+  },
+  "integracao": {
+   "gatilho": "Claude usando uma integração externa (Drive, e-mail, etc.)",
+   "emoji": "🪞",
+   "personagens": [
+    {
+     "personagem": "rei_espelho",
+     "sprite": "../chefoes/rei_espelho/rei_espelho_02.png",
+     "espelhar": true,
+     "w": 59,
+     "h": 114,
+     "abre_arena": false
+    }
+   ]
+  },
+  "subagente": {
+   "gatilho": "Claude chamando um subagente (cada um é um clone)",
+   "emoji": "🎭",
+   "personagens": [
+    {
+     "personagem": "dama_penumbra",
+     "sprite": "../chefoes/dama_penumbra/dama_penumbra_02.png",
+     "espelhar": true,
+     "w": 61,
+     "h": 91,
+     "abre_arena": false
+    }
+   ]
+  },
+  "elite": {
+   "gatilho": "erro que o Claude consertou (leva o nome do erro)",
+   "emoji": "🪨",
+   "personagens": [
+    {
+     "personagem": "golem_obsidiana",
+     "sprite": "../chefoes/golem_obsidiana/golem_obsidiana_02.png",
+     "espelhar": true,
+     "w": 186,
+     "h": 164,
+     "abre_arena": true
+    }
+   ]
+  }
+ }
+}

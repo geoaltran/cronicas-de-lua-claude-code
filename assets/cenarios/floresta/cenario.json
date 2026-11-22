@@ -1,0 +1,66 @@
+{
+ "tamanho_nativo": [
+  479,
+  268
+ ],
+ "pes_dos_personagens_y": 209,
+ "camadas": [
+  {
+   "arquivo": "fundo.png",
+   "velocidade": 0.0,
+   "rola": false,
+   "obs": "parado e centralizado; a ilustração original fica no meio"
+  },
+  {
+   "arquivo": "nuvens.png",
+   "velocidade": 0.15,
+   "rola": true,
+   "vento_px_por_s": 2
+  },
+  {
+   "ilhas": [
+    {
+     "arquivo": "ilha_1.png",
+     "x": 377,
+     "y": 53
+    },
+    {
+     "arquivo": "ilha_2.png",
+     "x": 565,
+     "y": 98
+    }
+   ],
+   "velocidade": 0.2,
+   "balanco_px": 2,
+   "obs": "coordenadas no fundo.png; sobem e descem devagar"
+  },
+  {
+   "arquivo": "meio.png",
+   "velocidade": 0.5,
+   "rola": true
+  },
+  {
+   "arquivo": "chao.png",
+   "velocidade": 1.0,
+   "rola": true
+  }
+ ],
+ "velocidade_1": "px por px que a Lua anda",
+ "modos": {
+  "chefao": {
+   "janela_y": [
+    0,
+    226
+   ],
+   "obs": "arena aberta: cabem chefões de até ~200 px"
+  },
+  "compacto": {
+   "janela_y": [
+    70,
+    226
+   ],
+   "camadas_de_tras_descem": 62,
+   "obs": "faixa baixa: fundo, nuvens e ilhas descem para a Lua do céu e o castelo caberem"
+  }
+ }
+}

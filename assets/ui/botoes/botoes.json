@@ -1,0 +1,32 @@
+{
+ "icone_px": 24,
+ "moldura_px": 32,
+ "icone_na_moldura": [
+  4,
+  4
+ ],
+ "botoes": {
+  "vigilia": {
+   "rotulo": "Vigília",
+   "inativo": "apagada",
+   "ativo": "acesa",
+   "animacao": "vigilia_ativo_3f.png"
+  },
+  "estandarte": {
+   "rotulo": "Estandarte",
+   "inativo": "enrolado",
+   "ativo": "desfraldado",
+   "animacao": "estandarte_ativo_3f.png"
+  },
+  "livro": {
+   "rotulo": "Livro",
+   "inativo": "fechado",
+   "ativo": "aberto"
+  },
+  "mochila": {
+   "rotulo": "Mochila",
+   "inativo": "leve",
+   "ativo": "cheia"
+  }
+ }
+}

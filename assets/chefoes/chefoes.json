@@ -1,0 +1,148 @@
+{
+ "vespera": {
+  "arena": "vespera_02.png",
+  "espelhar": true,
+  "frente": "vespera_01.png",
+  "w": 110,
+  "h": 92,
+  "vistas": [
+   "vespera_01.png",
+   "vespera_02.png",
+   "vespera_03.png",
+   "vespera_04.png",
+   "vespera_05.png",
+   "vespera_06.png"
+  ]
+ },
+ "dama_penumbra": {
+  "arena": "dama_penumbra_02.png",
+  "espelhar": true,
+  "frente": "dama_penumbra_01.png",
+  "w": 61,
+  "h": 91,
+  "vistas": [
+   "dama_penumbra_01.png",
+   "dama_penumbra_02.png",
+   "dama_penumbra_03.png",
+   "dama_penumbra_04.png",
+   "dama_penumbra_05.png",
+   "dama_penumbra_06.png",
+   "dama_penumbra_07.png"
+  ]
+ },
+ "golem_obsidiana": {
+  "arena": "golem_obsidiana_02.png",
+  "espelhar": true,
+  "frente": "golem_obsidiana_01.png",
+  "w": 186,
+  "h": 164,
+  "vistas": [
+   "golem_obsidiana_01.png",
+   "golem_obsidiana_02.png",
+   "golem_obsidiana_03.png",
+   "golem_obsidiana_04.png",
+   "golem_obsidiana_05.png",
+   "golem_obsidiana_06.png"
+  ]
+ },
+ "leviata": {
+  "arena": "leviata_02.png",
+  "espelhar": true,
+  "frente": "leviata_01.png",
+  "w": 122,
+  "h": 138,
+  "vistas": [
+   "leviata_01.png",
+   "leviata_02.png",
+   "leviata_03.png",
+   "leviata_04.png",
+   "leviata_05.png",
+   "leviata_06.png"
+  ]
+ },
+ "ignis": {
+  "arena": "ignis_02.png",
+  "espelhar": true,
+  "frente": "ignis_01.png",
+  "w": 94,
+  "h": 112,
+  "vistas": [
+   "ignis_01.png",
+   "ignis_02.png",
+   "ignis_03.png",
+   "ignis_04.png"
+  ]
+ },
+ "relojoeiro": {
+  "arena": "relojoeiro_02.png",
+  "espelhar": true,
+  "frente": "relojoeiro_01.png",
+  "w": 114,
+  "h": 123,
+  "vistas": [
+   "relojoeiro_01.png",
+   "relojoeiro_02.png",
+   "relojoeiro_03.png",
+   "relojoeiro_04.png",
+   "relojoeiro_05.png",
+   "relojoeiro_06.png"
+  ]
+ },
+ "sir_solis": {
+  "arena": "sir_solis_02.png",
+  "espelhar": true,
+  "frente": "sir_solis_01.png",
+  "w": 65,
+  "h": 73,
+  "vistas": [
+   "sir_solis_01.png",
+   "sir_solis_02.png",
+   "sir_solis_03.png",
+   "sir_solis_04.png",
+   "sir_solis_05.png",
+   "sir_solis_06.png",
+   "sir_solis_07.png"
+  ]
+ },
+ "rei_espelho": {
+  "arena": "rei_espelho_02.png",
+  "espelhar": true,
+  "frente": "rei_espelho_01.png",
+  "w": 59,
+  "h": 114,
+  "vistas": [
+   "rei_espelho_01.png",
+   "rei_espelho_02.png",
+   "rei_espelho_03.png",
+   "rei_espelho_04.png",
+   "rei_espelho_05.png",
+   "rei_espelho_06.png"
+  ]
+ },
+ "nebula": {
+  "arena": "nebula_05.png",
+  "espelhar": false,
+  "frente": "nebula_01.png",
+  "w": 158,
+  "h": 184,
+  "vistas": [
+   "nebula_01.png",
+   "nebula_02.png",
+   "nebula_03.png",
+   "nebula_04.png",
+   "nebula_05.png"
+  ]
+ },
+ "malakor": {
+  "arena": "malakor_01.png",
+  "espelhar": false,
+  "frente": "malakor_01.png",
+  "w": 184,
+  "h": 180,
+  "vistas": [
+   "malakor_01.png",
+   "malakor_02.png",
+   "malakor_03.png"
+  ]
+ }
+}

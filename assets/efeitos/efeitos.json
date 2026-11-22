@@ -1,0 +1,43 @@
+{
+ "projetil": {
+  "arquivo": "projetil_4f.png",
+  "quadro": [
+   11,
+   11
+  ],
+  "quadros": 4,
+  "ms_por_quadro": 60
+ },
+ "impacto": {
+  "arquivo": "impacto_6f.png",
+  "quadro": [
+   31,
+   31
+  ],
+  "quadros": 6,
+  "ms_por_quadro": 55
+ },
+ "canalizar": {
+  "arquivo": "canalizar_4f.png",
+  "quadro": [
+   41,
+   11
+  ],
+  "quadros": 4,
+  "ms_por_quadro": 120
+ },
+ "exclamacao": {
+  "arquivo": "exclamacao.png"
+ },
+ "digitos": {
+  "pasta": "digitos",
+  "dano": "dano_<c>.png (branco)",
+  "xp": "xp_<c>.png (dourado)",
+  "caracteres": "0-9, mais, menos, X, P",
+  "tamanho": [
+   5,
+   7
+  ],
+  "passo": 4
+ }
+}

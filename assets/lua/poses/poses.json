@@ -1,0 +1,141 @@
+{
+ "quadro": [
+  80,
+  100
+ ],
+ "pes_y": 96,
+ "altura_lua": 83,
+ "quadros": {
+  "andar": {
+   "arquivo": "lua_andar_8f.png",
+   "n": 8,
+   "quadros": [
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 84,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 84,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    }
+   ]
+  },
+  "ataque": {
+   "arquivo": "lua_ataque_4f.png",
+   "n": 4,
+   "quadros": [
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    }
+   ],
+   "ponta_da_varinha": [
+    [
+     65,
+     39
+    ],
+    [
+     74,
+     46
+    ],
+    [
+     79,
+     53
+    ],
+    [
+     68,
+     57
+    ]
+   ],
+   "lancamento": 2
+  },
+  "dano": {
+   "arquivo": "lua_dano_2f.png",
+   "n": 2,
+   "quadros": [
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    }
+   ]
+  },
+  "vitoria": {
+   "arquivo": "lua_vitoria_2f.png",
+   "n": 2,
+   "quadros": [
+    {
+     "altura": 74,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 93,
+     "acima_do_chao": 10
+    }
+   ]
+  },
+  "canalizar": {
+   "arquivo": "lua_canalizar_2f.png",
+   "n": 2,
+   "quadros": [
+    {
+     "altura": 84,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 1
+    }
+   ]
+  },
+  "parada": {
+   "arquivo": "lua_parada_3f.png",
+   "n": 3,
+   "quadros_nome": [
+    "normal",
+    "respirando",
+    "piscando"
+   ],
+   "uso": "alterna normal/respirando a cada ~600 ms; pisca (2 quadros) a cada 3–5 s"
+  }
+ }
+}

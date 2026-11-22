@@ -1,0 +1,6 @@
+{
+  "name": "cronicas-de-lua",
+  "version": "0.1.0",
+  "description": "As Crônicas de Lua: RPG em pixel art acima da caixa de mensagem que mostra, como jogo, o que o Claude está fazendo e o estado da sessão.",
+  "types": "./types/index.d.ts"
+}
