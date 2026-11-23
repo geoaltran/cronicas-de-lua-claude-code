@@ -1,0 +1,53 @@
+The Chronicles of Lua (As Crônicas de Lua) — ART LICENSE
+
+Illustration and pixel art © 2026 George Altran (@geoaltran).
+Licensed under the Creative Commons Attribution-NonCommercial 4.0
+International License (CC BY-NC 4.0).
+
+Full legal code: https://creativecommons.org/licenses/by-nc/4.0/legalcode
+Summary:         https://creativecommons.org/licenses/by-nc/4.0/
+
+WHAT THIS LICENSE COVERS ("the Art")
+  - everything under assets/ (Lua, the bosses and monsters, the scenery,
+    the UI, the effects, the trophies, the particles, the signature), except
+    the fonts in assets/fontes/, which keep their own license (SIL OFL 1.1);
+  - the art embedded in the mod (mod/cronicas-de-lua/hooks/arte.ts) and the
+    sounds in mod/cronicas-de-lua/sons/;
+  - the preview images and animations (previa_*.png, previa_*.gif);
+  - the characters themselves: Lua, Vespera, Dama Penumbra, Golem de
+    Obsidiana, Leviatã, Ignis, Relojoeiro, Sir Solis, Rei Espelho, Nébula and
+    Malakor, their names and designs.
+
+YOU MAY
+  - share the Art: copy and redistribute it in any medium or format;
+  - adapt it: remix, transform and build upon it (fan art, new versions),
+  as long as you follow the terms below.
+
+UNDER THESE TERMS
+  - Attribution: credit the author wherever the Art (or anything made from
+    it) appears, in this form or an equivalent one:
+
+        Art by George Altran (@geoaltran) — https://github.com/geoaltran
+        Licensed under CC BY-NC 4.0
+
+    Link to the license and say if you changed the Art. You may not suggest
+    that the author endorses you or your use.
+  - NonCommercial: you may NOT use the Art for commercial purposes. That
+    includes selling it or anything made with it (prints, merchandise, NFTs,
+    games, apps, plugins or assets for sale), using it in paid products or
+    services, and using it in advertising or branding.
+
+COMMERCIAL LICENSE AVAILABLE ON REQUEST
+  Want to use the Art or the characters commercially? Contact the author
+  (@geoaltran on GitHub) for a commercial license.
+
+The source code of this repository is licensed separately under the MIT
+License (see LICENSE); that license does NOT apply to the Art.
+
+---
+
+Licença da arte (português): a arte e as personagens são © 2026 George
+Altran (@geoaltran), sob a licença CC BY-NC 4.0: pode compartilhar e adaptar
+dando o crédito "Arte de George Altran (@geoaltran)", mas é PROIBIDO qualquer
+uso comercial sem autorização. Licença comercial sob consulta com o autor.
+O texto legal que vale é o da Creative Commons, em inglês (link acima).

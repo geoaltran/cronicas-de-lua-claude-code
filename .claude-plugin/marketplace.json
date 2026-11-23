@@ -1,0 +1,15 @@
+{
+  "name": "cronicas-de-lua",
+  "description": "The Chronicles of Lua: a pixel-art RPG band for Claude Code (art by George Altran, CC BY-NC 4.0; code MIT).",
+  "owner": {
+    "name": "George Altran",
+    "url": "https://github.com/geoaltran"
+  },
+  "plugins": [
+    {
+      "name": "cronicas-de-lua",
+      "source": "./mod/cronicas-de-lua",
+      "description": "🌙 A pixel-art RPG mod for Claude Code. Every tool call is a monster, your context window is a backpack, your rate limit is mana, and Lua, a tiny moon mage, fights them all while Claude works."
+    }
+  ]
+}

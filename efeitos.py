@@ -142,6 +142,48 @@ def exclamacao():
     return t
 
 
+AZUL_DUVIDA = (84, 120, 200)
+
+
+def interrogacao():
+    """Balão "?" azul (o mesmo balão do "!"): a Lua em dúvida quando o escudo do chefão defende."""
+    t = exclamacao()
+    t[(t[..., :3] == (232, 72, 72)).all(-1)] = (*BRANCO, 255)
+    for (x, y) in ((4, 2), (5, 2), (6, 2), (3, 3), (7, 3), (7, 4), (6, 5), (5, 6), (5, 8)):
+        t[y, x] = (*AZUL_DUVIDA, 255)
+    return t
+
+
+GOTA_AZUL, GOTA_SOMBRA = (150, 205, 245), (96, 150, 222)
+
+
+def gota(w=9, h=14):
+    """Gota de suor estilo mangá (9x14): ponta em cima, redonda embaixo, sombra e brilho."""
+    W, H = w - 2, h - 2
+    r = W / 2
+    cx, cy = W / 2, H - r
+    m = np.zeros((H, W), bool)
+    for y in range(H):
+        for x in range(W):
+            px, py = x + .5, y + .5
+            if (px - cx) ** 2 + (py - cy) ** 2 <= r * r:
+                m[y, x] = True
+            elif py < cy and abs(px - cx) <= r * (py / cy) ** 1.3:
+                m[y, x] = True
+    m = np.pad(m, 1)
+    t = np.zeros(m.shape + (4,), np.uint8)
+    t[m] = (*GOTA_AZUL, 255)
+    for y, x in zip(*np.nonzero(m)):
+        if (x - 1 - cx + .5) + (y - 1 - cy + .5) > r * 0.55:
+            t[y, x] = (*GOTA_SOMBRA, 255)
+    t[nd.binary_dilation(m) & ~m] = (*CONTORNO, 255)
+    hy, hx = int(cy) + 1 - max(1, int(r * 0.4)), 1 + max(1, int(r * 0.45))
+    t[hy, hx] = t[hy + 1, hx] = (*BRANCO, 255)
+    if w >= 9:
+        t[hy - 1, hx + 1] = (*BRANCO, 255)
+    return t
+
+
 # dígitos 3x5 (desenhados à mão), ampliados para traço de 1 px com contorno
 DIG = {
     "0": ["###", "#.#", "#.#", "#.#", "###"], "1": [".#.", "##.", ".#.", ".#.", "###"],
@@ -198,4 +240,12 @@ def texto(s, tipo="dano"):
 
 
 if __name__ == "__main__":
-    print(json.dumps(gerar(), indent=1, ensure_ascii=False))
+    import sys
+    SOLTOS = {"interrogacao": interrogacao, "gota": gota}
+    if sys.argv[1:] and set(sys.argv[1:]) <= set(SOLTOS):
+        # só os efeitos pedidos (não regera os outros nem o efeitos.json)
+        for nome in sys.argv[1:]:
+            Image.fromarray(SOLTOS[nome]()).save(SAIDA / f"{nome}.png")
+            print(f"assets/efeitos/{nome}.png")
+    else:
+        print(json.dumps(gerar(), indent=1, ensure_ascii=False))

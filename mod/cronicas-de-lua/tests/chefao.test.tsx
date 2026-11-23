@@ -1,6 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
-import { chefaoPeloNome, novoChefao } from '../hooks/chefao'
+import { PONTOS_POR_TAREFA, chefaoPeloNome, crescer, critico, defesa, ferir, novoChefao, vidaEmTarefas } from '../hooks/chefao'
 
 const FAIXA = {
   plugin: 'cronicas-de-lua',
@@ -158,4 +158,124 @@ test('/cronicas chefao <nome> chama um chefão escolhido (para testar)', () => {
   const c = novoChefao(7, 'lutas', 0, undefined, 'relojoeiro')
   expect([c.nome, c.pagina, c.vida]).toEqual(['relojoeiro', 6, 3])
   expect(novoChefao(7, 'lutas', 0).nome).toBe('rei_espelho')
+})
+
+/** Avança o relógio de 70 em 70 ms e diz se algum desenho no caminho teve o texto. */
+async function apareceu(clock: { advance(ms: number): Promise<void> }, svg: () => Promise<string>, texto: string, ms: number): Promise<{ viu: boolean; maior: number }> {
+  let viu = false
+  let maior = 0
+  for (let t = 0; t < ms; t += 70) {
+    await clock.advance(70)
+    const s = await svg()
+    maior = Math.max(maior, s.length)
+    viu = viu || s.includes(texto)
+  }
+  return { viu, maior }
+}
+
+test('chefão de lista: vida em blocos; o golpe comum tira pouco e nunca passa da metade do bloco', () => {
+  const c = novoChefao(0, 'lista', 0, { total: 5, feitas: 0 })
+  expect([c.bloco, c.vida, c.vidaMax]).toEqual([PONTOS_POR_TAREFA, 50, 50])
+  expect(vidaEmTarefas(c)).toEqual({ resta: 5, total: 5 })
+  // golpes seguidos: 1 ou 2 por vez, até a metade do bloco; depois o escudo segura tudo (0)
+  let x = c
+  const tirados: number[] = []
+  for (let k = 0; k < 8; k++) {
+    const t = defesa(x, k)
+    tirados.push(t)
+    x = ferir(x, x.vida - t, 0)
+  }
+  expect(tirados.every(t => t >= 0 && t <= 2)).toBe(true)
+  expect(x.vida).toBe(45)
+  expect(defesa(x, 3)).toBe(0)
+  expect(vidaEmTarefas(x).resta).toBe(5)
+  // os golpes sozinhos nunca derrubam: no último bloco também sobra vida
+  let u = novoChefao(0, 'lista', 0, { total: 1, feitas: 0 })
+  for (let k = 0; k < 20; k++) {
+    u = ferir(u, u.vida - defesa(u, k), 0)
+  }
+  expect(u.vida).toBeGreaterThan(0)
+  expect(u.caiu).toBeUndefined()
+})
+
+test('tarefa concluída desce até o fim do bloco; tarefa nova dá um bloco; crítico maior quando sobra mais vida', () => {
+  const c = ferir(novoChefao(0, 'lista', 0, { total: 3, feitas: 0 }), 27, 0)
+  // concluiu uma: desce até 2 blocos (20), com o rastro a partir de 27
+  const d = ferir(c, 20, 100, 400)
+  expect([d.vida, d.golpe?.antes, d.golpe?.at]).toEqual([20, 27, 400])
+  // a lista ganhou uma tarefa pendente: +1 bloco, sem golpe
+  const e = crescer({ ...d, tarefas: { total: 3, feitas: 1 } }, { total: 4, feitas: 1 })
+  expect([e.vida, e.vidaMax, vidaEmTarefas(e).resta]).toEqual([30, 40, 3])
+  // o crítico cresce com a vida que sobrou (terminar cedo dá um número enorme)
+  expect(critico(50, 4)).toBeGreaterThan(critico(10, 4))
+  expect(critico(10, 4)).toBeGreaterThan(critico(1, 4))
+})
+
+test('no chefão de lista a ferramenta bate no escudo e a vida não cai de bloco; o fechamento é um golpe crítico', async ($, on) => {
+  const { clock, ui, svg, alt } = await comecar($, on, [[PLANO, 50], [FECHO, 50], ['Read', 50]], { xp: 0, paginas: 0, lutas: 0 })
+  await usar($, clock, { tool: PLANO, items: itens(0, 2) })
+  await clock.advance(6000)
+  expect(await alt()).toContain('2/2')
+  // golpe comum: o escudo aparece e a vida continua no mesmo bloco
+  const p = chamar($, { tool: 'Read', file_path: '/a' })
+  await clock.advance(60)
+  await p
+  const escudo = await apareceu(clock, svg, 'id="escudo"', 4000)
+  expect(escudo.viu).toBe(true)
+  expect(escudo.maior).toBeLessThan(131072)
+  // o escudo defendeu: a Lua não comemora; fica em dúvida com o "?" azul
+  let viuDuvida = false
+  let viuPergunta = false
+  let viuPulo = false
+  let viuGota = false
+  for (let t = 0; t < 4000; t += 70) {
+    await clock.advance(70)
+    const s = await svg()
+    viuDuvida = viuDuvida || s.includes('id="lua_duvida"')
+    viuPergunta = viuPergunta || s.includes('id="interrogacao"')
+    viuGota = viuGota || s.includes('id="gota"')
+    viuPulo = viuPulo || s.includes('id="lua_vitoria"')
+  }
+  expect(viuDuvida).toBe(true)
+  expect(viuPergunta).toBe(true)
+  expect(viuGota).toBe(true)
+  expect(viuPulo).toBe(false)
+  expect(await alt()).toContain('2/2')
+  // tarefa concluída: um bloco a menos
+  await usar($, clock, { tool: PLANO, advance: true })
+  expect(await alt()).toContain('1/2')
+  await clock.advance(6000)
+  // o fechamento derruba com um crítico (número dourado e a cena tremendo)
+  await usar($, clock, { tool: FECHO, recap: 'pronto' })
+  const crit = await apareceu(clock, svg, 'CRÍTICO!', 3200)
+  expect(crit.viu).toBe(true)
+  expect(crit.maior).toBeLessThan(131072)
+  expect(await svg()).toContain('PÁGINA 1/10')
+  await ui.unmount()
+})
+
+test('o chefão das 12 lutas continua igual (3 de vida, sem escudo) e o último golpe também é crítico', async ($, on) => {
+  const { clock, ui, svg, alt } = await comecar($, on, [['Read', 100]], { xp: 0, paginas: 0, lutas: 0 })
+  await $.command.run({ command: 'cronicas', args: 'chefao', origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } })
+  await clock.advance(3000)
+  expect(await alt()).toContain('3/3')
+  let viuEscudo = false
+  let viuCritico = false
+  let viuDuvida = false
+  for (const f of ['/a', '/b', '/c']) {
+    const p = chamar($, { tool: 'Read', file_path: f })
+    await clock.advance(100)
+    await p
+    for (let t = 0; t < 8000; t += 70) {
+      await clock.advance(70)
+      const s = await svg()
+      viuEscudo = viuEscudo || s.includes('id="escudo"')
+      viuCritico = viuCritico || s.includes('CRÍTICO!')
+      viuDuvida = viuDuvida || s.includes('id="lua_duvida"')
+    }
+  }
+  expect(viuEscudo).toBe(false)
+  expect(viuDuvida).toBe(false)
+  expect(viuCritico).toBe(true)
+  await ui.unmount()
 })

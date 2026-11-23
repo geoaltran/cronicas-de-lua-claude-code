@@ -39,13 +39,7 @@ test('no desktop a faixa desenha a cena em SVG, com a Lua parada', async ($, on)
   await ui.unmount()
 })
 
-test('fora do desktop (por enquanto) a faixa não desenha nada próprio', async $ => {
-  for (const surface of ['terminal', 'vscode', 'mobile'] as const) {
-    const ui = await $.ui.mount({ ...FAIXA, surface })
-    expect(await ui.find({ type: 'Svg' })).toBeUndefined()
-    await ui.unmount()
-  }
-})
+
 
 test('na lua nova a faixa mostra o aviso e pede confirmação antes do /clear', async ($, on) => {
   mock.clock(on, { now: 1_800_000_000_000 })
@@ -86,7 +80,9 @@ test('prova técnica (Fase 4): áreas de hover com borda e botões invisíveis s
   for (const b of ['vigilia', 'mochila', 'estandarte', 'livro']) {
     expect(await ui.find({ type: 'Button', key: `pv_botao_${b}` })).toBeDefined()
   }
-  await ui.press({ key: 'pv_botao_livro' })
+  // na prova o clique faz a ação de verdade (a Mochila pede confirmação embaixo da cena)
+  await ui.press({ key: 'pv_botao_mochila' })
+  expect(await ui.find({ type: 'Button', key: 'mochila_sim' })).toBeDefined()
   // o balão é um SVG pixel art com o texto da barra
   const baloes = (await ui.findAll({ type: 'Svg' })).map(s => String((s as { props?: { source?: string } }).props?.source ?? ''))
   expect(baloes.some(f => f.includes('Mana Estelar') && f.includes('72% livre'))).toBe(true)

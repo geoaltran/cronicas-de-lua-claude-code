@@ -34,6 +34,9 @@ FOLHAS = {
     "vitoria": {"n": 2, "altura_origem": 1000},
     "canalizar": {"n": 2, "altura_origem": 1051},
     "parada": {"n": 2, "altura_origem": 1039},
+    # reação quando o escudo do chefão segura o golpe (8ª sessão; escolher uma)
+    "triste": {"n": 2, "altura_origem": 1255},
+    "duvida": {"n": 2, "altura_origem": 1258},
 }
 
 

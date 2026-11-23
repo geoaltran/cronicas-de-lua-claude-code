@@ -1,6 +1,12 @@
 {
   "name": "cronicas-de-lua",
   "version": "0.1.0",
-  "description": "As Crônicas de Lua: RPG em pixel art acima da caixa de mensagem que mostra, como jogo, o que o Claude está fazendo e o estado da sessão.",
-  "types": "./types/index.d.ts"
+  "description": "🌙 A pixel-art RPG mod for Claude Code. Every tool call is a monster, your context window is a backpack, your rate limit is mana, and Lua, a tiny moon mage, fights them all while Claude works.",
+  "types": "./types/index.d.ts",
+  "license": "MIT AND CC-BY-NC-4.0",
+  "author": {
+    "name": "George Altran",
+    "url": "https://github.com/geoaltran"
+  },
+  "homepage": "https://github.com/geoaltran/cronicas-de-lua-claude-code"
 }

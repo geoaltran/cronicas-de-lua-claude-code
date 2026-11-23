@@ -16,7 +16,7 @@ Os comandos servem pra três coisas: **ver como está a jornada**, **ajustar a f
 |---|---|
 | `/cronicas escala 1` · `2` · `3` | Tamanho do pixel da cena: 1x, 2x ou 3x. |
 | `/cronicas regua` | Liga uma régua embaixo da cena pra medir a largura da faixa. Digite de novo pra desligar. |
-| `/cronicas largura <px>` | Calibra a largura com o número que a régua mostrou inteiro na borda direita (ex.: `/cronicas largura 752`). A cena passa a acompanhar a largura da faixa e a régua desliga sozinha. |
+| `/cronicas largura <px> [vscode\|celular\|desktop]` | Calibra a largura com o número que a régua mostrou inteiro na borda direita (ex.: `/cronicas largura 752`). A cena passa a acompanhar a largura da faixa e a régua desliga sozinha. **Cada lugar tem a sua calibração** (app, VS Code, celular); sem o nome no fim, vale o lugar onde a faixa apareceu por último. |
 | `/cronicas coluna <px>` | Ajuste fino: quantos pixels mede cada coluna de texto da faixa (de 4 a 20; o padrão é 8,9). Normalmente não precisa: use a régua e a largura. |
 | `/cronicas imagem` | Modo **imagem** (o padrão): mostra toda a arte e as animações, e os balões de explicação aparecem ao passar o mouse nas barras e no selo de nível. |
 | `/cronicas quadro` | Modo **quadro** (antigo): balões feitos dentro do desenho, mas no app esse modo não mostra as imagens. Só para testes. |
@@ -36,8 +36,10 @@ Estes comandos fazem acontecer na hora o que normalmente depende do trabalho do 
 |---|---|
 | `/cronicas chefao` | Chama o **próximo chefão da jornada**, com 3 de vida. |
 | `/cronicas chefao <nome>` | Chama **um chefão específico**, com 3 de vida. Aceita o nome com ou sem acento, ou só o começo: `vespera`, `dama`, `golem`, `leviata`, `ignis`, `relojoeiro`, `sir solis`, `rei espelho`, `nebula`, `malakor`. |
-| `/cronicas golpe` | Tira 1 de vida do chefão em cena. No último golpe ele cai: se desfaz em pixels, sobe "+PÁGINA x/10" e a Lua ganha um nível. |
+| `/cronicas chefao lista` | Chama um **chefão de lista de tarefas** (de mentira), com 3 tarefas: a vida vem em blocos, um por tarefa. Enquanto ele está em cena, cada ferramenta que o Claude usa bate no **escudo** e tira só um pouquinho (número pequeno cinza; às vezes 0). Também aceita o número de tarefas e o nome: `/cronicas chefao lista 5 relojoeiro`. |
+| `/cronicas golpe` | Num chefão comum, tira 1 de vida. Num chefão de lista, **conclui uma tarefa**: a vida desce até o fim do bloco. O golpe que derruba é **CRÍTICO** (número grande dourado, a cena treme); ele se desfaz em pixels, sobe "+PÁGINA x/10" e a Lua ganha um nível. |
 | `/cronicas elite` | A **próxima luta comum** vira o elite (Golem de Obsidiana). Quando ele cai, o troféu aparece grande no lugar dele por uns segundos. Cada vez que você roda, vem um troféu diferente: 🔥 taça (comando), ⚙️ engrenagem (edição), 🌙 lua (leitura), 🪐 orbe (web). Depois de rodar, peça ao Claude qualquer coisa que use uma ferramenta (ler um arquivo, por exemplo). |
+| `/cronicas vigilia` | Deixa o **luar a 10 s** da hora em que a Vigília age, pra ver ela funcionando sem esperar quase uma hora. Com a lanterna acesa, a Lua manda a mensagem curtinha 10 s depois (a lanterna pisca e toca o som). ⚠️ Essa mensagem é de verdade: o Claude responde e gasta um pouquinho do limite. Também funciona como `/cronicas vigília`. |
 | `/cronicas lua-nova` | Simula a **lua nova** (cache da conversa frio): a Lua desmaia e aparece o aviso de que a próxima mensagem sai mais cara. Volta ao normal na próxima resposta do Claude. |
 
 > 💡 Só um chefão fica em cena por vez. Se já houver um, `/cronicas chefao` avisa e não chama outro: derrote o atual com `/cronicas golpe`.
@@ -46,13 +48,32 @@ Estes comandos fazem acontecer na hora o que normalmente depende do trabalho do 
 
 | Comando | O que faz |
 |---|---|
-| `/cronicas prova` | Liga a **prova técnica da Fase 4** (balões e botões no app). As áreas de mouse ganham borda (sobre as 4 barras e o selo de nível: a borda acende e surge o balão em pixel art), e os 4 ícones de botão aparecem na cena, cada um com uma área clicável marcada com "•" por cima, num bloco contínuo (o clique mostra um aviso; o mouse em cima mostra o balão do botão). Digite de novo para desligar. |
+| `/cronicas prova` | Liga a **prova técnica da Fase 4** (balões e botões no app). As áreas de mouse ganham borda (sobre as 4 barras e o selo de nível: a borda acende e surge o balão em pixel art), e a área clicável de cada um dos 4 botões aparece marcada com "•", num bloco contínuo (o clique faz a ação de verdade do botão; o mouse em cima mostra o balão). Serve pra ver onde as áreas caem. Digite de novo para desligar. |
 
-## 🔘 Botão abaixo da cena
+## 🔘 Os 4 botões do HUD (à direita das barras)
+
+Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o que ele faz.
 
 | Botão | O que faz |
 |---|---|
-| 🌙 **Nova conversa** | Aparece na lua nova. Pede confirmação e limpa a conversa (`/clear`), pra começar com o cache novo. |
+| 🏮 **Vigília** (🔥 acesa) | Começa **apagada**. Clicando, acende (a chama tremula, toca um som e aparece o aviso do custo). Acesa, quando o luar está pra acabar (5 min antes no cache de 1 h; 1 min antes no de 5 min) e o Claude está parado, a Lua manda uma mensagem curtinha pra manter o cache quente; a lanterna pisca e toca o som. **No máximo 6 mensagens** por vez que é acesa; depois ela apaga sozinha e avisa (com outro som). Clique de novo pra apagar. ⚠️ Cada mensagem gasta um pouco do limite do plano. Vale só pra conversa atual. |
+| 🎒 **Mochila** | Arruma a conversa (compacta o contexto, como o `/compact`). Pede confirmação embaixo da cena: **Arrumar a mochila** ou **Agora não**. Fica cheia (ícone e barra tremendo) acima de 80%. Só funciona com o Claude parado. |
+| 🚩 **Estandarte** | Pede ao Claude o **resumo da missão** pra continuar numa sessão nova (o `PROXIMA_SESSAO.md`). A bandeira ondula enquanto ele escreve; no fim, aparece **🌙 Nova conversa** (ou **Fechar**). Só funciona com o Claude parado. |
+| 📖 **Livro** | Abre e fecha o painel do Livro, ao lado da conversa, com 4 abas: **Ficha** (a Lua, nível, XP, lutas, chefões, troféus e as páginas das Crônicas), **Bestiário** (os 10 chefões; os que ainda não caíram ficam em silhueta), **Troféus** (a estante com os troféus dos elites; passe o mouse para ler o nome do erro) e **Grimório** (as ferramentas do Claude como feitiços, com quantas vezes cada uma foi usada). |
+
+## 🔘 Botões abaixo da cena
+
+| Botão | O que faz |
+|---|---|
+| 🌙 **Nova conversa** | Aparece na lua nova e depois do resumo do Estandarte. Pede confirmação e limpa a conversa (`/clear`), pra começar com o cache novo. |
+| **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
+
+## 🗓️ Em breve (planejado, ainda não funciona)
+
+| Comando | O que vai fazer |
+|---|---|
+| `/cronicas language` | Mostra a lista de idiomas do jogo, com o atual marcado, e explica como trocar. Também funciona como `/cronicas idioma` ou `/cronicas lang`. |
+| `/cronicas language <código>` | Troca o idioma de todo o jogo e guarda a escolha. Idiomas previstos: `pt-BR` (português), `en` (inglês), `es` (espanhol), `fr` (francês), `de` (alemão), `zh` (mandarim), `ja` (japonês), `ko` (coreano). |
 
 ---
-*Última atualização: 22/11/2026 (Fase 4 em andamento: `/cronicas prova` e `/cronicas linha`).*
+*Última atualização: 22/11/2026 (Fase 5: a faixa no VS Code e no celular, com botões numa linha embaixo da cena; `/cronicas largura` calibra cada lugar separado).*

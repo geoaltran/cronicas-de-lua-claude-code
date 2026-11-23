@@ -39,5 +39,18 @@
    7
   ],
   "passo": 4
+ },
+ "escudo": {
+  "arquivo": "escudo_3f.png",
+  "quadro": [
+   35,
+   38
+  ],
+  "quadros": 3,
+  "ms_por_quadro": [
+   90,
+   120,
+   120
+  ]
  }
 }

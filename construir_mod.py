@@ -94,9 +94,15 @@ def cenario():
     return meta
 
 
+# poses guardadas em assets/ mas fora do jogo (alternativa não escolhida)
+POSES_FORA = {"triste"}
+
+
 def lua():
     poses = json.loads((A / "lua" / "poses" / "poses.json").read_text())
     for nome, q in poses["quadros"].items():
+        if nome in POSES_FORA:
+            continue
         guarda(f"lua_{nome}", abre(A / "lua" / "poses" / q["arquivo"]), n=q["n"])
     return poses
 
@@ -105,7 +111,15 @@ def efeitos():
     fx = json.loads((A / "efeitos" / "efeitos.json").read_text())
     for nome in ("projetil", "impacto", "canalizar"):
         guarda(nome, abre(A / "efeitos" / fx[nome]["arquivo"]), n=fx[nome]["quadros"], ms=fx[nome]["ms_por_quadro"])
+    # assinatura do autor (assinatura.py): na cena, na Ficha do Livro e nos GIFs
+    guarda("assinatura", abre(A / "ui" / "assinatura.png"))
     guarda("exclamacao", abre(A / "efeitos" / "exclamacao.png"))
+    # "?" azul: a Lua em dúvida quando o escudo do chefão defende
+    guarda("interrogacao", abre(A / "efeitos" / "interrogacao.png"))
+    # gota de suor estilo mangá, ao lado do olho, junto com o "?"
+    guarda("gota", abre(A / "efeitos" / "gota.png"))
+    # escudo do chefão (golpe comum defendido): aparece, bloqueia, some
+    guarda("escudo", abre(A / "efeitos" / fx["escudo"]["arquivo"]), n=fx["escudo"]["quadros"], ms=fx["escudo"]["ms_por_quadro"])
     for cor in ("dano", "xp"):
         for c in list("0123456789") + ["mais", "menos", "X", "P"]:
             guarda(f"{cor}_{c}", abre(A / "efeitos" / "digitos" / f"{cor}_{c}.png"))
@@ -131,9 +145,12 @@ def ui():
     for f in sorted(bt.glob("*.png")):
         guarda("bt_" + f.stem, abre(f))
     # troféus do elite (trofeus.py), no tamanho nativo: aparecem quando ele cai.
-    # Os de 24 px e a estante só entram com o painel do Livro.
     for f in sorted((u / "trofeus").glob("trofeu_*_grande.png")):
         guarda(f.stem, abre(f))
+    # o Livro (Fase 4): a estante e os ícones pequenos dos troféus (aprovados)
+    guarda("estante", abre(u / "trofeus" / "estante.png"))
+    for tipo in ("comando", "edicao", "leitura", "web"):
+        guarda(f"trofeu_{tipo}", abre(u / "trofeus" / f"trofeu_{tipo}.png"))
 
 
 def monstros():
@@ -206,10 +223,12 @@ def main():
         "barra": json.loads((A / "ui" / "barra.json").read_text()),
         "nivel": json.loads((A / "ui" / "nivel" / "nivel.json").read_text()),
         "teia": json.loads((A / "chefoes" / "vespera" / "teia" / "teia.json").read_text()),
+        "trofeus": json.loads((A / "ui" / "trofeus" / "trofeus.json").read_text()),
     }
     ui()
     linhas = [
         "// Gerado por construir_mod.py a partir de assets/ (arte aprovada). Não edite à mão.",
+        "// Arte e personagens: (c) 2026 George Altran (@geoaltran), CC BY-NC 4.0, sem uso comercial sem autorização (LICENSE-ART).",
         "// Fonte: Silkscreen, (c) 2001 The Silkscreen Project Authors, SIL Open Font License 1.1 (fontes/OFL.txt).",
         "// Fonte dos textos longos: Pixelify Sans, (c) 2021 The Pixelify Sans Project Authors, SIL Open Font License 1.1 (fontes/OFL-PixelifySans.txt).",
         "export type Arte = { u: string; w: number; h: number; [k: string]: unknown }",

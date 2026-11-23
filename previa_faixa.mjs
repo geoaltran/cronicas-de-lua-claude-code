@@ -48,7 +48,7 @@ Object.assign(casos, {
   'LUTA · ferramenta ainda rodando, Lua canalizando': { agora: t0 + 3200, luta: { n: 3, papel: 'integracao', monstro: 'rei_espelho', t0, ativas: 1, golpes: [] }, caminho: { ...andandoAte, ate: t0 + 700 } },
 })
 // chefões (Fase 3): na mesma faixa, barra de vida no alto, cena tingida
-const chefe = (nome, pagina, extra = {}) => ({ nome, pagina, origem: 'lista', t0: agora, vidaMax: 3, vida: 3, tarefas: { total: 3, feitas: 0 }, ...extra })
+const chefe = (nome, pagina, extra = {}) => ({ nome, pagina, origem: 'lista', t0: agora, bloco: 1, vidaMax: 3, vida: 3, tarefas: { total: 3, feitas: 0 }, ...extra })
 Object.assign(casos, {
   'CHEFÃO · lista de tarefas criada: o Golem entra (vida 3/3)': { W: 760, caminho: parada, hud, chefao: chefe('golem_obsidiana', 3) },
   'CHEFÃO · tarefa concluída: Leviatã perde vida (rastro escuro na barra)': { W: 760, caminho: parada, hud, chefao: chefe('leviata', 4, { t0: agora - 5000, vidaMax: 4, vida: 2, golpe: { at: agora + 600, antes: 3 } }) },
@@ -62,8 +62,19 @@ Object.assign(casos, {
   'TEIA · Vespera chefão, teias girando (vida 2/3)': { W: 760, caminho: parada, hud, chefao: chefe('vespera', 1, { t0: agora - 5000, vida: 2 }) },
   'TEIA · Vespera na luta comum, vitória (teia some junto nos pixels)': { luta: luta('ler', 'vespera', [{ at: t0 + 300, ok: true, dano: 17 }]) },
 })
+// chefão híbrido (7ª sessão): vida em blocos de 10 por tarefa, escudo no golpe comum, crítico no final
+const acerto = t0 + 1260 + 1120 // primeiro ataque + impacto
+const hib = (nome, pagina, tarefas, extra = {}) => chefe(nome, pagina, { t0: agora - 9000, bloco: 10, vidaMax: tarefas * 10, vida: tarefas * 10, tarefas: { total: tarefas, feitas: 0 }, ...extra })
+Object.assign(casos, {
+  'HÍBRIDO · golpe comum: o escudo segura e tira só 2 (Relojoeiro, 5 tarefas)': { chefao: hib('relojoeiro', 6, 5, { vida: 48, golpe: { at: acerto, antes: 50 } }), luta: luta('editar', 'relojoeiro', [{ at: t0 + 300, ok: true, dano: 14, escudo: 2 }], { fixo: true }) },
+  'HÍBRIDO · o escudo segura tudo: 0 (Ignis, metade do bloco já foi)': { chefao: hib('ignis', 5, 3, { vida: 25 }), luta: luta('terminal', 'ignis', [{ at: t0 + 300, ok: true, dano: 7, escudo: 0 }], { fixo: true }) },
+  'HÍBRIDO · tarefa concluída: a vida desce até o fim do bloco (Leviatã)': { chefao: hib('leviata', 4, 4, { vida: 30, golpe: { at: acerto, antes: 35 }, tarefas: { total: 4, feitas: 1 } }), luta: luta('integracao', 'leviata', [{ at: t0 + 300, ok: true, dano: 9, tarefa: 5 }], { fixo: true }) },
+  'HÍBRIDO · golpe final CRÍTICO (Vespera, última tarefa)': { chefao: hib('vespera', 1, 3, { vida: 0, golpe: { at: acerto, antes: 5 }, caiu: t0 + 300 + 1260 + 1500, tarefas: { total: 3, feitas: 3 } }), luta: luta('integracao', 'vespera', [{ at: t0 + 300, ok: true, dano: 9, critico: 54 }], { fixo: true, final: true }) },
+  'HÍBRIDO · CRÍTICO enorme: a lista acabou cedo (Nébula, 5 tarefas de uma vez)': { chefao: hib('nebula', 9, 5, { vida: 0, golpe: { at: acerto, antes: 50 }, caiu: t0 + 300 + 1260 + 1500, tarefas: { total: 5, feitas: 5 } }), luta: luta('integracao', 'nebula', [{ at: t0 + 300, ok: true, dano: 9, critico: 459 }], { fixo: true, final: true }) },
+  'HÍBRIDO · chefão das 12 lutas: último golpe também é crítico (Golem)': { chefao: chefe('golem_obsidiana', 3, { origem: 'lutas', t0: agora - 9000, vida: 0, golpe: { at: acerto, antes: 1 }, caiu: t0 + 300 + 1260 + 1500 }), luta: luta('editar', 'golem_obsidiana', [{ at: t0 + 300, ok: true, dano: 13 }], { fixo: true, final: true }) },
+})
 if (process.argv.includes('--novos')) {
-  for (const k of Object.keys(casos)) if (!/^(ELITE|TEIA)/.test(k)) delete casos[k]
+  for (const k of Object.keys(casos)) if (!/^HÍBRIDO/.test(k)) delete casos[k]
 }
 // tom da cena: os 10 chefões, antes (tudo de leve) e depois (só o fundo, mais forte)
 const JORNADA = [['vespera', 'Vespera'], ['dama_penumbra', 'Dama Penumbra'], ['golem_obsidiana', 'Golem'], ['leviata', 'Leviatã'], ['ignis', 'Ignis'], ['relojoeiro', 'Relojoeiro'], ['sir_solis', 'Sir Solis'], ['rei_espelho', 'Rei Espelho'], ['nebula', 'Nébula'], ['malakor', 'Malakor']]
@@ -81,7 +92,11 @@ for (const v of Object.values(casos)) {
     v.caminho ??= andandoAte
     v.hud ??= hud
     v.W ??= 760
-    v.botoes ??= false // no app os botões só chegam na Fase 4
+    // no app os botões aparecem sempre (Fase 4): o pior caso tem a lanterna e a bandeira animadas
+    v.botoes ??= true
+    v.estadoBotoes ??= { vigilia: true, envios: 2, maxEnvios: 6, pisca: agora - 200, mochila: false, estandarte: 'escrevendo', livro: true }
+    v.celula ??= 8.8
+    v.semBaloes ??= true
     v.modo = 'compacto' // a faixa tem sempre a mesma altura
   }
 }

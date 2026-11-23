@@ -29,5 +29,21 @@ __pycache__/
 .DS_Store
 *.icloud
 
-# Configuração local do Claude Code
-.claude/settings.local.json
+# ============================================================
+# SEGURANÇA: nada com caminhos do computador, ids de sessão ou segredos
+# ============================================================
+# Configuração local do Claude Code (launch.json tem caminhos e ids de sessão)
+.claude/
+# tipos que o Claude Code gera ao carregar o mod
+**/.claude-plugin/types/
+# editores e ambientes locais
+.vscode/
+.idea/
+node_modules/
+# segredos e logs
+.env
+.env.*
+*.pem
+*.key
+*.log
+

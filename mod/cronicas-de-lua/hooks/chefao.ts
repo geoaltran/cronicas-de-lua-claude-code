@@ -3,7 +3,11 @@
 //
 // A faixa não cresce: o chefão luta na mesma cena das lutas comuns, no mesmo
 // lugar do monstro. Enquanto ele está em cena, cada ferramenta do Claude vira
-// um golpe nele (luta `fixo`), mas a vida só cai com tarefa concluída.
+// um golpe nele (luta `fixo`). Chefão híbrido (7ª sessão): com lista de
+// tarefas, a vida é em blocos (PONTOS_POR_TAREFA por tarefa); o golpe comum
+// bate no escudo e tira 1 ou 2 pontos, sem passar da metade do bloco da
+// tarefa atual; a tarefa concluída desce a vida até o fim do bloco; o golpe
+// final é crítico (número grande dourado, cena tremendo).
 import { type Doc, esc, r } from './base'
 import type { Chefao } from '../types'
 import { DESFAZ, F, corpoMonstro, desfazer, monstroInfo } from './luta'
@@ -42,6 +46,32 @@ const TOM: Record<string, string> = {
 export const A_CADA = 12
 /** Vida do chefão que veio pelas lutas (sem lista): cada vitória tira 1. */
 export const VIDA_SEM_LISTA = 3
+/** Vida do chefão de lista por tarefa que falta. */
+export const PONTOS_POR_TAREFA = 10
+/** Quanto de cada bloco os golpes comuns podem tirar (o resto só cai com a tarefa concluída). */
+export const MORDIDA = 0.5
+
+/** Quanto falta para ele cair, contado em tarefas (lista) ou em golpes (sem lista). */
+export function vidaEmTarefas(c: Chefao): { resta: number; total: number } {
+  const b = Math.max(1, c.bloco)
+  return { resta: Math.ceil(c.vida / b), total: Math.ceil(c.vidaMax / b) }
+}
+
+/**
+ * Quanto um golpe comum tira de um chefão de lista (ele defende com o escudo):
+ * 1 ou 2 pontos, sem passar da mordida do bloco da tarefa atual (pode ser 0).
+ */
+export function defesa(c: Chefao, dano: number): number {
+  const b = Math.max(1, c.bloco)
+  const piso = (vidaEmTarefas(c).resta - 1) * b + Math.ceil(b * (1 - MORDIDA))
+  return Math.max(0, Math.min(1 + (dano % 2), c.vida - piso))
+}
+
+/** O número do golpe crítico: quanto mais vida ele tinha, maior (terminar cedo dá um número enorme). */
+export function critico(antes: number, dano: number): number {
+  return Math.max(1, antes) * 9 + (dano % 9)
+}
+
 /** Quanto a queda fica na tela (desfaz em pixels + página recuperada). */
 export const QUEDA_MS = 3600
 
@@ -121,18 +151,32 @@ export function lerTarefas(tool: string, input: unknown, atual: Tarefas | null):
 export function novoChefao(paginas: number, origem: Chefao['origem'], t0: number, tarefas: Tarefas = { total: 0, feitas: 0 }, escolhido?: string): Chefao {
   const i = escolhido === undefined ? -1 : (JORNADA as readonly string[]).indexOf(escolhido)
   const { nome, pagina } = i >= 0 ? { nome: escolhido as string, pagina: i + 1 } : proximoChefao(paginas)
-  const vidaMax = origem === 'lista' ? Math.max(1, tarefas.total) : VIDA_SEM_LISTA
-  const vida = origem === 'lista' ? Math.max(1, tarefas.total - tarefas.feitas) : VIDA_SEM_LISTA
-  return { nome, pagina, origem, t0, vidaMax, vida, tarefas }
+  const bloco = origem === 'lista' ? PONTOS_POR_TAREFA : 1
+  const vidaMax = origem === 'lista' ? Math.max(1, tarefas.total) * bloco : VIDA_SEM_LISTA
+  const vida = origem === 'lista' ? Math.max(1, tarefas.total - tarefas.feitas) * bloco : VIDA_SEM_LISTA
+  return { nome, pagina, origem, t0, bloco, vidaMax, vida, tarefas }
 }
 
-/** Tira vida (ou acerta pela lista). Na vida 0 ele cai. */
-export function ferir(c: Chefao, vida: number, agora: number): Chefao {
+/** Tira vida (ou acerta pela lista). Na vida 0 ele cai. `at`: quando o golpe acerta (a barra desce nesse instante). */
+export function ferir(c: Chefao, vida: number, agora: number, at = agora): Chefao {
   const v = Math.max(0, Math.min(c.vidaMax, vida))
   if (v >= c.vida || c.caiu !== undefined) {
     return c
   }
-  return { ...c, vida: v, golpe: { at: agora, antes: c.vida }, ...(v === 0 ? { caiu: agora } : {}) }
+  return { ...c, vida: v, golpe: { at, antes: c.vida }, ...(v === 0 ? { caiu: agora } : {}) }
+}
+
+/**
+ * A lista mudou: o chefão ganha um bloco de vida por tarefa nova pendente (sem
+ * golpe) e guarda a lista. A queda pelas tarefas concluídas vem depois, em `ferir`.
+ */
+export function crescer(c: Chefao, t: Chefao['tarefas']): Chefao {
+  const b = Math.max(1, c.bloco)
+  const antes = c.tarefas.total - c.tarefas.feitas
+  const agora = t.total - t.feitas
+  const vidaMax = Math.max(c.vidaMax, t.total * b)
+  const vida = agora > antes ? Math.min(vidaMax, c.vida + (agora - antes) * b) : c.vida
+  return { ...c, tarefas: t, vidaMax, vida }
 }
 
 // ---------------------------------------------------------------- desenho
@@ -213,18 +257,31 @@ export function barraDeVida(d: Doc, c: Chefao, x: number, y: number, w: number, 
   const iw = w - 10
   const larg = (v: number) => r((iw * Math.max(0, v)) / Math.max(1, c.vidaMax))
   const fw = larg(c.vida)
+  const cheio = (w: number) => ret(ix, y + 2, w, 2, R1) + ret(ix, y + 4, w, 2, R2)
   let s =
     // 8 px: contorno, ouro, vermelho (2 claros + 2 escuros), ouro, contorno
     ret(x + 2, y, w - 4, 8, O) +
     ret(x + 2, y + 1, w - 4, 1, G1) +
     ret(x + 2, y + 6, w - 4, 1, G2) +
-    ret(ix, y + 2, iw, 4, VAZIO) +
-    ret(ix, y + 2, fw, 2, R1) +
-    ret(ix, y + 4, fw, 2, R2)
+    ret(ix, y + 2, iw, 4, VAZIO)
+  const g = c.golpe
+  if (g !== undefined && g.at > agora) {
+    // o golpe ainda vai acertar (a estrela está voando): a barra desce no impacto
+    s += d.janela(-Infinity, g.at, agora, cheio(larg(g.antes))) + d.janela(g.at, Infinity, agora, cheio(fw))
+  } else {
+    s += cheio(fw)
+  }
   // rastro do golpe: o pedaço que acabou de sair fica escuro por um instante
-  if (c.golpe !== undefined && c.golpe.at + 1200 > agora) {
-    const aw = larg(c.golpe.antes) - fw
-    s += d.janela(c.golpe.at, c.golpe.at + 1200, agora, ret(ix + fw, y + 2, aw, 2, D1) + ret(ix + fw, y + 4, aw, 2, D2))
+  if (g !== undefined && g.at + 1200 > agora) {
+    const aw = larg(g.antes) - fw
+    s += d.janela(g.at, g.at + 1200, agora, ret(ix + fw, y + 2, aw, 2, D1) + ret(ix + fw, y + 4, aw, 2, D2))
+  }
+  // chefão de lista: um risco no fim de cada bloco (uma tarefa por bloco)
+  const blocos = Math.round(c.vidaMax / Math.max(1, c.bloco))
+  if (c.bloco > 1 && blocos > 1 && iw / blocos >= 4) {
+    for (let k = 1; k < blocos; k++) {
+      s += ret(ix + larg(k * c.bloco), y + 2, 1, 4, O)
+    }
   }
   s += ponta(x - 1, y) + ponta(x + w - 5, y)
   const nome = (NOME_CHEFAO[c.nome] ?? c.nome).toUpperCase()

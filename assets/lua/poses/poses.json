@@ -136,6 +136,34 @@
     "piscando"
    ],
    "uso": "alterna normal/respirando a cada ~600 ms; pisca (2 quadros) a cada 3–5 s"
+  },
+  "triste": {
+   "arquivo": "lua_triste_2f.png",
+   "n": 2,
+   "quadros": [
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    }
+   ]
+  },
+  "duvida": {
+   "arquivo": "lua_duvida_2f.png",
+   "n": 2,
+   "quadros": [
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 83,
+     "acima_do_chao": 0
+    }
+   ]
   }
  }
 }

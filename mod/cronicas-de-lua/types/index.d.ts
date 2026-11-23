@@ -4,8 +4,13 @@
  */
 export type Caminho = { andando: boolean; desde: number; dist0: number; ate?: number }
 
-/** O resultado de uma ferramenta numa luta: quando voltou, se deu certo e o dano do golpe. */
-export type Golpe = { at: number; ok: boolean; dano: number }
+/**
+ * O resultado de uma ferramenta numa luta: quando voltou, se deu certo e o dano do golpe.
+ * Num chefão, o que o golpe fez com a vida dele (em pontos): `escudo` (golpe
+ * comum defendido: tirou pouco, às vezes 0), `tarefa` (uma tarefa concluída:
+ * a vida desceu até o fim do bloco) ou `critico` (o golpe final: o número grande).
+ */
+export type Golpe = { at: number; ok: boolean; dano: number; escudo?: number; tarefa?: number; critico?: number }
 
 /**
  * Uma luta comum: um monstro por vez. Ferramentas em paralelo (ou seguidas, com
@@ -46,8 +51,12 @@ export type TipoTrofeu = 'comando' | 'edicao' | 'leitura' | 'web'
 export type Elite = { erros: Record<string, string>; proximo?: string; proximoTipo?: TipoTrofeu }
 
 /**
- * O chefão da vez (Fase 3). Com lista de tarefas, a vida é o que falta da
- * lista; sem lista (a cada 12 lutas), 3 de vida e cada vitória tira 1.
+ * O chefão da vez (Fase 3; vida em blocos desde a 7ª sessão). Com lista de
+ * tarefas, a vida é em pontos: `bloco` pontos por tarefa que falta. Os golpes
+ * comuns batem no escudo e tiram pouco, sem passar da metade do bloco da
+ * tarefa atual; a tarefa concluída desce a vida até o fim do bloco; a última
+ * é o golpe crítico. Sem lista (a cada 12 lutas), `bloco` 1, 3 de vida, e
+ * cada vitória tira 1.
  */
 export type Chefao = {
   /** Personagem (chave em chefoes.json), pela ordem da jornada. */
@@ -57,9 +66,11 @@ export type Chefao = {
   origem: 'lista' | 'lutas'
   /** Quando entrou em cena. */
   t0: number
+  /** Pontos de vida por tarefa (lista: PONTOS_POR_TAREFA; sem lista: 1). */
+  bloco: number
   vidaMax: number
   vida: number
-  /** O último golpe que tirou vida: quando, e quanto havia antes (rastro escuro na barra). */
+  /** O último golpe que tirou vida: quando acerta (pode ser logo adiante: o impacto da estrela), e quanto havia antes (rastro escuro na barra). */
   golpe?: { at: number; antes: number }
   /** Tarefas da lista: total e concluídas (TodoWrite, TaskCreate/Update, plano do app). */
   tarefas: { total: number; feitas: number }
@@ -95,7 +106,12 @@ export type Jogo = {
   trofeus?: string[]
   /** O tipo de cada troféu, na mesma ordem de `trofeus` (os antigos, sem tipo, contam como 'edicao'). */
   trofeusTipos?: TipoTrofeu[]
+  /** Grimório do Livro: quantas vezes cada papel de ferramenta (ler, editar, terminal...) deu certo. */
+  feiticos?: Record<string, number>
 }
+
+/** As abas do Livro da Lua. */
+export type AbaDoLivro = 'ficha' | 'bestiario' | 'trofeus' | 'grimorio'
 
 export type Hud = {
   luz: Luz | null
@@ -103,6 +119,21 @@ export type Hud = {
   /** % do contexto usado. */
   mochila: number | null
   jogo: Jogo
+}
+
+/**
+ * Os 4 botões do HUD (Fase 4). A Vigília vale só para esta sessão e começa
+ * apagada (gasta limite do plano).
+ */
+export type Botoes = {
+  /** Vigília: acesa, quantas mensagens mandou desde que acendeu (no máximo 6) e quando a lanterna piscou. */
+  vigilia: { ligada: boolean; envios: number; pisca?: number }
+  /** Mochila: pedindo confirmação para compactar, ou compactando. */
+  mochila: 'nada' | 'confirma' | 'arrumando'
+  /** Estandarte: o Claude escrevendo o resumo da missão, ou o resumo pronto. */
+  estandarte: 'nada' | 'escrevendo' | 'pronto'
+  /** Livro: o painel está aberto. */
+  livro: boolean
 }
 
 declare module 'claude-code' {
@@ -119,6 +150,9 @@ declare module 'claude-code' {
       tique: number
       /** O botão de conversa nova pediu confirmação. */
       confirma: boolean
+      botoes: Shaped<Botoes>
+      /** A aba aberta no Livro. */
+      livroAba: AbaDoLivro
     }
   }
 }

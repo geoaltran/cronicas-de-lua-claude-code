@@ -29,6 +29,13 @@ export type Vista = {
   hud: Hud
   /** Mostrar os botões (fase 4): ficam no HUD quando cabem, senão no alto da cena. */
   botoes?: boolean
+  /** Como cada botão está (aceso, cheio, desfraldado, aberto); sem isso, todos inativos. */
+  estadoBotoes?: EstadoBotoes
+  /**
+   * Sem os balões dentro do SVG: no modo imagem eles nunca aparecem (o hover é
+   * do app, com balões próprios), e só gastariam o limite de caracteres.
+   */
+  semBaloes?: boolean
   /**
    * Largura de uma célula de texto do app em px de arte: o HUD alinha as barras
    * a essa grade, para as áreas de mouse (posicionadas em células) caírem em
@@ -274,7 +281,7 @@ function lua(d: Doc, v: Vista, desmaiada: boolean, naLuta?: { corpo: string; tri
 
 // ---------------------------------------------------------------- HUD
 
-const CSS_TEXTO =
+export const CSS_TEXTO =
   // Silkscreen: grade de 8 px; 12 px = 1,5 px de tela por pixel da fonte (3 pixels físicos na Retina)
   `@font-face{font-family:'Silkscreen';src:url(${FONTE}) format('woff2')}` +
   ".t{font-family:'Silkscreen',ui-monospace,monospace;font-size:12px;fill:#fff6d8;stroke:#1d1433;stroke-width:2px;paint-order:stroke;text-rendering:optimizeSpeed}" +
@@ -283,7 +290,7 @@ const CSS_TEXTO =
   ".l{font-family:'Pixelify Sans','Silkscreen',ui-monospace,monospace;font-weight:500;font-size:10px}"
 
 /** A Pixelify Sans só entra no desenho quando um texto longo pode aparecer (economiza ~6 mil caracteres). */
-const CSS_FONTE_LONGA = `@font-face{font-family:'Pixelify Sans';src:url(${FONTE_LONGA}) format('woff2');font-weight:500}`
+export const CSS_FONTE_LONGA = `@font-face{font-family:'Pixelify Sans';src:url(${FONTE_LONGA}) format('woff2');font-weight:500}`
 
 function texto(x: number, y: number, s: string, classe = 'm'): string {
   return `<text class="t ${classe}" x="${x}" y="${y}">${esc(s)}</text>`
@@ -377,7 +384,7 @@ function barra(d: Doc, x: number, y: number, larguraBarra: number, b: Barra, ago
 }
 
 /** Selo de nível: a estrela "LV" em cima e a moldura com o número embaixo. */
-function selo(d: Doc, x: number, base: number, nivel: number, escalaEstrela: number): { svg: string; largura: number } {
+export function selo(d: Doc, x: number, base: number, nivel: number, escalaEstrela: number): { svg: string; largura: number } {
   const s = String(Math.max(1, Math.min(9999, nivel)))
   const dig = Math.max(2, s.length) as 2 | 3 | 4
   const m = META.nivel.molduras[`${dig}dig`]
@@ -407,12 +414,64 @@ function selo(d: Doc, x: number, base: number, nivel: number, escalaEstrela: num
   }
 }
 
-const BOTOES = ['vigilia', 'mochila', 'estandarte', 'livro'] as const
-const ROTULO_BOTAO: Record<(typeof BOTOES)[number], [string, string]> = {
-  vigilia: ['Vigília', 'Mantém o cache aceso.\nGasta um pouco do limite.'],
-  mochila: ['Mochila', 'Arruma a conversa\n(compacta o contexto).'],
-  estandarte: ['Estandarte', 'Resumo da missão\npara a próxima sessão.'],
-  livro: ['Livro', 'Ficha, páginas,\nbestiário e troféus.'],
+export const BOTOES = ['vigilia', 'mochila', 'estandarte', 'livro'] as const
+export type NomeBotao = (typeof BOTOES)[number]
+
+/** O estado de cada botão, como a cena o desenha. */
+export type EstadoBotoes = {
+  /** Vigília acesa, quantas mensagens já mandou e o máximo; `pisca`: quando a lanterna piscou. */
+  vigilia: boolean
+  envios: number
+  maxEnvios: number
+  pisca?: number
+  /** Mochila cheia (contexto acima de 80%) ou sendo arrumada. */
+  mochila: boolean
+  estandarte: 'enrolado' | 'escrevendo' | 'pronto'
+  livro: boolean
+}
+
+/** Nome e explicação do balão de cada botão, conforme o estado. Curtos: cabem numa linha. */
+export function rotuloBotao(b: NomeBotao, e?: EstadoBotoes): [string, string] {
+  switch (b) {
+    case 'vigilia':
+      return e?.vigilia === true
+        ? ['Vigília · acesa', `Cache quente: ${e.envios}/${e.maxEnvios} mensagens.\nClique para apagar.`]
+        : ['Vigília', 'Mantém o cache aceso.\nGasta um pouco do limite.']
+    case 'mochila':
+      return e?.mochila === true ? ['Mochila cheia', 'Clique para arrumar\n(compactar a conversa).'] : ['Mochila', 'Arruma a conversa\n(compacta o contexto).']
+    case 'estandarte':
+      return e?.estandarte === 'escrevendo'
+        ? ['Estandarte', 'O Claude está escrevendo\no resumo da missão.']
+        : e?.estandarte === 'pronto'
+          ? ['Estandarte', 'Resumo da missão pronto.']
+          : ['Estandarte', 'Resumo da missão\npara a próxima sessão.']
+    case 'livro':
+      return e?.livro === true ? ['Livro', 'Clique para fechar.'] : ['Livro', 'Ficha, páginas,\nbestiário e troféus.']
+  }
+}
+
+/** Quadros da chama da Vigília e da bandeira do Estandarte (160 ms, como na prévia). */
+const QUADROS_BOTAO: readonly Q[] = [[0, 160], [1, 160], [2, 160]]
+/** Quanto tempo a lanterna pisca depois de acender ou de mandar uma mensagem. */
+export const PISCA_MS = 1600
+
+/** Um ícone de botão: aceso/animado conforme o estado; a lanterna pisca depois de cada envio. */
+function iconeBotao(d: Doc, b: NomeBotao, bx: number, y: number, e: EstadoBotoes | undefined, agora: number): string {
+  const anima = (b === 'vigilia' && e?.vigilia === true) || (b === 'estandarte' && e?.estandarte === 'escrevendo')
+  let corpo: string
+  if (anima) {
+    corpo = `<use href="${d.img('bt_moldura_ativo')}" x="${bx}" y="${y}"/>` + d.tira(`bt_${b}_ativo_3f`, bx + 4, y + 4, 24, 24, QUADROS_BOTAO, agora)
+  } else {
+    const ativo = b === 'mochila' ? e?.mochila === true : b === 'estandarte' ? e?.estandarte === 'pronto' : b === 'livro' ? e?.livro === true : false
+    corpo = `<use href="${d.img(`bt_botao_${b}_${ativo ? 'ativo' : 'inativo'}`)}" x="${bx}" y="${y}"/>`
+  }
+  const desde = b === 'vigilia' && e?.pisca !== undefined ? agora - e.pisca : Infinity
+  if (desde >= 0 && desde < PISCA_MS) {
+    // 4 clarões de 200 ms em 1,6 s, uma vez só (o atraso negativo continua de onde estava)
+    const k = d.anim('0%,25%,50%,75%{filter:brightness(2.2)}12.5%,37.5%,62.5%,87.5%,100%{filter:none}', PISCA_MS, 'step-end', -desde, '1 both')
+    corpo = `<g class="${k}">${corpo}</g>`
+  }
+  return corpo
 }
 const PASSO_BOTAO = 38 // 32 px de botão + 6 de vão, igual entre todos
 export const LARGURA_BOTOES = PASSO_BOTAO * 3 + 32
@@ -504,16 +563,18 @@ function balao(cx: number, ponta: number, acima: boolean, nome: string, desc: st
  * que o botão faz aparecem num balão de fala ao passar o mouse (por cima quando
  * os botões estão no HUD, por baixo quando estão no alto da cena).
  */
-function botoes(d: Doc, xDireita: number, y: number, balaoAcima: boolean, W: number): string {
+function botoes(d: Doc, xDireita: number, y: number, balaoAcima: boolean, W: number, e?: EstadoBotoes, agora = 0, comBaloes = true): string {
   const x0 = xDireita - LARGURA_BOTOES
   const icones: string[] = []
   const baloes: string[] = []
   BOTOES.forEach((b, i) => {
     const bx = x0 + i * PASSO_BOTAO
-    const [nome, desc] = ROTULO_BOTAO[b]
+    const [nome, desc] = rotuloBotao(b, e)
     const k = `bt${i}`
-    icones.push(`<g class="bt ${k}"><rect x="${bx}" y="${y}" width="32" height="32" fill="transparent"/><use href="${d.img(`bt_botao_${b}_inativo`)}" x="${bx}" y="${y}"/></g>`)
-    baloes.push(`<g class="bl ${k}">${balao(bx + 16, balaoAcima ? y : y + 32, balaoAcima, nome, desc, W)}</g>`)
+    icones.push(`<g class="bt ${k}"><rect x="${bx}" y="${y}" width="32" height="32" fill="transparent"/>${iconeBotao(d, b, bx, y, e, agora)}</g>`)
+    if (comBaloes) {
+      baloes.push(`<g class="bl ${k}">${balao(bx + 16, balaoAcima ? y : y + 32, balaoAcima, nome, desc, W)}</g>`)
+    }
   })
   // os balões vêm depois dos ícones para ficarem por cima de tudo
   return icones.join('') + baloes.join('')
@@ -638,7 +699,7 @@ function hud(d: Doc, v: Vista, y0: number): { svg: string; botoesNaCena: boolean
     nome: 'XP',
     valor: `${n.dentro}/${n.precisa}`,
     titulo: `XP · nível ${n.nivel}`,
-    explica: `Faltam ${n.precisa - n.dentro} XP para o nível ${n.nivel + 1}.\nPáginas ${paginasNoCiclo(h.jogo.paginas)}/10.\nChefão em ${chefaoEm(h.jogo.lutas)} lutas.`,
+    explica: `Faltam ${n.precisa - n.dentro} XP para o nível ${n.nivel + 1}.\nPáginas ${paginasNoCiclo(h.jogo.paginas)}/10.\n${sobreChefao(v.chefao, h.jogo.lutas)}`,
   }
 
   const sl = selo(d, 0, 0, n.nivel, v.estrela ?? 0.5)
@@ -664,19 +725,21 @@ function hud(d: Doc, v: Vista, y0: number): { svg: string; botoesNaCena: boolean
   })
   const yb = a.botoes === 'hud' ? y0 + Math.floor((ALTURA_HUD - 32) / 2) : 4
   if (a.botoes === 'hud') {
-    partes.push(botoes(d, v.W - 4, yb, true, v.W))
+    partes.push(botoes(d, v.W - 4, yb, true, v.W, v.estadoBotoes, agora, v.semBaloes !== true))
   }
   if (a.botoes !== 'nenhum') {
     BOTOES.forEach((b, i) => {
-      const [nome, desc] = ROTULO_BOTAO[b]
+      const [nome, desc] = rotuloBotao(b, v.estadoBotoes)
       alvos.push({ id: `botao_${b}`, x: v.W - 4 - LARGURA_BOTOES + i * PASSO_BOTAO, y: yb, w: 32, h: 32, titulo: nome, explica: desc })
     })
   }
   // balões das barras: por último, para ficarem por cima de tudo (até da cena)
-  barras.forEach((b, i) => {
-    const cx = xBarra(a, i) + a.larguraBarra / 2
-    partes.push(`<g class="bl br${i}">${balao(cx, by, true, b.titulo, b.explica, v.W)}</g>`)
-  })
+  if (v.semBaloes !== true) {
+    barras.forEach((b, i) => {
+      const cx = xBarra(a, i) + a.larguraBarra / 2
+      partes.push(`<g class="bl br${i}">${balao(cx, by, true, b.titulo, b.explica, v.W)}</g>`)
+    })
+  }
   return { svg: partes.join(''), botoesNaCena: a.botoes === 'cena', alvos }
 }
 
@@ -766,6 +829,18 @@ function avisoLuaNova(W: number, H: number, frase: string, noMeio: boolean): str
 
 // ---------------------------------------------------------------- tudo junto
 
+/** A última frase do balão do XP: quando vem o próximo chefão, ou quando cai o que está em cena. */
+function sobreChefao(c: Chefao | undefined, lutas: number): string {
+  if (c === undefined || c.caiu !== undefined) {
+    return `Chefão em ${chefaoEm(lutas)} lutas.`
+  }
+  if (c.origem === 'lista') {
+    const t = c.tarefas
+    return `O chefão cai quando as tarefas acabarem: ${Math.min(t.feitas, t.total)} de ${t.total}.`
+  }
+  return `O chefão cai em ${c.vida} ${c.vida === 1 ? 'vitória' : 'vitórias'}.`
+}
+
 export function montar(v: Vista): { svg: string; largura: number; altura: number; alvos: Alvo[] } {
   const d = new Doc()
   const H = alturaCena(v.modo)
@@ -800,8 +875,16 @@ export function montar(v: Vista): { svg: string; largura: number; altura: number
   }
   const hd = hud(d, v, H)
   if (hd.botoesNaCena) {
-    corpo.push(botoes(d, v.W - 4, 4, false, v.W))
+    corpo.push(botoes(d, v.W - 4, 4, false, v.W, v.estadoBotoes, v.agora, v.semBaloes !== true))
   }
+  if (lt !== undefined && lt.tremor.length > 0) {
+    // golpe crítico: a cena inteira treme (o HUD fica parado)
+    const cena = corpo.splice(1).join('')
+    corpo.push(d.pista(lt.tremor, v.agora, cena))
+  }
+  // assinatura do autor (pedido do usuário): discreta no canto de cima à
+  // esquerda, fora do tremor; vai junto em todo print da faixa
+  corpo.push(`<use href="${d.img('assinatura')}" x="4" y="4" opacity="0.72"/>`)
   corpo.push('</svg>')
   corpo.push(hd.svg)
   const Ht = H + ALTURA_HUD

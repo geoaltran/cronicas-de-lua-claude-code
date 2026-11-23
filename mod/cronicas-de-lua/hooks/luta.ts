@@ -187,6 +187,12 @@ export type Roteiro = {
   /** Quando a luta acaba e a Lua volta a andar (desconhecido enquanto não se decide). */
   fim: number | null
   xp: number
+  /**
+   * Golpe no chefão de lista em que só o escudo apanhou (nenhuma tarefa
+   * concluída, sem crítico): a luta termina sem comemoração, a Lua fica em
+   * dúvida com o "?" azul.
+   */
+  defendida: boolean
 }
 
 export function roteiro(l: Luta): Roteiro {
@@ -236,7 +242,27 @@ export function roteiro(l: Luta): Roteiro {
       fim = d + SAIDA
     }
   }
-  return { ataques, contras, livre, canalAberto, desfecho, fim, xp }
+  const defendida = desfecho?.tipo === 'vitoria' && l.fixo === true && l.final !== true &&
+    golpes.some(g => g.escudo !== undefined) && !golpes.some(g => g.tarefa !== undefined || g.critico !== undefined)
+  return { ataques, contras, livre, canalAberto, desfecho, fim, xp, defendida }
+}
+
+/** Quando a estrela do golpe que voltou em `at` acerta o monstro (o instante do impacto). */
+export function quandoAcerta(l: Luta, at: number): number {
+  const a = roteiro(l).ataques.find(x => x.golpe?.at === at)
+  return a === undefined ? at : a.a + IMPACTO
+}
+
+/**
+ * O golpe crítico de uma luta (o que derruba o chefão): o marcado pela lista
+ * de tarefas, ou o último ataque da luta final. -1 se não há.
+ */
+export function ataqueCritico(l: Luta, rt: Roteiro = roteiro(l)): number {
+  if (l.final !== true) {
+    return -1
+  }
+  const k = rt.ataques.findIndex(a => a.golpe?.critico !== undefined)
+  return k >= 0 ? k : rt.ataques.length - 1
 }
 
 /** A luta que está na tela agora (a primeira que ainda não acabou). */
@@ -248,10 +274,14 @@ export function lutaDaVez(lista: readonly Luta[], agora: number): Luta | undefin
  * Uma pose da Lua num trecho da luta. `entrada` é andar (ou parada, se ela não
  * vinha andando) enquanto o monstro chega.
  */
-export type Pose = { de: number; ate: number; nome: 'entrada' | 'lua_parada' | 'lua_ataque' | 'lua_canalizar' | 'lua_dano' | 'lua_vitoria'; qs: readonly Q[]; desde: number; repete: boolean }
+export type Pose = { de: number; ate: number; nome: 'entrada' | 'lua_parada' | 'lua_ataque' | 'lua_canalizar' | 'lua_dano' | 'lua_vitoria' | 'lua_duvida'; qs: readonly Q[]; desde: number; repete: boolean }
 
 const QS_ATAQUE: Q[] = [[0, 3 * F], [1, 3 * F], [2, 6 * F], [3, 6 * F]]
 const QS_CANAL: Q[] = [[0, 4 * F], [1, 4 * F]]
+/** Dúvida (o escudo defendeu): coça a cabeça, "hmm", e de novo. */
+const QS_DUVIDA: Q[] = [[0, 7 * F], [1, 7 * F]]
+/** Onde a gota de suor fica no quadro da Lua (80x100): borda do rosto, ao lado do olho. */
+const GOTA = [51, 28] as const
 
 /** A Lua na luta, trecho a trecho, do começo ao fim (entre uma ação e outra, parada). */
 export function posesDaLua(l: Luta, rt: Roteiro = roteiro(l)): Pose[] {
@@ -270,7 +300,9 @@ export function posesDaLua(l: Luta, rt: Roteiro = roteiro(l)): Pose[] {
   }
   if (rt.desfecho?.tipo === 'vitoria') {
     const v = rt.desfecho.d + ATE_VITORIA
-    acoes.push({ de: v, ate: v + VITORIA, nome: 'lua_vitoria', qs: [[0, 4 * F], [1, 18 * F]], desde: v, repete: false })
+    acoes.push(rt.defendida
+      ? { de: v, ate: v + VITORIA, nome: 'lua_duvida', qs: QS_DUVIDA, desde: v, repete: true }
+      : { de: v, ate: v + VITORIA, nome: 'lua_vitoria', qs: [[0, 4 * F], [1, 18 * F]], desde: v, repete: false })
   }
   acoes.sort((a, b) => a.de - b.de)
   const ent = l.t0 + ENTRA
@@ -361,15 +393,15 @@ function tinta(d: Doc, id: string, cor: readonly [number, number, number], forca
   return d.filtro(id, `<feColorMatrix type="matrix" values="${k} 0 0 0 ${cr} 0 ${k} 0 0 ${cg} 0 0 ${k} 0 ${cb} 0 0 0 1 0"/>`)
 }
 
-/** Números em pixel art (dígitos da arte, 4 px de passo), em escala 2. */
-function numero(d: Doc, txt: string, cor: 'dano' | 'xp'): { svg: string; w: number } {
+/** Números em pixel art (dígitos da arte, 4 px de passo), em escala 2 (ou a pedida). */
+function numero(d: Doc, txt: string, cor: 'dano' | 'xp', esc = 2): { svg: string; w: number } {
   const nome = (c: string) => (c === '-' ? 'menos' : c === '+' ? 'mais' : c)
   let s = ''
   for (let i = 0; i < txt.length; i++) {
     s += `<use href="${d.img(`${cor}_${nome(txt[i] as string)}`)}" x="${i * 4}"/>`
   }
   const w = 4 * (txt.length - 1) + 5
-  return { svg: `<g transform="scale(2)">${s}</g>`, w: w * 2 }
+  return { svg: `<g transform="scale(${esc})">${s}</g>`, w: w * esc }
 }
 
 /** Sobe `px` por quadro durante `n` quadros a partir de `de`. */
@@ -377,7 +409,10 @@ function subindo(de: number, n: number, px: number): [number, string][] {
   return Array.from({ length: n }, (_, k) => [de + k * F, `translateY(${-k * px}px)`] as [number, string])
 }
 
-export type DesenhoLuta = { monstro: string; luaCorpo: string; luaTrilha: [number, string][]; efeitos: string }
+/** Tremor da cena inteira no golpe crítico (deslocamentos quadro a quadro). */
+const TREMOR: readonly (readonly [number, number])[] = [[3, 1], [-3, -1], [2, -2], [-2, 2], [2, 1], [-1, -1], [1, 0], [0, 0]]
+
+export type DesenhoLuta = { monstro: string; luaCorpo: string; luaTrilha: [number, string][]; efeitos: string; tremor: [number, string][] }
 
 export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
   const rt = roteiro(l)
@@ -403,11 +438,19 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
   // golpe no chefão: ele já está em cena, não entra nem foge
   const fixo = l.fixo === true
   const desfaz = rt.desfecho?.tipo === 'vitoria' && (!fixo || l.final === true)
+  const kc = ataqueCritico(l, rt)
   const efs: Efeito[] = fixo ? [] : [{ de: l.t0, dx: Array.from({ length: 10 }, (_, k) => r(longe * (1 - k / 10))) }]
-  for (const a of rt.ataques) {
+  rt.ataques.forEach((a, k) => {
     const i = a.a + IMPACTO
-    efs.push({ de: i, dx: Array.from({ length: 8 }, (_, k) => Math.max(0, 6 - k) + (k % 2 === 1 ? 1 : -1)) })
-  }
+    if (a.golpe?.escudo !== undefined) {
+      // defendeu: só um tranco curto
+      efs.push({ de: i, dx: [2, 1, -1, 1, 0] })
+    } else {
+      // crítico: recuo maior
+      const forte = k === kc ? 12 : 6
+      efs.push({ de: i, dx: Array.from({ length: forte + 2 }, (_, q) => Math.max(0, forte - q) + (q % 2 === 1 ? 1 : -1)) })
+    }
+  })
   for (const c of rt.contras) {
     efs.push({ de: c.c, dx: [0, -6, -14, -22, -24, -20, -14, -8, -3, 0] })
   }
@@ -421,11 +464,20 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
   const respira = d.anim('0%{transform:translateY(0)}50%{transform:translateY(-1px)}100%{transform:translateY(0)}', 16 * F, 'step-end', -(agora % (16 * F)), 'infinite')
   let corpoM = d.janela(l.t0, fimNormal, agora, `<g class="${respira}">${sprite()}</g>`)
   const vermelho = tinta(d, 'fv', [255, 80, 80], 0.45)
-  for (const a of rt.ataques) {
+  rt.ataques.forEach((a, k) => {
     const i = a.a + IMPACTO
-    corpoM += d.janela(i - 2 * F, i + F, agora, sprite(branco))
-    corpoM += d.janela(i + F, i + 3 * F, agora, sprite(vermelho))
-  }
+    if (a.golpe?.escudo !== undefined) {
+      // o escudo segura: só um lampejo branco curto, sem vermelho
+      corpoM += d.janela(i, i + F, agora, sprite(branco))
+    } else if (k === kc) {
+      // crítico: pausa de impacto maior (fica branco mais tempo) e vermelho depois
+      corpoM += d.janela(i - 3 * F, i + 3 * F, agora, sprite(branco))
+      corpoM += d.janela(i + 3 * F, i + 6 * F, agora, sprite(vermelho))
+    } else {
+      corpoM += d.janela(i - 2 * F, i + F, agora, sprite(branco))
+      corpoM += d.janela(i + F, i + 3 * F, agora, sprite(vermelho))
+    }
+  })
   let poeira = ''
   if (desfaz && rt.desfecho !== null && rt.desfecho.d + DESFAZ > agora && cabe(rt.desfecho.d)) {
     const dz = rt.desfecho.d
@@ -513,11 +565,42 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
       }
       efeitos += d.janela(a.a + VOO_DE, a.a + VOO_ATE, agora, d.pista(pts, agora, d.tira('projetil', -5, -5, 11, 11, [[0, 60], [1, 60], [2, 60], [3, 60]], agora)))
     }
-    // explosão + número de dano subindo
-    if (i + 14 * F > agora && cabe(a.a)) {
+    const g = a.golpe
+    const depoisDoCritico = kc >= 0 && n > kc
+    if (g?.escudo !== undefined) {
+      // golpe comum no chefão de lista: o escudo aparece no ponto do impacto,
+      // solta 3 faíscas, e o número sai pequeno e cinza (às vezes 0)
+      if (i + 12 * F > agora && cabe(a.a)) {
+        const ms = (art('escudo')['ms'] as readonly number[] | undefined) ?? [90, 120, 120]
+        const qs: Q[] = ms.map((m, q) => [q, m] as Q)
+        const dur = ms.reduce((t, m) => t + m, 0)
+        efeitos += d.janela(i, i + dur, agora, d.tira('escudo', ax - 24, ay - 19, 35, 38, qs, agora - i, false))
+        for (let j = 0; j < 3; j++) {
+          const pts: [number, string][] = Array.from({ length: 5 }, (_, q) => [i + q * F, `translate(${ax - 24 - q * (2 + j)}px,${ay - 12 + j * 10 + (j - 1) * q * 2}px)`])
+          efeitos += d.janela(i + F, i + 6 * F, agora, d.pista(pts, agora, d.tira('p_faisca', -2, -2, 5, 5, [[0, 80], [1, 80], [2, 80], [3, 80]], agora)))
+        }
+        const num = numero(d, g.escudo > 0 ? `-${g.escudo}` : '0', 'dano', 1)
+        // cinza: escurece só o branco (o contorno escuro dos dígitos continua escuro)
+        const cinza = d.filtro('fc', '<feColorMatrix type="matrix" values="0.66 0 0 0 0 0 0.66 0 0 0 0 0 0.74 0 0 0 0 0 1 0"/>')
+        const ny = Math.max(my - 4, 30)
+        efeitos += d.janela(i + F, i + 12 * F, agora, `<g transform="translate(${r(mx + mi.w / 2 - num.w / 2)},${ny})" filter="${cinza}">${d.pista(subindo(i + F, 11, 1), agora, num.svg)}</g>`)
+      }
+    } else if (n === kc) {
+      // golpe crítico: explosão, número grande dourado e "CRÍTICO!" em vermelho (escolha do usuário) (estrelas em volta passavam do limite na Vespera)
+      if (i + 22 * F > agora && cabe(a.a)) {
+        efeitos += d.janela(i, i + 6 * 55, agora, d.tira('impacto', ax - 15, ay - 15, 31, 31, [0, 1, 2, 3, 4, 5].map(q => [q, 55] as const), agora - i, false))
+        const valor = g?.critico ?? critico1(g?.dano ?? 0)
+        const num = numero(d, `-${valor}`, 'xp', 3)
+        const cx = r(Math.min(Math.max(mx + mi.w / 2, num.w / 2 + 4), W - num.w / 2 - 4))
+        const ny = Math.max(ay - 16, 44)
+        const txt = `<text class="t m" x="${cx}" y="${ny - 6}" style="font-size:16px;fill:#ff3b4e">CRÍTICO!</text>`
+        efeitos += d.janela(i + 2 * F, i + 22 * F, agora, d.pista(subindo(i + 2 * F, 20, 1), agora, txt + `<g transform="translate(${r(cx - num.w / 2)},${ny})">${num.svg}</g>`))
+      }
+    } else if (i + 14 * F > agora && cabe(a.a)) {
+      // explosão + número de dano subindo (depois do crítico, só a explosão)
       efeitos += d.janela(i, i + 6 * 55, agora, d.tira('impacto', ax - 15, ay - 15, 31, 31, [0, 1, 2, 3, 4, 5].map(q => [q, 55] as const), agora - i, false))
-      if (a.golpe === null || a.golpe.ok) {
-        const dano = a.golpe?.dano ?? 3 + ((l.t0 + n) % 7)
+      if ((g === null || g.ok) && !depoisDoCritico) {
+        const dano = g?.tarefa ?? g?.dano ?? 3 + ((l.t0 + n) % 7)
         const num = numero(d, `-${dano}`, 'dano')
         // sobe 26 px: começa baixo o bastante para não sair pelo topo da faixa
         const ny = Math.max(my - 6, 30)
@@ -535,7 +618,21 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
     }
   }
   // vitória: "+XP" dourado e estrelinhas em volta da Lua
-  if (rt.desfecho?.tipo === 'vitoria') {
+  if (rt.defendida && rt.desfecho !== null) {
+    // o escudo defendeu: "?" azul sobre a cabeça, com um pulinho como o "!"
+    const v = rt.desfecho.d + ATE_VITORIA
+    if (v + VITORIA > agora && cabe(v)) {
+      const qq = d.img('interrogacao')
+      efeitos += d.janela(v, v + 2 * F, agora, `<use href="${qq}" x="${centro - 5}" y="${cabeca - 20}"/>`)
+      efeitos += d.janela(v + 2 * F, v + VITORIA - 2 * F, agora, `<use href="${qq}" x="${centro - 5}" y="${cabeca - 18}"/>`)
+      // gota de suor (mangá) na borda do rosto, ao lado do olho: escorre 1 px
+      // no ritmo dos quadros da dúvida
+      const gt = d.img('gota')
+      for (let k = 0, t = v; t < v + VITORIA; k++, t += QS_DUVIDA[0]![1]) {
+        efeitos += d.janela(t, Math.min(t + QS_DUVIDA[0]![1], v + VITORIA), agora, `<use href="${gt}" x="${lx + GOTA[0]}" y="${ly + GOTA[1] + (k % 2)}"/>`)
+      }
+    }
+  } else if (rt.desfecho?.tipo === 'vitoria') {
     const v = rt.desfecho.d + ATE_VITORIA
     if (v + 18 * F > agora && cabe(v)) {
       const num = numero(d, `+${rt.xp}XP`, 'xp')
@@ -582,7 +679,22 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
       })
     }
   }
-  return { monstro, luaCorpo, luaTrilha: trilhaX(luaEfs), efeitos }
+  // a cena treme no golpe crítico
+  const ac = rt.ataques[kc]
+  const tremor: [number, string][] = []
+  if (ac !== undefined) {
+    const i = ac.a + IMPACTO
+    if (i + TREMOR.length * F > agora && cabe(ac.a)) {
+      TREMOR.forEach(([x, y], q) => tremor.push([i + q * F, `translate(${x}px,${y}px)`]))
+      tremor.unshift([i - F, 'translate(0px,0px)'])
+    }
+  }
+  return { monstro, luaCorpo, luaTrilha: trilhaX(luaEfs), efeitos, tremor }
+}
+
+/** O crítico do chefão sem lista (1 de vida antes do golpe final). */
+function critico1(dano: number): number {
+  return 9 + (dano % 9)
 }
 
 /**

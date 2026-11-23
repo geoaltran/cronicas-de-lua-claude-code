@@ -1,10 +1,13 @@
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, Register, SessionContextUsage, SessionRateLimit, Timer } from 'claude-code'
+import type { EngineInterface, Register, RenderChildren, SessionContextUsage, SessionRateLimit, Timer } from 'claude-code'
 
-import type { Caminho, Chefao, Elite, Golpe, Hud, Jogo, Luta, Lutas, TipoTrofeu } from '../types'
-import { LARGURA_MAX, LARGURA_MIN, type Alvo, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
-import { ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, roteiro, tipoTrofeu } from './luta'
-import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, ferir, lerTarefas, novoChefao, paginasNoCiclo } from './chefao'
+import type { AbaDoLivro, Botoes, Caminho, Chefao, Elite, Golpe, Hud, Jogo, Luta, Lutas, TipoTrofeu } from '../types'
+import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
+import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
+import { BOTOES, LARGURA_MAX, LARGURA_MIN, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
+import { type Pedaco, linhaAcao, linhaHud } from './texto'
+import { ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu } from './luta'
+import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, vidaEmTarefas } from './chefao'
 
 const PLUGIN = 'cronicas-de-lua'
 /** O app desenha SVG de até 131.072 caracteres; uma margem para não arriscar. */
@@ -23,9 +26,12 @@ const turno = atom({ plugin: 'cronicas-de-lua', key: 'turno' } as const, false)
 const hud = atom({ plugin: 'cronicas-de-lua', key: 'hud' } as const, HUD0, { shape: 'hud-1' })
 const tique = atom({ plugin: 'cronicas-de-lua', key: 'tique' } as const, 0)
 const confirma = atom({ plugin: 'cronicas-de-lua', key: 'confirma' } as const, false)
-const chefao = atom({ plugin: 'cronicas-de-lua', key: 'chefao' } as const, null as Chefao | null, { shape: 'chefao-1' })
+const chefao = atom({ plugin: 'cronicas-de-lua', key: 'chefao' } as const, null as Chefao | null, { shape: 'chefao-2' })
 const ELITE0: Elite = { erros: {} }
 const elite = atom({ plugin: 'cronicas-de-lua', key: 'elite' } as const, ELITE0, { shape: 'elite-1' })
+const BOTOES0: Botoes = { vigilia: { ligada: false, envios: 0 }, mochila: 'nada', estandarte: 'nada', livro: false }
+const botoes = atom({ plugin: 'cronicas-de-lua', key: 'botoes' } as const, BOTOES0, { shape: 'botoes-1' })
+const livroAba = atom({ plugin: 'cronicas-de-lua', key: 'livroAba' } as const, 'ficha' as AbaDoLivro)
 /** Quantos erros de ações diferentes o elite lembra (os mais velhos saem). */
 const ERROS_MAX = 20
 /** Quantos troféus ficam guardados. */
@@ -48,6 +54,26 @@ type Ajustes = {
   prova?: boolean
   /** Altura de uma linha (célula) da faixa em px: as posições do app são em células. */
   pxLinha?: number
+  /** px por coluna no VS Code e no celular (cada um calibra a sua régua). */
+  pxColunaPor?: Partial<Record<Remota, number>>
+}
+
+/** As superfícies que desenham a cena em Svg. Fora do desktop: sem hover, botões numa linha. */
+type Sup = 'desktop' | 'vscode' | 'mobile'
+type Remota = Exclude<Sup, 'desktop'>
+/**
+ * px por coluna fora do desktop, até a régua calibrar. O VS Code estica a
+ * imagem até a largura da faixa (e a altura cresce junto): a cena tem que ser
+ * desenhada na largura certa. Medido no VS Code em 22/11/2026: 647 px em 49
+ * colunas. O celular ainda é palpite.
+ */
+const PX_COLUNA_REMOTA: Record<Remota, number> = { vscode: 13.2, mobile: 8.4 }
+const pxColunaDe = (a: Ajustes, sup: Sup): number => (sup === 'desktop' ? a.pxColuna : (a.pxColunaPor?.[sup] ?? PX_COLUNA_REMOTA[sup]))
+const NOME_SUP: Record<Sup, string> = { desktop: 'app desktop', vscode: 'VS Code', mobile: 'celular' }
+/** "vscode", "celular"... no fim de um comando. */
+function supDoTexto(t: string | undefined): Sup | undefined {
+  const x = (t ?? '').toLowerCase()
+  return x === 'vscode' || x === 'editor' ? 'vscode' : x === 'celular' || x === 'mobile' ? 'mobile' : x === 'desktop' || x === 'app' ? 'desktop' : undefined
 }
 // 8,9 px por coluna: medido no app desktop (85 colunas = ~752 px), com uns px de folga
 // 20 px por linha: medido no app desktop (print da prova técnica, 22/11/2026)
@@ -81,17 +107,23 @@ async function salvarJogo($: $, jogo: Jogo): Promise<void> {
   await $.store.set('jogo', jogo)
 }
 
-async function ganharXp($: $, quanto: number): Promise<void> {
+/** XP para a Lua; com `tool`, conta também o feitiço no Grimório do Livro. */
+async function ganharXp($: $, quanto: number, tool?: string): Promise<void> {
   let novo: Jogo = JOGO0
   await update($, hud, h => {
-    novo = { ...h.jogo, xp: h.jogo.xp + quanto }
+    const papel = tool === undefined ? undefined : papelDe(tool)
+    const feiticos = papel === undefined ? h.jogo.feiticos : { ...(h.jogo.feiticos ?? {}), [papel]: (h.jogo.feiticos?.[papel] ?? 0) + 1 }
+    novo = { ...h.jogo, xp: h.jogo.xp + quanto, ...(feiticos === undefined ? {} : { feiticos }) }
     return { ...h, jogo: novo }
   })
   await salvarJogo($, novo)
 }
 
-/** Colunas do último desenho da faixa (para calibrar a largura com /cronicas largura). */
-let ultimasColunas = 0
+/** Colunas do último desenho da faixa em cada superfície (para calibrar a largura com /cronicas largura). */
+const colunasPor: Record<Sup, number> = { desktop: 0, vscode: 0, mobile: 0 }
+/** A superfície que desenhou a faixa por último: é a que a /cronicas largura calibra. */
+let ultimaSup: Sup = 'desktop'
+
 
 // Um só alarme para "o luar acabou": redesenha a faixa (desmaio).
 let alarme: Timer | undefined
@@ -170,23 +202,31 @@ async function chamarChefao($: $, origem: Chefao['origem'], tarefas?: Chefao['ta
   return true
 }
 
+/** O que um golpe fez com o chefão: a vida antes e depois (em pontos), e se ele caiu. */
+type Ferida = { antes: number; depois: number; caiu: boolean }
+
 /**
- * Tira vida do chefão. Se ele cai: a luta `n` (golpe no chefão) vira a final
- * (ele se desfaz nela), a página é recuperada e a Lua sobe de nível.
+ * Tira vida do chefão (`at`: quando o golpe acerta). Se ele cai: a luta `n`
+ * (golpe no chefão) vira a final (ele se desfaz nela), a página é recuperada
+ * e a Lua sobe de nível.
  */
-async function ferirChefao($: $, vida: (c: Chefao) => number, n?: number): Promise<void> {
+async function ferirChefao($: $, vida: (c: Chefao) => number, n?: number, at?: number): Promise<Ferida | null> {
   const agora = await $.clock.now()
   let antes: Chefao | null = null
   let depois: Chefao | null = null
   await update($, chefao, c => {
     antes = c
-    depois = dePe(c) ? ferir(c, vida(c), agora) : c
+    depois = dePe(c) ? ferir(c, vida(c), agora, at ?? agora) : c
     return depois
   })
   const a = antes as Chefao | null
   const b = depois as Chefao | null
-  if (a === null || b === null || a.caiu !== undefined || b.caiu === undefined) {
-    return
+  if (a === null || b === null || a.caiu !== undefined) {
+    return null
+  }
+  const ferida: Ferida = { antes: a.vida, depois: b.vida, caiu: b.caiu !== undefined }
+  if (b.caiu === undefined) {
+    return ferida
   }
   if (n !== undefined) {
     await update($, lutas, s => ({ ...s, lista: s.lista.map(l => (l.n === n && l.fixo === true ? { ...l, final: true } : l)) }))
@@ -198,6 +238,7 @@ async function ferirChefao($: $, vida: (c: Chefao) => number, n?: number): Promi
     return { ...h, jogo }
   })
   await salvarJogo($, jogo)
+  return ferida
 }
 
 /**
@@ -295,23 +336,55 @@ async function revisar($: $, turnoAcabou = false): Promise<void> {
   }
 }
 
-/** Ferramentas de lista de tarefas: chamam o chefão, ou tiram vida dele a cada tarefa concluída. */
-async function lista($: $, tool: string, input: unknown, n: number): Promise<void> {
+/**
+ * Ferramentas de lista de tarefas: chamam o chefão, ou tiram vida dele a cada
+ * tarefa concluída (a vida desce até o fim do bloco). Devolve o que o golpe fez.
+ */
+async function lista($: $, tool: string, input: unknown, n: number, at?: number): Promise<Ferida | null> {
   const ch = await read($, chefao)
   const doChefao = dePe(ch) && ch.origem === 'lista' ? ch.tarefas : null
   const t = lerTarefas(tool, input, doChefao)
   if (t === null) {
-    return
+    return null
   }
   if (doChefao === null) {
     if (ch === null && t.total > t.feitas) {
       await chamarChefao($, 'lista', t)
     }
-    return
+    return null
   }
-  // tarefas novas na lista: o chefão ganha vida (sem golpe)
-  await update($, chefao, c => (dePe(c) ? { ...c, tarefas: t, vidaMax: Math.max(c.vidaMax, t.total), vida: Math.max(c.vida, Math.min(t.total - t.feitas, Math.max(c.vidaMax, t.total))) } : c))
-  await ferirChefao($, () => t.total - t.feitas, n)
+  // tarefas novas na lista: o chefão ganha um bloco de vida por tarefa (sem golpe)
+  await update($, chefao, c => (dePe(c) ? crescer(c, t) : c))
+  const f = await ferirChefao($, c => (t.total - t.feitas) * c.bloco, n, at)
+  return f !== null && f.depois < f.antes ? f : null
+}
+
+/**
+ * O que um golpe (ferramenta que voltou bem) fez num chefão: a tarefa
+ * concluída desce a vida até o fim do bloco (a última é crítico); um golpe
+ * comum no chefão de lista bate no escudo e tira pouco. Marca o golpe na luta.
+ */
+async function golpeNoChefao($: $, tool: string, input: unknown, n: number, at: number, dano: number): Promise<void> {
+  const l = (await read($, lutas)).lista.find(x => x.n === n)
+  const acerto = l === undefined ? at : quandoAcerta(l, at)
+  let marca: Partial<Golpe> | null = null
+  const f = await lista($, tool, input, n, acerto)
+  if (f !== null) {
+    marca = f.caiu ? { critico: critico(f.antes, dano) } : { tarefa: f.antes - f.depois }
+  } else if (l?.fixo === true) {
+    const ch = await read($, chefao)
+    if (dePe(ch) && ch.origem === 'lista') {
+      const tira = defesa(ch, dano)
+      if (tira > 0) {
+        await ferirChefao($, c => c.vida - tira, n, acerto)
+      }
+      marca = { escudo: tira }
+    }
+  }
+  if (marca !== null) {
+    const m = marca
+    await update($, lutas, s => ({ ...s, lista: s.lista.map(x => (x.n === n ? { ...x, golpes: x.golpes.map(g => (g.at === at ? { ...g, ...m } : g)) } : x)) }))
+  }
 }
 
 /**
@@ -355,6 +428,8 @@ async function lembrarErro($: $, tool: string, input: unknown, ok: boolean, text
  * o `pxColuna` da largura da cena tem folga e não serve aqui).
  */
 const PX_CELULA = 8.8
+/** Cor transparente: a borda das áreas de mouse existe (o hover precisa dela) mas não aparece. */
+const INVISIVEL = '#00000000'
 const DESLOC_CENA = 0
 
 /** Posição na faixa em células (colunas x linhas), a partir de px da arte. */
@@ -415,7 +490,8 @@ function areasDeHover(els: Elementos, a: Ajustes, colunas: number, W: number, al
     return visivel ? (
       <Box key={`pv_${t.id}`} position="absolute" top={top} left={left} {...tam} borderStyle="single" borderColor="gray" hover={{ scope: grupo(t), borderColor: 'yellow' }} />
     ) : (
-      <Box key={`hv_${t.id}`} position="absolute" top={top} left={left} {...tam} hover={{ scope: grupo(t) }} />
+      // igual à da prova (que o app reconhece no hover), mas com a borda transparente
+      <Box key={`hv_${t.id}`} position="absolute" top={top} left={left} {...tam} borderStyle="single" borderColor={INVISIVEL} hover={{ scope: grupo(t), borderColor: INVISIVEL }} />
     )
   })
   // os balões depois das áreas: ficam por cima
@@ -439,13 +515,13 @@ function provaTecnica($: $, els: Elementos, colunas: number, W: number, a: Ajust
   const icones = ['vigilia', 'mochila', 'estandarte', 'livro'].map(b => alvos.find(x => x.id === `botao_${b}`)).filter((t): t is Alvo => t !== undefined)
   const inicio = (t: Alvo) => Math.floor((t.x * a.escala) / PX_CELULA)
   const botao = (t: Alvo, i: number) => {
-    const nome = t.titulo
     const left = inicio(t)
     const prox = icones[i + 1]
     const fim = prox !== undefined ? inicio(prox) : Math.ceil(((t.x + t.w) * a.escala) / PX_CELULA)
     const largura = Math.max(2, fim - left)
     const pontos = Math.max(2, Math.round((largura * PX_CELULA - 14) / 6.5))
-    const aperta = () => $.ui.toast(`Prova: o clique no ${nome} funcionou.`)
+    // a prova usa as ações de verdade: os "•" só mostram onde a área de clique cai
+    const aperta = () => apertar($, t.id.slice('botao_'.length) as NomeBotao)
     return (
       <Box key={`pb_${t.id}`} position="absolute" top={lin(t.y)} left={left} width={largura} height={2} flexDirection="column" hover={{ scope: grupo(t) }}>
         <Button key={`pv_${t.id}`} plain label={'•'.repeat(pontos)} onPress={aperta} />
@@ -467,6 +543,425 @@ function provaTecnica($: $, els: Elementos, colunas: number, W: number, a: Ajust
   )
 }
 
+// ---------------------------------------------------------------- botões (Fase 4)
+
+/** O painel do Livro. */
+const LIVRO = 'livro'
+/** A Vigília manda no máximo 6 mensagens por vez que é acesa; depois apaga sozinha. */
+export const VIGILIA_MAX = 6
+/** A mensagem curtinha da Vigília (reacende o cache). */
+export const MSG_VIGILIA = '🌙 Vigília da Lua: só mantendo o cache aceso. Não faça nada; responda apenas "ok".'
+/** O pedido do Estandarte: o resumo da missão para continuar numa sessão nova. */
+export const PEDIDO_RESUMO =
+  '🚩 Estandarte da Lua: escreva agora o resumo da missão para continuar numa sessão nova. ' +
+  'Crie ou atualize o arquivo PROXIMA_SESSAO.md na raiz do projeto, em português, limpo e objetivo, com: ' +
+  'no topo, o texto pronto para colar na sessão nova; onde está cada coisa (arquivos, pastas, comandos para rodar, validar e testar); ' +
+  'o que está pronto e aprovado (para não refazer); as decisões tomadas e as restrições ou pegadinhas descobertas; ' +
+  'o próximo passo em detalhe, como um plano numerado; e as pendências e perguntas abertas. ' +
+  'Se o projeto tiver um CLAUDE.md, ponha nele uma linha apontando para o PROXIMA_SESSAO.md. ' +
+  'Ao terminar, diga em poucas linhas o que ficou salvo.'
+
+/** Quanto antes de o luar acabar a Vigília manda a mensagem: 5 min (cache de 1 h) ou 1 min (cache de 5 min). */
+const antecedencia = (ttlMs: number) => (ttlMs >= 1_800_000 ? 300_000 : 60_000)
+
+async function tocar($: $, som: 'vigilia' | 'apagou'): Promise<void> {
+  try {
+    await $.audio.play({ asset: `sons/${som}.wav` }, { gain: 0.6 })
+  } catch {
+    // sem player de som (ou o som falhou): só o visual
+  }
+}
+
+let alarmeVigilia: Timer | undefined
+
+/** Marca o próximo envio da Vigília (se acesa e com luar): antes de o cache esfriar. */
+async function agendarVigilia($: $): Promise<void> {
+  alarmeVigilia?.cancel()
+  alarmeVigilia = undefined
+  const [bt, h, agora] = await Promise.all([read($, botoes), read($, hud), $.clock.now()])
+  const luz = h.luz
+  if (!bt.vigilia.ligada || luz === null) {
+    return
+  }
+  const fim = luz.at + luz.ttlMs
+  if (fim - agora < 15_000) {
+    // o cache já esfriou (ou está para esfriar agora): não há mais o que guardar
+    return
+  }
+  const quando = fim - antecedencia(luz.ttlMs)
+  alarmeVigilia = $.clock.after(Math.max(0, quando - agora), () => {
+    void vigiar($, luz.at)
+  })
+}
+
+/** Hora da Vigília: se o usuário não escreveu e o Claude está parado, manda a mensagem curtinha. */
+async function vigiar($: $, luzAt: number): Promise<void> {
+  const [bt, h, trabalhando, agora] = await Promise.all([read($, botoes), read($, hud), read($, turno), $.clock.now()])
+  if (!bt.vigilia.ligada) {
+    return
+  }
+  if (h.luz?.at !== luzAt) {
+    // houve resposta nova desde que marcamos: o luar já foi reaceso
+    await agendarVigilia($)
+    return
+  }
+  if (trabalhando) {
+    // o Claude está trabalhando: o fim do turno reacende o luar e remarca
+    return
+  }
+  const envios = bt.vigilia.envios + 1
+  const apaga = envios >= VIGILIA_MAX
+  await update($, botoes, (b): Botoes => ({ ...b, vigilia: { ligada: !apaga, envios, pisca: agora } }))
+  void tocar($, 'vigilia')
+  void $.prompt.submit({ text: MSG_VIGILIA })
+  if (apaga) {
+    $.clock.after(900, () => {
+      void avisarApagou($)
+    })
+  }
+}
+
+async function avisarApagou($: $): Promise<void> {
+  const agora = await $.clock.now()
+  await update($, botoes, (b): Botoes => ({ ...b, vigilia: { ...b.vigilia, pisca: agora } }))
+  void tocar($, 'apagou')
+  $.ui.toast(`🏮 A Vigília apagou sozinha depois de ${VIGILIA_MAX} mensagens. Acenda de novo se quiser manter o cache quente.`)
+}
+
+async function alternarVigilia($: $): Promise<void> {
+  const agora = await $.clock.now()
+  const antes = (await read($, botoes)).vigilia.ligada
+  await update($, botoes, (b): Botoes => ({ ...b, vigilia: antes ? { ligada: false, envios: 0 } : { ligada: true, envios: 0, pisca: agora } }))
+  if (antes) {
+    $.ui.toast('🏮 Vigília apagada.')
+  } else {
+    void tocar($, 'vigilia')
+    $.ui.toast(
+      `🔥 Vigília acesa. Perto de o luar acabar, a Lua manda uma mensagem curtinha para manter o cache quente (até ${VIGILIA_MAX} vezes, só enquanto você não escreve). Cada uma gasta um pouco do limite do plano. Clique de novo para apagar.`,
+    )
+  }
+  await agendarVigilia($)
+}
+
+async function arrumarMochila($: $): Promise<void> {
+  if (await read($, turno)) {
+    $.ui.toast('🎒 Espere o Claude terminar a tarefa para arrumar a mochila.')
+    await update($, botoes, (b): Botoes => ({ ...b, mochila: 'nada' }))
+    return
+  }
+  await update($, botoes, (b): Botoes => ({ ...b, mochila: 'arrumando' }))
+  try {
+    const r = await $.session.compact({})
+    $.ui.toast(r.skip === undefined ? '🎒 Mochila arrumada: a conversa foi resumida e sobrou espaço.' : `🎒 A mochila não foi arrumada: ${String(r.skip)}`)
+  } catch (err) {
+    $.ui.toast(`🎒 Não deu para arrumar a mochila agora: ${err instanceof Error ? err.message : String(err)}`)
+  } finally {
+    await update($, botoes, (b): Botoes => ({ ...b, mochila: 'nada' }))
+  }
+}
+
+async function erguerEstandarte($: $): Promise<void> {
+  if (await read($, turno)) {
+    $.ui.toast('🚩 Espere o Claude terminar a tarefa para erguer o estandarte.')
+    return
+  }
+  if ((await read($, botoes)).estandarte === 'escrevendo') {
+    return
+  }
+  await update($, botoes, (b): Botoes => ({ ...b, estandarte: 'escrevendo' }))
+  try {
+    await $.prompt.submit({ text: PEDIDO_RESUMO })
+  } catch (err) {
+    await update($, botoes, (b): Botoes => ({ ...b, estandarte: 'nada' }))
+    $.ui.toast(`🚩 Não deu para pedir o resumo: ${err instanceof Error ? err.message : String(err)}`)
+  }
+}
+
+async function alternarLivro($: $): Promise<void> {
+  const aberto = (await $.ui.panes()).some(p => p.id === LIVRO)
+  if (aberto) {
+    await $.ui.close({ id: LIVRO })
+    await update($, botoes, (b): Botoes => ({ ...b, livro: false }))
+    return
+  }
+  const r = await $.ui.open({ id: LIVRO, title: 'O Livro da Lua' })
+  await update($, botoes, (b): Botoes => ({ ...b, livro: true }))
+  if (!r.isPlaced) {
+    $.ui.toast(`📖 O Livro ainda não abriu: ${r.reason}`)
+  }
+}
+
+function apertar($: $, b: NomeBotao): Promise<void> {
+  switch (b) {
+    case 'vigilia':
+      return alternarVigilia($)
+    case 'mochila':
+      return update($, botoes, (x): Botoes => ({ ...x, mochila: x.mochila === 'confirma' ? 'nada' : x.mochila === 'arrumando' ? x.mochila : 'confirma' })).then(() => undefined)
+    case 'estandarte':
+      return erguerEstandarte($)
+    case 'livro':
+      return alternarLivro($)
+  }
+}
+
+/**
+ * O rótulo invisível do botão. O desktop desenha o rótulo (não os filhos), não
+ * deixa mudar a cor dele e, quando ele não cabe, corta com "…", que aparece
+ * (foi o que se viu com "•", braile e espaços: o recuo interno do botão é maior
+ * do que parece). Como o botão se estica na largura da área (coluna), basta um
+ * espaço de algarismo (U+2007, não desenha nada na fonte do sistema) entre dois
+ * "word joiners" (U+2060, largura zero), para o app não o tomar por vazio.
+ */
+const ROTULO_INVISIVEL = '\u2060\u2007\u2060'
+
+/**
+ * Os 4 botões de verdade: por cima de cada ícone pixel art, uma área com dois
+ * botões do app empilhados (mesma ação; o botão tem 1 linha e o ícone, 2) de
+ * rótulo invisível. As áreas formam um bloco contínuo, sem vão: cada uma começa
+ * na coluna à esquerda do ícone e vai até a próxima. O balão de cada botão
+ * acende no hover, como nas barras.
+ */
+function botoesDoHud($: $, els: Elementos, a: Ajustes, colunas: number, W: number, alvos: readonly Alvo[]) {
+  const { Box, Button } = els
+  const { lin } = celulas(a)
+  const icones = BOTOES.map(b => alvos.find(x => x.id === `botao_${b}`)).filter((t): t is Alvo => t !== undefined)
+  const inicio = (t: Alvo) => Math.floor((t.x * a.escala) / PX_CELULA)
+  const areas = icones.map((t, i) => {
+    const b = t.id.slice('botao_'.length) as NomeBotao
+    const left = inicio(t)
+    const prox = icones[i + 1]
+    const fim = prox !== undefined ? inicio(prox) : Math.ceil(((t.x + t.w) * a.escala) / PX_CELULA)
+    const largura = Math.max(2, fim - left)
+    const aperta = () => apertar($, b)
+    // o hover do próprio botão entra no grupo do balão (a caixa em volta não
+    // basta: o botão fica por cima dela)
+    const estilo = { scope: grupo(t), color: INVISIVEL, backgroundColor: INVISIVEL }
+    const botao = (k: string) => <Button key={k} plain label={ROTULO_INVISIVEL} hover={estilo} onPress={aperta} />
+    return (
+      <Box key={`ab_${b}`} position="absolute" top={lin(t.y)} left={left} width={largura} height={2} flexDirection="column" hover={{ scope: grupo(t) }}>
+        {botao(`bt_${b}`)}
+        {botao(`bt2_${b}`)}
+      </Box>
+    )
+  })
+  return [...areas, ...icones.map(t => balaoDoAlvo(els, a, colunas, W, t))]
+}
+
+/**
+ * Fora do desktop (VS Code, celular) não há posição em células nem hover no
+ * desenho: os 4 botões viram uma linha embaixo da cena, na variante C aprovada
+ * (maquete em previa_faixa/botoes_vscode.html). Cada um é uma caixa com
+ * contorno (cinza discreto apagado; cor do Claude aceso), o ícone outline em
+ * Svg e o nome num botão do app.
+ *
+ * Visto no VS Code (22/11/2026): o editor desenha todo Button como um chip
+ * próprio (azul), mesmo com `plain`, e ignora a cor do texto e o hover da caixa;
+ * só o chip recebe o clique. Por isso: chip "secondary" (o cinza do editor)
+ * sempre, e o estado fica na caixa (contorno na cor do Claude) e no ícone.
+ */
+function botoesEmLinha($: $, els: Elementos, bt: Botoes) {
+  const { Box, Button, Svg } = els
+  const rotulo: Record<NomeBotao, string> = {
+    vigilia: bt.vigilia.ligada ? `Vigília acesa (${bt.vigilia.envios}/${VIGILIA_MAX})` : 'Vigília',
+    mochila: 'Mochila',
+    estandarte: bt.estandarte === 'escrevendo' ? 'Escrevendo…' : 'Estandarte',
+    livro: 'Livro',
+  }
+  const ativo: Record<NomeBotao, boolean> = { vigilia: bt.vigilia.ligada, mochila: bt.mochila !== 'nada', estandarte: bt.estandarte !== 'nada', livro: bt.livro }
+  return (
+    <Box key="l_botoes" flexDirection="row" gap={1} flexWrap="wrap">
+      {BOTOES.map(b => {
+        const aceso = ativo[b]
+        return (
+          <Box
+            key={`lc_${b}`}
+            flexDirection="row"
+            alignItems="center"
+            paddingX={1}
+            borderStyle="round"
+            borderColor={aceso ? COR_CLAUDE : BORDA_APAGADO}
+          >
+            <Svg source={iconeBotao(b, aceso)} width={ICONE_W} height={ICONE_H} alt="" />
+            <Button key={`lb_${b}`} variant="secondary" label={rotulo[b]} onPress={() => apertar($, b)} />
+          </Box>
+        )
+      })}
+    </Box>
+  )
+}
+
+/**
+ * VS Code (variante A, escolhida pelo usuário em 22/11/2026): só os chips do
+ * editor, com o nome. O editor desenha todo Button como um chip azul próprio e
+ * só ele recebe o clique; dentro dele só cabe texto (o ícone outline é imagem).
+ * O estado fica no texto e nos ícones pixel art da cena (lanterna acesa, livro
+ * aberto). A variante C (caixa + ícone outline, `botoesEmLinha`) fica para
+ * quando o editor deixar estilizar o botão; o celular ainda usa a C.
+ */
+function botoesChips($: $, els: Elementos, bt: Botoes) {
+  const { Box, Button } = els
+  const rotulo: Record<NomeBotao, string> = {
+    vigilia: bt.vigilia.ligada ? `Vigília acesa (${bt.vigilia.envios}/${VIGILIA_MAX})` : 'Vigília',
+    mochila: 'Mochila',
+    estandarte: bt.estandarte === 'escrevendo' ? 'Escrevendo…' : 'Estandarte',
+    livro: bt.livro ? 'Livro aberto' : 'Livro',
+  }
+  // tudo encostado à esquerda (pedido do usuário): a linha não estica os chips
+  return (
+    <Box key="l_botoes" flexDirection="row" gap={1} flexWrap="wrap" justifyContent="flex-start" alignItems="flex-start" alignSelf="flex-start">
+      {BOTOES.map(b => (
+        <Button key={`lb_${b}`} label={rotulo[b]} onPress={() => apertar($, b)} />
+      ))}
+    </Box>
+  )
+}
+
+/**
+ * A faixa do terminal (Fase 5): duas linhas de texto colorido (o HUD e o que a
+ * Lua está fazendo; `texto.ts` monta os pedaços) e os botões embaixo. Cada
+ * linha corta no fim se não couber.
+ */
+function faixaEmTexto(els: Elementos, linhas: readonly (readonly Pedaco[])[], resto: readonly RenderChildren[]) {
+  const { Box, Text } = els
+  return (
+    <Box flexDirection="column">
+      {linhas.map((l, i) => (
+        <Text key={`tx_${i}`} wrap="truncate-end">
+          {l.map((p, j) => (
+            <Text key={`tx_${i}_${j}`} {...(p.cor === undefined ? {} : { color: p.cor })} {...(p.dim === true ? { dimColor: true } : {})} {...(p.negrito === true ? { bold: true } : {})}>
+              {p.t}
+            </Text>
+          ))}
+        </Text>
+      ))}
+      {resto}
+    </Box>
+  )
+}
+
+/** As linhas de ação embaixo da cena: confirmações e ofertas dos botões e da lua nova. */
+function acoesDaFaixa($: $, els: Elementos, bt: Botoes, confirmando: boolean, cansada: boolean) {
+  const { Box, Button, Text } = els
+  const linhas = []
+  if (confirmando) {
+    linhas.push(
+      <Box key="l_confirma" flexDirection="row" gap={1} alignItems="center">
+        <Text>A conversa atual sai da tela (volta com /resume).</Text>
+        <Button
+          key="sim"
+          variant="primary"
+          onPress={async () => {
+            await update($, confirma, () => false)
+            await $.command.run({ command: 'clear' })
+          }}
+        >
+          Começar
+        </Button>
+        <Button key="nao" onPress={() => update($, confirma, () => false)}>
+          Ficar nesta
+        </Button>
+      </Box>,
+    )
+  } else if (cansada) {
+    linhas.push(
+      <Box key="l_luanova" flexDirection="row" gap={1} alignItems="center">
+        <Button key="nova" variant="primary" onPress={() => update($, confirma, () => true)}>
+          🌙 Nova conversa
+        </Button>
+        <Text dimColor>ou continue aqui: só a próxima mensagem custa mais.</Text>
+      </Box>,
+    )
+  }
+  if (bt.mochila === 'confirma') {
+    linhas.push(
+      <Box key="l_mochila" flexDirection="row" gap={1} alignItems="center">
+        <Text>Arrumar a mochila resume a conversa e libera espaço (como o /compact).</Text>
+        <Button key="mochila_sim" variant="primary" onPress={() => arrumarMochila($)}>
+          Arrumar a mochila
+        </Button>
+        <Button key="mochila_nao" onPress={() => update($, botoes, (b): Botoes => ({ ...b, mochila: 'nada' }))}>
+          Agora não
+        </Button>
+      </Box>,
+    )
+  } else if (bt.mochila === 'arrumando') {
+    linhas.push(
+      <Text key="l_mochila" dimColor>
+        🎒 Arrumando a mochila…
+      </Text>,
+    )
+  }
+  if (bt.estandarte === 'pronto' && !confirmando) {
+    linhas.push(
+      <Box key="l_estandarte" flexDirection="row" gap={1} alignItems="center">
+        <Text>🚩 Resumo da missão pronto (PROXIMA_SESSAO.md).</Text>
+        <Button key="est_nova" variant="primary" onPress={() => update($, confirma, () => true)}>
+          🌙 Nova conversa
+        </Button>
+        <Button key="est_ok" onPress={() => update($, botoes, (b): Botoes => ({ ...b, estandarte: 'nada' }))}>
+          Fechar
+        </Button>
+      </Box>,
+    )
+  }
+  return linhas
+}
+
+/** O Livro (por enquanto): a ficha da Lua em texto. As abas e a estante vêm no passo 4. */
+/**
+ * O Livro no painel do desktop: as 4 abas (botões do app) e a página da aba
+ * aberta, um SVG em modo imagem na largura do painel. Na estante de troféus,
+ * as áreas de hover do app por cima de cada troféu mostram o nome do erro.
+ */
+function livroNoPainel($: $, els: Elementos, jogo: Jogo, aba: AbaDoLivro, colunas: number, a: Ajustes, sup: Sup = 'desktop') {
+  const { Box, Button, Svg } = els
+  const remota = sup !== 'desktop'
+  const px = Math.max(200, colunas * (remota ? pxColunaDe(a, sup) : PX_CELULA) - 4)
+  // pixel art em escala inteira: 2x quando a página cabe (o texto em 1x fica miúdo), senão 1x
+  const escala = px >= 2 * LARGURA_LIVRO ? 2 : 1
+  const W = Math.floor(px / escala)
+  const p = paginaDoLivro(aba, jogo, W, escala)
+  const aj: Ajustes = { ...a, escala }
+  return (
+    <Box flexDirection="column" gap={1}>
+      <Box key="abas" flexDirection="row" gap={1}>
+        {ABAS.map(t => (
+          <Button key={`aba_${t.id}`} label={t.nome} {...(t.id === aba ? { variant: 'primary' as const } : remota ? { variant: 'secondary' as const } : {})} onPress={() => void update($, livroAba, () => t.id)} />
+        ))}
+      </Box>
+      <Box key="pagina" position="relative">
+        {remota ? <Svg source={p.svg} alt={p.alt} /> : <Svg source={p.svg} height={p.altura} alt={p.alt} />}
+        {p.alvos.length > 0 && !remota ? areasDeHover(els, aj, colunas, W, p.alvos, false) : null}
+      </Box>
+    </Box>
+  )
+}
+
+/** O Livro em texto, onde o app não desenha Svg. */
+function livroEmTexto(els: Elementos, jogo: Jogo) {
+  const { Box, Text } = els
+  const nv = nivelDe(jogo.xp)
+  const trofeus = jogo.trofeus ?? []
+  return (
+    <Box flexDirection="column" gap={1}>
+      <Text bold>Ficha da Lua</Text>
+      <Box flexDirection="column">
+        <Text>{`Nível ${nv.nivel} · ${jogo.xp} XP (faltam ${nv.precisa - nv.dentro} para o ${nv.nivel + 1})`}</Text>
+        <Text>{`Páginas das Crônicas: ${paginasNoCiclo(jogo.paginas)}/10 (${jogo.paginas} no total)`}</Text>
+        <Text>{`Lutas vencidas: ${jogo.lutas} · chefão em ${A_CADA - (jogo.lutas % A_CADA)} lutas`}</Text>
+        <Text>{`Troféus: ${trofeus.length}`}</Text>
+      </Box>
+      {trofeus.length > 0 ? (
+        <Box flexDirection="column">
+          {trofeus.slice(0, 8).map((t, i) => (
+            <Text key={`tr_${i}`} dimColor>{`· ${t}`}</Text>
+          ))}
+        </Box>
+      ) : null}
+    </Box>
+  )
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const salvo = (await $.store.get('jogo')) as Partial<Jogo> | undefined
@@ -478,10 +973,11 @@ export const register: Register = on => {
       mochila: mochilaDe(uso.context) ?? h.mochila,
     }))
     await revisar($)
+    await agendarVigilia($)
     await $.command.register({
       name: 'cronicas',
       description: 'As Crônicas de Lua: jornada, ajustes da faixa e testes (chefão, elite, lua nova)',
-      argumentHint: 'escala 2 | largura 690 | regua | quadro | imagem | teste | lua-nova | chefao [nome] | golpe | elite',
+      argumentHint: 'escala 2 | largura 690 | regua | quadro | imagem | teste | lua-nova | vigilia | chefao [lista N] [nome] | golpe | elite',
     })
     return next(e)
   })
@@ -490,19 +986,37 @@ export const register: Register = on => {
     const [chave, valor] = String(e.args ?? '').trim().split(/\s+/)
     const a = await lerAjustes($)
     const n = Number(valor)
+    if (chave === 'superficies' || chave === 'superfícies') {
+      // diagnóstico da Fase 5: onde esta sessão está desenhando agora
+      const lista = await $.session.surfaces()
+      const nomes: Record<string, string> = { terminal: 'terminal', desktop: 'app desktop', vscode: 'VS Code', mobile: 'celular' }
+      return { text: lista.length === 0 ? 'Nenhuma superfície desenha esta sessão agora.' : `Esta sessão desenha em: ${lista.map(x => nomes[x] ?? x).join(', ')}.` }
+    }
     if (chave === 'escala' && (n === 1 || n === 2 || n === 3)) {
       a.escala = n
     } else if (chave === 'coluna' && n >= 4 && n <= 20) {
       a.pxColuna = n
-    } else if (chave === 'largura' && n >= 300 && n <= 4000) {
-      // a régua mostrou a largura da faixa em px: daí sai o px por coluna
-      if (ultimasColunas <= 0) {
-        return { text: 'Ainda não sei quantas colunas a faixa tem: espere ela aparecer e tente de novo.' }
+    } else if (chave === 'largura' && n >= 200 && n <= 4000) {
+      // a régua mostrou a largura da faixa em px: daí sai o px por coluna.
+      // Sem superfície no comando, vale a que desenhou a faixa por último.
+      const sup = supDoTexto(String(e.args ?? '').trim().split(/\s+/)[2]) ?? ultimaSup
+      if (colunasPor[sup] <= 0) {
+        return { text: `Ainda não sei quantas colunas a faixa tem no ${NOME_SUP[sup]}: espere ela aparecer e tente de novo.` }
       }
-      // uns px a mais: desenho mais largo que a faixa é cortado à direita (sem
-      // distorcer); mais estreito, o app pode esticar a imagem
-      a.pxColuna = Math.round(((n + 4) / ultimasColunas) * 100) / 100
+      // desktop: uns px a mais (desenho mais largo que a faixa é cortado à
+      // direita, sem distorcer). VS Code e celular esticam ou encolhem a imagem
+      // até a largura da faixa: a borda está entre o número lido e o próximo
+      // (a régua marca de 100 em 100), então o meio do caminho
+      const px = Math.round(((n + (sup === 'desktop' ? 4 : 50)) / colunasPor[sup]) * 100) / 100
+      if (sup === 'desktop') {
+        a.pxColuna = px
+      } else {
+        a.pxColunaPor = { ...a.pxColunaPor, [sup]: px }
+      }
       a.regua = false
+      await $.store.set('ajustes', a)
+      await update($, tique, t => t + 1)
+      return { text: `Largura calibrada no ${NOME_SUP[sup]}: ${n} px em ${colunasPor[sup]} colunas = ${px} px por coluna. A cena agora acompanha a largura da faixa (régua desligada).` }
     } else if (chave === 'quadro' || chave === 'imagem') {
       a.quadro = chave === 'quadro'
       a.teste = false
@@ -532,24 +1046,60 @@ export const register: Register = on => {
     } else if (chave === 'chefao' || chave === 'chefão') {
       // para ver o chefão sem lista de tarefas: 3 de vida, /cronicas golpe tira 1.
       // Com um nome (/cronicas chefao relojoeiro), chama esse; sem, o próximo da jornada.
-      const pedido = String(e.args ?? '').trim().split(/\s+/).slice(1).join(' ')
+      // Com "lista" (/cronicas chefao lista 3 relojoeiro): um chefão de lista de mentira
+      // com N tarefas (padrão 3), com escudo; /cronicas golpe conclui uma tarefa.
+      let palavras = String(e.args ?? '').trim().split(/\s+/).slice(1)
+      const comLista = palavras[0]?.toLowerCase() === 'lista'
+      let tarefas: Chefao['tarefas'] | undefined
+      if (comLista) {
+        palavras = palavras.slice(1)
+        const q = /^\d+$/.test(palavras[0] ?? '') ? Math.min(20, Math.max(1, Number(palavras[0]))) : 3
+        if (/^\d+$/.test(palavras[0] ?? '')) {
+          palavras = palavras.slice(1)
+        }
+        tarefas = { total: q, feitas: 0 }
+      }
+      const pedido = palavras.join(' ')
       const escolhido = chefaoPeloNome(pedido)
       if (pedido !== '' && escolhido === undefined) {
         return { text: `Não conheço o chefão "${pedido}". Use um destes: ${JORNADA.map(n => NOME_CHEFAO[n] ?? n).join(', ')}.` }
       }
-      const veio = await chamarChefao($, 'lutas', undefined, escolhido)
+      const veio = await chamarChefao($, comLista ? 'lista' : 'lutas', tarefas, escolhido)
       await revisar($)
       const ch = await read($, chefao)
-      return { text: veio && ch !== null ? `${NOME_CHEFAO[ch.nome] ?? ch.nome} entrou em cena (página ${ch.pagina}/10). Use /cronicas golpe para tirar vida.` : 'Já há um chefão em cena.' }
+      if (!veio || ch === null) {
+        return { text: 'Já há um chefão em cena.' }
+      }
+      const nome = NOME_CHEFAO[ch.nome] ?? ch.nome
+      return {
+        text: comLista
+          ? `${nome} entrou em cena com uma lista de ${tarefas?.total ?? 0} tarefas (página ${ch.pagina}/10). Cada ferramenta do Claude bate no escudo e tira pouco; /cronicas golpe conclui uma tarefa (a última é o golpe crítico).`
+          : `${nome} entrou em cena (página ${ch.pagina}/10). Use /cronicas golpe para tirar vida.`,
+      }
     } else if (chave === 'golpe') {
       const ch = await read($, chefao)
       if (!dePe(ch)) {
         return { text: 'Não há chefão em cena. /cronicas chefao chama um.' }
       }
-      await ferirChefao($, c => c.vida - 1)
+      if (ch.origem === 'lista') {
+        // conclui uma tarefa da lista: a vida desce até o fim do bloco
+        const t = { total: ch.tarefas.total, feitas: Math.min(ch.tarefas.total, ch.tarefas.feitas + 1) }
+        await update($, chefao, c => (dePe(c) ? { ...c, tarefas: t } : c))
+        await ferirChefao($, c => (t.total - t.feitas) * c.bloco)
+      } else {
+        await ferirChefao($, c => c.vida - 1)
+      }
       await revisar($)
       const depois = await read($, chefao)
-      return { text: depois?.caiu !== undefined ? `${NOME_CHEFAO[ch.nome] ?? ch.nome} caiu! Página ${ch.pagina}/10 recuperada.` : `Golpe! Vida ${depois?.vida ?? 0}/${depois?.vidaMax ?? 0}.` }
+      const v = depois === null ? { resta: 0, total: 0 } : vidaEmTarefas(depois)
+      return {
+        text:
+          depois?.caiu !== undefined
+            ? `${NOME_CHEFAO[ch.nome] ?? ch.nome} caiu! Página ${ch.pagina}/10 recuperada.`
+            : ch.origem === 'lista'
+              ? `Tarefa concluída! Faltam ${v.resta} de ${v.total}.`
+              : `Golpe! Vida ${v.resta}/${v.total}.`,
+      }
     } else if (chave === 'elite') {
       // para ver o elite sem esperar um erro de verdade: a próxima ferramenta chama o Golem
       // cada teste traz o próximo dos 4 troféus, para ver todos
@@ -564,6 +1114,20 @@ export const register: Register = on => {
       await update($, elite, el => ({ ...el, proximo: nomeDoErro(exemplo[tipo]), proximoTipo: tipo }))
       const nomes: Record<TipoTrofeu, string> = { comando: 'taça com chama (comando)', edicao: 'engrenagem (edição)', leitura: 'lua crescente (leitura)', web: 'orbe (web)' }
       return { text: `A próxima luta comum será o elite (Golem de Obsidiana) trazendo o troféu ${nomes[tipo]}. Rode de novo depois para ver o próximo tipo.` }
+    } else if (chave === 'vigilia' || chave === 'vigília') {
+      // para ver a Vigília sem esperar: o luar fica a 10 s da hora em que ela manda a mensagem
+      const agora = await $.clock.now()
+      const ttlMs = (await read($, hud)).luz?.ttlMs ?? 3_600_000
+      const restante = antecedencia(ttlMs) + 10_000
+      await update($, hud, h => ({ ...h, luz: { at: agora - (ttlMs - restante), ttlMs } }))
+      await marcarFimDoLuar($, restante)
+      await agendarVigilia($)
+      const acesa = (await read($, botoes)).vigilia.ligada
+      return {
+        text: acesa
+          ? 'Luar simulado perto do fim: a Vigília manda a mensagem curtinha em 10 s.'
+          : 'Luar simulado perto do fim. A Vigília está apagada: clique na lanterna para acender (a mensagem sai logo depois).',
+      }
     } else if (chave === 'lua-nova') {
       // só para ver o aviso: a próxima resposta acende o luar de novo
       const agora = await $.clock.now()
@@ -573,16 +1137,13 @@ export const register: Register = on => {
       const atual = await read($, hud)
       const nv = nivelDe(atual.jogo.xp)
       return {
-        text: `As Crônicas de Lua: escala ${a.escala}x, ${a.pxColuna} px por coluna, modo ${a.quadro ? 'quadro' : 'imagem'}. Nível ${nv.nivel}, ${atual.jogo.xp} XP, ${paginasNoCiclo(atual.jogo.paginas)}/10 páginas.\nUse /cronicas escala 1|2|3, /cronicas regua e /cronicas largura <px> (calibra a largura), /cronicas quadro|imagem, /cronicas teste (compara os dois) /cronicas lua-nova (simula o cache frio) ou /cronicas chefao [nome] e /cronicas golpe (testa o chefão) ou /cronicas elite (a próxima luta é o elite).${(atual.jogo.trofeus ?? []).length > 0 ? `\nTroféus: ${(atual.jogo.trofeus ?? []).slice(0, 5).join(' · ')}` : ''}`,
+        text: `As Crônicas de Lua: escala ${a.escala}x, ${a.pxColuna} px por coluna, modo ${a.quadro ? 'quadro' : 'imagem'}. Nível ${nv.nivel}, ${atual.jogo.xp} XP, ${paginasNoCiclo(atual.jogo.paginas)}/10 páginas.\nUse /cronicas escala 1|2|3, /cronicas regua e /cronicas largura <px> (calibra a largura), /cronicas quadro|imagem, /cronicas teste (compara os dois) /cronicas lua-nova (simula o cache frio), /cronicas vigilia (o luar perto do fim, para ver a Vigília) ou /cronicas chefao [nome] e /cronicas golpe (testa o chefão) ou /cronicas elite (a próxima luta é o elite).${(atual.jogo.trofeus ?? []).length > 0 ? `\nTroféus: ${(atual.jogo.trofeus ?? []).slice(0, 5).join(' · ')}` : ''}`,
       }
     }
     await $.store.set('ajustes', a)
     await update($, tique, t => t + 1)
     if (chave === 'linha') {
       return { text: `Altura da linha: ${n} px. As áreas de mouse foram recalculadas.` }
-    }
-    if (chave === 'largura') {
-      return { text: `Largura calibrada: ${n} px em ${ultimasColunas} colunas = ${a.pxColuna} px por coluna. A cena agora acompanha a largura da faixa (régua desligada).` }
     }
     return {
       text: a.teste
@@ -596,8 +1157,33 @@ export const register: Register = on => {
     if (e.reason === 'clear') {
       await update($, hud, h => ({ ...h, luz: null, mochila: null }))
       await update($, confirma, () => false)
+      await update($, botoes, (b): Botoes => ({ ...b, estandarte: 'nada', mochila: 'nada' }))
+      await agendarVigilia($)
     }
     return next(e)
+  })
+
+  // o Livro fechado pelo próprio app (o x do painel): o ícone volta a fechado
+  on('ui.close', async ($, e, next) => {
+    if (e.id === LIVRO) {
+      await update($, botoes, (b): Botoes => ({ ...b, livro: false }))
+    }
+    return next(e)
+  })
+
+  on('ui.render', { component: 'Pane', requestId: LIVRO }, async ($, e) => {
+    const els = $.ui.resolve(e) as Elementos
+    const jogo = (await read($, hud)).jogo
+    if (e.surface === 'terminal') {
+      return livroEmTexto(els, jogo)
+    }
+    if (e.props.placement === 'widget') {
+      // painel minimizado: só uma linha que se lê de relance
+      const { Text } = els
+      return <Text>{`📖 Nível ${nivelDe(jogo.xp).nivel} · páginas ${paginasNoCiclo(jogo.paginas)}/10 · ${(jogo.trofeus ?? []).length} troféus`}</Text>
+    }
+    const [aba, a] = await Promise.all([read($, livroAba), lerAjustes($)])
+    return livroNoPainel($, els, jogo, aba, e.props.bodyColumns, a, e.surface)
   })
 
   // Mana e Mochila: o engine avisa quando os números mudam.
@@ -636,6 +1222,10 @@ export const register: Register = on => {
       // a última ferramenta do turno decide a luta na hora
       await revisar($, true)
       await ganharXp($, 1)
+      if ((await read($, botoes)).estandarte === 'escrevendo') {
+        await update($, botoes, (b): Botoes => ({ ...b, estandarte: 'pronto' }))
+      }
+      await agendarVigilia($)
     }
     return res
   })
@@ -657,6 +1247,7 @@ export const register: Register = on => {
       if (usouCache) {
         await update($, hud, h => ({ ...h, luz: { at, ttlMs } }))
         await marcarFimDoLuar($, at + ttlMs - (await $.clock.now()))
+        await agendarVigilia($)
       }
     }
     return resposta
@@ -669,7 +1260,7 @@ export const register: Register = on => {
       // as ferramentas de dentro de um subagente não chamam monstro (o próprio Agent já é a luta)
       const res = await next(e)
       if (res.deny === undefined && res.isError !== true) {
-        await ganharXp($, 2)
+        await ganharXp($, 2, e.tool)
       }
       return res
     }
@@ -702,43 +1293,72 @@ export const register: Register = on => {
       return res
     } finally {
       const fim = await $.clock.now()
-      await update($, lutas, s => golpear(s, n, { at: fim, ok, dano: danoDe(texto) }))
+      const dano = danoDe(texto)
+      await update($, lutas, s => golpear(s, n, { at: fim, ok, dano }))
       await lembrarErro($, e.tool, e, ok, texto)
       if (ok) {
-        await lista($, e.tool, e, n)
+        await golpeNoChefao($, e.tool, e, n, fim, dano)
       }
       await revisar($)
       if (ok) {
-        await ganharXp($, 2)
+        await ganharXp($, 2, e.tool)
       }
     }
   }).catch(($, e, next) => next(e))
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    if (e.props.hasSurvey || e.surface !== 'desktop') {
+    if (e.props.hasSurvey) {
       return next(e)
     }
-    const { Box, Button, Svg, Text } = $.ui.resolve(e)
+    if (e.surface === 'terminal') {
+      // Fase 5: no terminal não há Svg: a faixa em texto, com emojis
+      await read($, tique)
+      const [c, estado, agora, confirmando, ls, bt, ch] = await Promise.all([read($, caminho), read($, hud), $.clock.now(), read($, confirma), read($, lutas), read($, botoes), read($, chefao)])
+      const els = $.ui.resolve(e) as unknown as Elementos
+      const cansada = luar(estado, agora).desmaiada
+      const linhas = [
+        linhaHud(estado, agora, e.props.bodyColumns),
+        linhaAcao(estado, agora, andandoAgora(c, agora), lutaDaVez(ls.lista, agora), ch),
+      ]
+      return faixaEmTexto(els, linhas, [botoesChips($, els, bt), ...acoesDaFaixa($, els, bt, confirmando, cansada)])
+    }
+    const sup: Sup = e.surface
+    const remota = sup !== 'desktop'
+    const { Box, Svg, Text } = $.ui.resolve(e)
     await read($, tique)
-    const [c, estado, agora, a, confirmando, ls] = await Promise.all([
+    const [c, estado, agora, a, confirmando, ls, bt] = await Promise.all([
       read($, caminho),
       read($, hud),
       $.clock.now(),
       lerAjustes($),
       read($, confirma),
       read($, lutas),
+      read($, botoes),
     ])
     const ch = await read($, chefao)
-    ultimasColunas = e.props.bodyColumns
+    colunasPor[sup] = e.props.bodyColumns
+    ultimaSup = sup
+    const pxColuna = pxColunaDe(a, sup)
     // a cena acompanha a largura da faixa (colunas x px por coluna, calibrado pela régua)
-    const W = Math.max(LARGURA_MIN, Math.min(LARGURA_MAX, Math.floor((e.props.bodyColumns * a.pxColuna) / a.escala)))
+    const W = Math.max(LARGURA_MIN, Math.min(LARGURA_MAX, Math.floor((e.props.bodyColumns * pxColuna) / a.escala)))
     const luta = lutaDaVez(ls.lista, agora)
     // a faixa tem sempre a mesma altura (pedido do usuário): todo monstro cabe nela
     const modo = 'compacto'
     // a Pixelify (textos longos) só entra quando os balões podem aparecer (modo quadro)
-    const textoLongo = a.quadro || a.teste
-    const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, ...(a.prova === true ? { botoes: true } : {}), ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }) } as const
-    const montada = montar(vista)
+    // (fora do desktop não há hover: nada de balões nem quadro interativo)
+    const textoLongo = !remota && (a.quadro || a.teste)
+    const estadoBotoes: EstadoBotoes = {
+      vigilia: bt.vigilia.ligada,
+      envios: bt.vigilia.envios,
+      maxEnvios: VIGILIA_MAX,
+      ...(bt.vigilia.pisca === undefined ? {} : { pisca: bt.vigilia.pisca }),
+      mochila: (estado.mochila ?? 0) > 80 || bt.mochila !== 'nada',
+      estandarte: bt.estandarte === 'nada' ? 'enrolado' : bt.estandarte,
+      livro: bt.livro,
+    }
+    const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }) } as const
+    // celular: menos animação (sem partículas nem a tira de andar na luta)
+    const montada = montar(sup === 'mobile' ? { ...vista, economia: true } : vista)
     let { svg } = montada
     const { altura, alvos } = montada
     if (svg.length > LIMITE_SVG) {
@@ -749,8 +1369,12 @@ export const register: Register = on => {
     // direita (preserveAspectRatio slice) em vez de encolher o desenho
     const nv = nivelDe(estado.jogo.xp)
     const cansada = luar(estado, agora).desmaiada
-    const alt = `As Crônicas de Lua: a Lua ${cansada ? 'está cansada (lua nova, cache frio)' : dePe(ch) ? `enfrenta o chefão ${NOME_CHEFAO[ch.nome] ?? ch.nome} (${ch.vida}/${ch.vidaMax} de vida)` : luta !== undefined ? 'luta com um monstro' : c.andando ? 'anda pela floresta' : 'descansa'}; nível ${nv.nivel}.`
-    const cena = a.teste ? (
+    const alt = `As Crônicas de Lua: a Lua ${cansada ? 'está cansada (lua nova, cache frio)' : dePe(ch) ? `enfrenta o chefão ${NOME_CHEFAO[ch.nome] ?? ch.nome} (${vidaEmTarefas(ch).resta}/${vidaEmTarefas(ch).total} de vida)` : luta !== undefined ? 'luta com um monstro' : c.andando ? 'anda pela floresta' : 'descansa'}; nível ${nv.nivel}.`
+    const cena = remota ? (
+      // sem altura fixa: o editor estica ou encolhe a imagem inteira até a largura
+      // da faixa (não corta os botões); com a largura calibrada, fica perto de 1:1
+      <Svg source={svg} alt={alt} />
+    ) : a.teste ? (
       <Box flexDirection="column" gap={1}>
         <Text key="ta">A: quadro interativo (balões no hover)</Text>
         <Svg key="sa" source={svg} isInteractive height={altura} alt={alt} />
@@ -763,50 +1387,40 @@ export const register: Register = on => {
       <Box position="relative">
         <Svg source={svg} height={altura} alt={alt} />
         {areasDeHover($.ui.resolve(e) as Elementos, a, e.props.bodyColumns, W, alvos, false)}
+        {botoesDoHud($, $.ui.resolve(e) as Elementos, a, e.props.bodyColumns, W, alvos)}
       </Box>
     )
-    if (a.prova === true) {
-      return provaTecnica($, $.ui.resolve(e) as Elementos, e.props.bodyColumns, W, a, <Svg source={svg} height={altura} alt={alt} />, alvos)
+    if (a.prova === true && !remota) {
+      const prova = provaTecnica($, $.ui.resolve(e) as Elementos, e.props.bodyColumns, W, a, <Svg source={svg} height={altura} alt={alt} />, alvos)
+      const linhas = acoesDaFaixa($, $.ui.resolve(e) as Elementos, bt, confirmando, cansada)
+      return linhas.length === 0 ? (
+        prova
+      ) : (
+        <Box flexDirection="column" gap={1}>
+          {prova}
+          {linhas}
+        </Box>
+      )
     }
     if (a.regua === true) {
       return (
         <Box flexDirection="column" gap={1}>
           {cena}
-          <Svg key="regua" source={regua(e.props.bodyColumns, a.pxColuna)} height={44} alt="Régua de calibrar a largura da faixa" />
+          <Svg key="regua" source={regua(e.props.bodyColumns, pxColuna)} height={44} alt="Régua de calibrar a largura da faixa" />
         </Box>
       )
     }
-    if (!cansada) {
+    const acoes = acoesDaFaixa($, $.ui.resolve(e) as Elementos, bt, confirmando, cansada)
+    if (remota) {
+      acoes.unshift(sup === 'vscode' ? botoesChips($, $.ui.resolve(e) as Elementos, bt) : botoesEmLinha($, $.ui.resolve(e) as Elementos, bt))
+    }
+    if (acoes.length === 0) {
       return cena
     }
-    // Lua nova: a chamada para ação é um botão de verdade logo abaixo da cena.
-    const acoes = confirmando ? (
-      <Box flexDirection="row" gap={1} alignItems="center">
-        <Text>A conversa atual sai da tela (volta com /resume).</Text>
-        <Button
-          key="sim"
-          variant="primary"
-          onPress={async () => {
-            await update($, confirma, () => false)
-            await $.command.run({ command: 'clear' })
-          }}
-        >
-          Começar
-        </Button>
-        <Button key="nao" onPress={() => update($, confirma, () => false)}>
-          Ficar nesta
-        </Button>
-      </Box>
-    ) : (
-      <Box flexDirection="row" gap={1} alignItems="center">
-        <Button key="nova" variant="primary" onPress={() => update($, confirma, () => true)}>
-          🌙 Nova conversa
-        </Button>
-        <Text dimColor>ou continue aqui: só a próxima mensagem custa mais.</Text>
-      </Box>
-    )
+    // VS Code e celular: sem a linha vazia entre a cena e os botões (a faixa
+    // do editor é baixa e a linha de botões rolava para fora)
     return (
-      <Box flexDirection="column" gap={1}>
+      <Box flexDirection="column" gap={remota ? 0 : 1}>
         {cena}
         {acoes}
       </Box>
