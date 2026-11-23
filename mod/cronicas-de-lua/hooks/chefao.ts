@@ -11,6 +11,7 @@
 import { type Doc, esc, r } from './base'
 import type { Chefao } from '../types'
 import { DESFAZ, F, corpoMonstro, desfazer, monstroInfo } from './luta'
+import { familiaCurta } from './fontes'
 import { t } from './t'
 
 /** A ordem da jornada: uma página das Crônicas por chefão. */
@@ -279,7 +280,7 @@ export function barraDeVida(d: Doc, c: Chefao, x: number, y: number, w: number, 
   }
   s += ponta(x - 1, y) + ponta(x + w - 5, y)
   const nome = (NOME_CHEFAO[c.nome] ?? c.nome).toUpperCase()
-  s += `<text x="${x + 3}" y="${y - 4}" style="font-family:'Silkscreen',ui-monospace,monospace;font-size:12px;fill:${O}">${esc(nome)}</text>`
+  s += `<text x="${x + 3}" y="${y - 4}" style="font-family:${familiaCurta()};font-size:12px;fill:${O}">${esc(nome)}</text>`
   return `<g>${s}</g>`
 }
 

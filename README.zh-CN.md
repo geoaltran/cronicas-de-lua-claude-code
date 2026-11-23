@@ -63,14 +63,14 @@
 
 ![Boss 战](previa_chefao.gif)
 
-各工具对应的怪物：读取文件 → Vespera · 编辑代码 → Relojoeiro / Sir Solis · 终端 → Ignis · 网页 → Leviatã / Nébula · 外部集成（MCP）→ Rei Espelho · 子代理 → Dama Penumbra 的分身。Boss 按顺序登场，每个对应编年史中的一页，直到 Malakor，之后进入"新游戏+"。
+各工具对应的怪物：读取文件 → Vespera · 编辑代码 → 钟表匠 / Sir Solis · 终端 → Ignis · 网页 → 利维坦 / Nébula · 外部集成（MCP）→ 镜之王 · 子代理 → 半影夫人的分身。Boss 按顺序登场，每个对应编年史中的一页，直到 Malakor，之后进入"新游戏+"。
 
 ## 命令
-`/cronicas` 显示 Lua 的概况。常用命令：`/cronicas ruler` 和 `/cronicas width <px>`（校准宽度）、`/cronicas boss` 和 `/cronicas hit`（试玩 Boss 战）、`/cronicas surfaces`（查看会话正在哪里绘制）、`/cronicas language`（选择游戏语言）。游戏目前支持英语、葡萄牙语、西班牙语、法语和德语（默认跟随系统语言，可用 `/cronicas language` 切换），中文、日语和韩语即将推出。
+`/cronicas` 显示 Lua 的概况。常用命令：`/cronicas ruler` 和 `/cronicas width <px>`（校准宽度）、`/cronicas boss` 和 `/cronicas hit`（试玩 Boss 战）、`/cronicas surfaces`（查看会话正在哪里绘制）、`/cronicas language`（选择游戏语言）。游戏支持英语、葡萄牙语、西班牙语、法语、德语、中文、日语和韩语（默认跟随系统语言，可用 `/cronicas language` 切换）。
 
 ## 许可
 - **代码**（Python 脚本、`mod/`）：**MIT**，见 [`LICENSE`](LICENSE)。
 - **美术与角色**（`assets/` 中的全部内容、模组内嵌的美术、音效和预览图）：**© 2026 George Altran (@geoaltran)，[CC BY-NC 4.0](LICENSE-ART)**。欢迎分享、二次创作和同人创作，只需注明 **"Art by George Altran (@geoaltran)"** 并附上链接。**未经授权不得用于商业用途**；商业授权可另行洽谈。
-- **字体**：Silkscreen 和 Pixelify Sans，**SIL Open Font License 1.1**（许可证文件与字体放在一起）。
+- **字体**：Silkscreen、Pixelify Sans 和 Fusion Pixel Font（中文、日语、韩语），**SIL Open Font License 1.1**（许可证文件与字体放在一起）。
 
 具有法律效力的是英文版许可文本。完整致谢见 [`CREDITS.md`](CREDITS.md)。

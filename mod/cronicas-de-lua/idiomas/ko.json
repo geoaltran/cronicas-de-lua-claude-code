@@ -1,0 +1,362 @@
+{
+  "_sobre": "게임의 한국어 텍스트. 키와 {표시}는 pt-BR.json(기준)과 같습니다. 고유 이름(Lua, Vespera, Ignis, Sir Solis, Nébula, Malakor)은 라틴 문자 그대로. 수정한 뒤 python3 idiomas.py를 실행하세요.",
+  "chefoes": {
+    "vespera": "Vespera",
+    "dama_penumbra": "반그림자 부인",
+    "golem_obsidiana": "흑요석 골렘",
+    "leviata": "리바이어던",
+    "ignis": "Ignis",
+    "relojoeiro": "시계공",
+    "sir_solis": "Sir Solis",
+    "rei_espelho": "거울 왕",
+    "nebula": "Nébula",
+    "malakor": "Malakor"
+  },
+  "chefao": {
+    "pagina": "+페이지 {pagina}/10",
+    "novo_jogo": "뉴 게임+"
+  },
+  "luta": {
+    "critico": "크리티컬!",
+    "trofeu": "+트로피",
+    "erro_misterioso": "수수께끼 오류"
+  },
+  "terminal": {
+    "nivel": "🌙 Lv {nivel}",
+    "lua_nova": "신월",
+    "minutos": "{n}분",
+    "luz": "달빛 ",
+    "mana": "마나 ",
+    "mochila": "배낭 ",
+    "mochila_cheia": " (가득!)",
+    "desmaio": "🌑 신월: Lua가 기절했어요(캐시가 식었어요). 다음 메시지는 비용이 더 듭니다.",
+    "vida_tarefas": " 할 일 {resta}/{total}",
+    "chefao_caiu": "🏆 {nome} 쓰러짐! +페이지 {pagina}/10",
+    "fugiu": "💥 {alvo}의 반격, 그리고 도망",
+    "defendeu": "🛡 {alvo}이(가) 방패로 막았다 ",
+    "critico": "💥 크리티컬! ",
+    "golpe_em": "{alvo}에게 명중",
+    "derrotado": "{alvo} 격파",
+    "xp": " +{xp} XP",
+    "trofeu": " +트로피",
+    "canaliza": "🔮 Lua가 {alvo}에게 마력을 모으는 중…",
+    "enfrenta": "⚔ Lua 대 {alvo}",
+    "enfrenta_elite": "⚔ Lua 대 {alvo} (엘리트)",
+    "anda": "🌲 Lua가 숲을 걷는 중",
+    "descansa": "💤 Lua가 쉬는 중",
+    "chefao_em": {
+      "um": "  ·  보스까지 {n}번 남음",
+      "outros": "  ·  보스까지 {n}번 남음"
+    }
+  },
+  "barras": {
+    "luz": {
+      "nome": "달빛",
+      "curto": "빛",
+      "minutos": "{n}분",
+      "lua_nova": "신월",
+      "titulo_lua_nova": "달빛 · 신월",
+      "sem_luz": "대화 캐시.\n첫 답변 때 불이 켜져요.",
+      "explica": "대화 캐시.\n답변마다 {min}분 유지돼요.",
+      "lua_nova_explica": "캐시가 식었어요.\n다음 메시지는 비용이 더 들어요."
+    },
+    "mana": {
+      "nome": "별의 마나",
+      "curto": "마나",
+      "sem_dado": "요금제 한도.\n첫 답변 뒤에 보여요.",
+      "explica": "요금제 한도: {livre}% 남음.",
+      "renova": "\n{hora}에 회복(5시간).",
+      "sete_dias": "\n7일: {livre}% 남음."
+    },
+    "mochila": {
+      "nome": "배낭",
+      "nome_cheia": "배낭!",
+      "curto": "배낭",
+      "explica": "대화를 얼마나 썼는지\n(컨텍스트).",
+      "cheia_explica": "대화가 거의 찼어요({pct}%).\n배낭을 정리할 때예요(압축)."
+    },
+    "xp": {
+      "nome": "XP",
+      "curto": "XP",
+      "titulo": "XP · 레벨 {nivel}",
+      "explica": "레벨 {proximo}까지 {faltam} XP.\n페이지 {paginas}/10.",
+      "chefao_em": {
+        "um": "보스까지 {n}번 남음.",
+        "outros": "보스까지 {n}번 남음."
+      },
+      "chefao_lista": "할 일을 마치면 보스가 쓰러져요: {feitas}/{total}.",
+      "chefao_vida": {
+        "um": "{n}번 더 이기면 보스가 쓰러져요.",
+        "outros": "{n}번 더 이기면 보스가 쓰러져요."
+      }
+    },
+    "selo": {
+      "titulo": "레벨 {nivel}",
+      "explica": "총 {xp} XP.\n페이지 {paginas}/10 · 승리 {lutas}번."
+    }
+  },
+  "botoes": {
+    "vigilia": {
+      "nome": "불침번",
+      "acesa": "불침번 · 켜짐",
+      "explica": "캐시를 따뜻하게 유지해요.\n한도를 조금 써요.",
+      "acesa_explica": "따뜻한 캐시: 메시지 {envios}/{max}.\n클릭하면 꺼져요."
+    },
+    "mochila": {
+      "nome": "배낭",
+      "cheia": "배낭이 가득",
+      "explica": "대화를 정리해요\n(컨텍스트 압축).",
+      "cheia_explica": "클릭해서 정리\n(대화 압축)."
+    },
+    "estandarte": {
+      "nome": "깃발",
+      "explica": "다음 세션을 위한\n임무 요약.",
+      "escrevendo": "Claude가 임무 요약을\n쓰고 있어요.",
+      "pronto": "임무 요약 완성."
+    },
+    "livro": {
+      "nome": "책",
+      "explica": "능력치, 페이지,\n도감과 트로피.",
+      "aberto_explica": "클릭하면 닫혀요."
+    }
+  },
+  "lua_nova": {
+    "frase": "Lua가 열심히 싸우다 지쳤어요.",
+    "linha2": "다음 메시지는 비용이 더 들어요(캐시가 식었어요)."
+  },
+  "livro": {
+    "alt": "Lua의 책. {alt}",
+    "abas": {
+      "ficha": "능력치",
+      "bestiario": "도감",
+      "trofeus": "트로피",
+      "grimorio": "마법서"
+    },
+    "ficha": {
+      "titulo": "Lua의 능력치",
+      "subtitulo": "달의 마법사, 연대기의 수호자.",
+      "nivel": "레벨",
+      "nivel_valor": "{nivel} · {xp} XP",
+      "proximo_nivel": "다음 레벨",
+      "proximo_nivel_valor": "{faltam} XP 남음",
+      "lutas": "승리한 전투",
+      "chefoes": "물리친 보스",
+      "trofeus": "트로피",
+      "proximo_chefao": "다음 보스",
+      "proximo_chefao_valor": {
+        "um": "{nome}: {n}번 더 싸우거나 다음 할 일 목록에서",
+        "outros": "{nome}: {n}번 더 싸우거나 다음 할 일 목록에서"
+      },
+      "paginas": "연대기 페이지: {ciclo}/10",
+      "paginas_novo_jogo": "연대기 페이지: {ciclo}/10 (뉴 게임+)",
+      "alt": "Lua의 능력치: 레벨 {nivel}, {xp} XP, 승리 {lutas}번, 물리친 보스 {chefoes}, 트로피 {trofeus}, 페이지 {ciclo}/10."
+    },
+    "bestiario": {
+      "titulo": "도감",
+      "todos": "보스 10명을 모두 물리쳤어요. 여정은 뉴 게임+에서 다시 시작돼요.",
+      "vistos": "보스 10명 중 {vistos}명을 물리쳤어요. 나머지는 어둠 속에서 기다리고 있어요.",
+      "pagina": "{n}페이지",
+      "alt": "도감: 보스 10명 중 {vistos}명 격파.",
+      "alt_nomes": "도감: 보스 10명 중 {vistos}명 격파({nomes})."
+    },
+    "trofeus": {
+      "titulo": "트로피",
+      "vazio": "엘리트(Claude가 고친 오류)를 물리치면 첫 트로피를 받아요.",
+      "subtitulo": "Claude가 고친 오류. 마우스를 올리면 이름이 보여요.",
+      "nome": {
+        "comando": "명령의 잔",
+        "edicao": "편집의 톱니바퀴",
+        "leitura": "읽기의 달",
+        "web": "웹의 구슬"
+      },
+      "explica": "{nome}\n오류를 고쳤어요.",
+      "estante_vazia": "선반이 아직 비어 있어요.",
+      "estante_cheia": "트로피 {n}개: 최신 {vagas}개가 선반에 있어요.",
+      "estante": {
+        "um": "선반에 트로피 {n}개.",
+        "outros": "선반에 트로피 {n}개."
+      },
+      "alt": "트로피: {lista}.",
+      "nenhum": "아직 없음"
+    },
+    "grimorio": {
+      "titulo": "마법서",
+      "subtitulo": "Claude의 도구는 Lua의 주문.",
+      "ler": { "nome": "루멘의 눈길", "desc": "파일을 읽고 찾아요. Vespera를 깨워요." },
+      "editar": { "nome": "재작성의 룬", "desc": "코드를 고치고 써요. 시계공과 Sir Solis를 불러요." },
+      "terminal": { "nome": "명령의 불꽃", "desc": "터미널 명령. Ignis를 깨워요." },
+      "web": { "nome": "별빛 물결", "desc": "웹을 검색하고 읽어요. 리바이어던과 Nébula를 데려와요." },
+      "integracao": { "nome": "거울의 서약", "desc": "외부 연동(MCP). 거울 왕을 불러요." },
+      "subagente": { "nome": "그림자 메아리", "desc": "도우미 부르기(서브에이전트). 반그림자 부인의 분신." },
+      "total": {
+        "um": "지금까지 주문 {n}번.",
+        "outros": "지금까지 주문 {n}번."
+      },
+      "alt": "마법서: {lista}.",
+      "alt_item": {
+        "um": "{nome}, {n}번",
+        "outros": "{nome}, {n}번"
+      }
+    },
+    "titulo_painel": "Lua의 책",
+    "widget": "📖 레벨 {nivel} · 페이지 {paginas}/10 · 트로피 {trofeus}",
+    "texto": {
+      "nivel": "레벨 {nivel} · {xp} XP (레벨 {proximo}까지 {faltam})",
+      "paginas": "연대기 페이지: {ciclo}/10 (총 {total})",
+      "lutas": {
+        "um": "승리 {lutas}번 · 보스까지 {n}번 남음",
+        "outros": "승리 {lutas}번 · 보스까지 {n}번 남음"
+      },
+      "trofeus": "트로피: {n}"
+    }
+  },
+  "superficies": {
+    "terminal": "터미널",
+    "desktop": "데스크톱 앱",
+    "vscode": "VS Code",
+    "mobile": "휴대폰"
+  },
+  "mensagens": {
+    "vigilia": "🌙 Lua의 불침번: 캐시를 따뜻하게 유지하는 중일 뿐이에요. 아무것도 하지 말고 \"ok\"라고만 답해 주세요.",
+    "estandarte": "🚩 Lua의 깃발: 새 세션에서 작업을 이어 갈 수 있도록 지금 임무 요약을 써 주세요. 프로젝트 루트에 NEXT_SESSION.md 파일을 만들거나 고치고, 한국어로 깔끔하고 간결하게 다음을 담아 주세요: 맨 위에 새 세션에 그대로 붙여 넣을 글, 무엇이 어디에 있는지(파일, 폴더, 실행·검증·테스트 명령), 끝나서 승인된 것(다시 하지 않도록), 내린 결정과 발견한 제약이나 함정, 번호를 매긴 다음 단계의 자세한 계획, 남은 할 일과 열린 질문. 프로젝트에 CLAUDE.md가 있으면 NEXT_SESSION.md를 가리키는 줄을 하나 추가해 주세요. 끝나면 무엇을 저장했는지 몇 줄로 알려 주세요."
+  },
+  "avisos": {
+    "vigilia": {
+      "apagou_sozinha": "🏮 불침번이 메시지 {max}개를 보낸 뒤 저절로 꺼졌어요. 캐시를 계속 따뜻하게 두려면 다시 켜 주세요.",
+      "apagada": "🏮 불침번 꺼짐.",
+      "acesa": "🔥 불침번 켜짐. 달빛이 다 떨어져 갈 때 Lua가 캐시를 따뜻하게 유지하려고 아주 짧은 메시지를 보내요(최대 {max}번, 입력하지 않을 때만). 한 번 보낼 때마다 요금제 한도를 조금 써요. 다시 클릭하면 꺼져요."
+    },
+    "mochila": {
+      "espere": "🎒 배낭을 정리하기 전에 Claude가 작업을 마칠 때까지 기다려 주세요.",
+      "arrumada": "🎒 배낭 정리 완료: 대화를 요약해서 다시 자리가 생겼어요.",
+      "nao_arrumada": "🎒 배낭을 정리하지 못했어요: {motivo}",
+      "falhou": "🎒 지금은 배낭을 정리할 수 없어요: {erro}"
+    },
+    "estandarte": {
+      "espere": "🚩 깃발을 올리기 전에 Claude가 작업을 마칠 때까지 기다려 주세요.",
+      "falhou": "🚩 요약을 요청하지 못했어요: {erro}"
+    },
+    "livro": {
+      "nao_abriu": "📖 책이 아직 열리지 않았어요: {motivo}"
+    }
+  },
+  "chips": {
+    "vigilia": "불침번",
+    "vigilia_acesa": "불침번 켜짐 ({envios}/{max})",
+    "mochila": "배낭",
+    "estandarte": "깃발",
+    "escrevendo": "쓰는 중…",
+    "livro": "책",
+    "livro_aberto": "책 열림"
+  },
+  "faixa": {
+    "nova_conversa": {
+      "explica": "지금 대화가 화면에서 사라져요(/resume으로 되돌릴 수 있어요).",
+      "sim": "시작",
+      "nao": "여기 있기",
+      "botao": "🌙 새 대화"
+    },
+    "lua_nova": {
+      "continuar": "아니면 여기서 계속해도 돼요: 다음 메시지 하나만 비용이 더 들어요."
+    },
+    "mochila": {
+      "explica": "배낭을 정리하면 대화를 요약하고 자리를 비워요(/compact와 같아요).",
+      "sim": "배낭 정리하기",
+      "nao": "나중에",
+      "arrumando": "🎒 배낭 정리 중…"
+    },
+    "estandarte": {
+      "pronto": "🚩 임무 요약 완성(NEXT_SESSION.md).",
+      "fechar": "닫기"
+    }
+  },
+  "cena_alt": {
+    "frase": "As Crônicas de Lua: Lua는 {acao}. 레벨 {nivel}.",
+    "cansada": "지쳤어요(신월, 캐시가 식음)",
+    "chefao": "보스 {nome}와(과) 싸우는 중(체력 {resta}/{total})",
+    "luta": "몬스터와 싸우는 중",
+    "anda": "숲을 걷는 중",
+    "descansa": "쉬는 중"
+  },
+  "regua_alt": "띠의 너비를 맞추는 자",
+  "comando": {
+    "descricao": "As Crônicas de Lua: 여정, 띠 설정과 테스트(보스, 엘리트, 신월)",
+    "superficies": {
+      "nenhuma": "지금 이 세션을 그리고 있는 화면이 없어요.",
+      "lista": "이 세션이 그려지는 곳: {lista}."
+    },
+    "abertura": {
+      "desligada": "오프닝 꺼짐: 그날 첫 세션에서도 더는 나오지 않아요. /cronicas intro on으로 다시 켜고, /cronicas intro로 지금 볼 수 있어요.",
+      "ligada": "오프닝 켜짐: 매일 첫 세션에 나와요. /cronicas intro로 지금 볼 수 있어요.",
+      "mostra": "띠에서 오프닝 재생 중(약 {s}초, 장면을 클릭하면 건너뛰어요).",
+      "mostra_desligada": "그날 첫 세션의 오프닝은 꺼져 있어요: /cronicas intro on으로 켜세요.",
+      "mostra_ligada": "/cronicas intro off로 끌 수 있어요."
+    },
+    "largura": {
+      "sem_colunas": "{sup}에서 띠가 몇 칸인지 아직 몰라요: 띠가 나타날 때까지 기다렸다가 다시 해 보세요.",
+      "calibrada": "{sup} 너비 보정 완료: {n} px ÷ {colunas}칸 = 칸당 {px} px. 이제 장면이 띠의 너비를 따라가요(자는 꺼짐)."
+    },
+    "prova": {
+      "ligada": "기술 테스트 켜짐. (1) 마우스 영역에 테두리가 생겨요: 막대와 레벨 배지에 마우스를 올려 보세요(테두리가 빛나고 말풍선이 나와요). (2) 장면에 버튼 아이콘 4개가 나오고 그 위에 보이지 않는 클릭 영역이 있어요: 하나씩 클릭하고(알림이 떠요) 마우스를 올려 보세요(버튼의 말풍선이 나와요). /cronicas probe를 다시 입력하면 꺼져요.",
+      "desligada": "기술 테스트 꺼짐.",
+      "rodape": "기술 테스트: {colunas}칸, 칸당 {px} px, 줄당 {linha} px. /cronicas probe로 끄기."
+    },
+    "regua": {
+      "ligada": "장면 아래에 자를 켰어요. 오른쪽 끝에서 온전히 보이는 마지막 숫자를 확인하고 /cronicas width <그 숫자>를 실행하세요. /cronicas ruler를 다시 입력하면 꺼져요.",
+      "desligada": "자 꺼짐."
+    },
+    "chefao": {
+      "desconhecido": "\"{pedido}\"라는 보스는 몰라요. 다음 중 하나를 쓰세요: {lista}.",
+      "ja_em_cena": "이미 보스가 나와 있어요.",
+      "com_lista": {
+        "um": "{nome} 등장, 할 일 {n}개 목록과 함께(페이지 {pagina}/10). Claude의 도구는 모두 방패에 맞아 조금밖에 못 깎아요. /cronicas hit은 할 일 하나를 끝내요(마지막 하나는 크리티컬).",
+        "outros": "{nome} 등장, 할 일 {n}개 목록과 함께(페이지 {pagina}/10). Claude의 도구는 모두 방패에 맞아 조금밖에 못 깎아요. /cronicas hit은 할 일 하나를 끝내요(마지막 하나는 크리티컬)."
+      },
+      "entrou": "{nome} 등장(페이지 {pagina}/10). /cronicas hit으로 체력을 깎으세요."
+    },
+    "golpe": {
+      "sem_chefao": "보스가 없어요. /cronicas boss로 불러내세요.",
+      "caiu": "{nome} 쓰러짐! 페이지 {pagina}/10을 되찾았어요.",
+      "tarefa": "할 일 완료! {total}개 중 {resta}개 남음.",
+      "golpe": "명중! 체력 {resta}/{total}."
+    },
+    "elite": {
+      "proximo": "다음 일반 전투는 트로피({trofeu})를 든 엘리트({elite})예요. 그 뒤에 다시 실행하면 다음 종류를 볼 수 있어요.",
+      "trofeu": {
+        "comando": "불꽃이 타는 잔(명령)",
+        "edicao": "톱니바퀴(편집)",
+        "leitura": "초승달(읽기)",
+        "web": "구슬(웹)"
+      }
+    },
+    "vigilia": {
+      "acesa": "달빛을 거의 끝으로 맞췄어요: 불침번이 10초 뒤에 짧은 메시지를 보내요.",
+      "apagada": "달빛을 거의 끝으로 맞췄어요. 불침번은 꺼져 있어요: 랜턴을 클릭해 켜세요(바로 메시지가 나가요)."
+    },
+    "lua_nova": "신월 시뮬레이션: 다음 답변까지 띠에 알림이 보여요.",
+    "modo": {
+      "quadro": "프레임",
+      "quadro_baloes": "프레임(마우스 말풍선)",
+      "imagem": "이미지"
+    },
+    "ajuda": {
+      "estado": "As Crônicas de Lua: 배율 {escala}x, 칸당 {px} px, {modo} 모드. 레벨 {nivel}, {xp} XP, 페이지 {paginas}/10.",
+      "uso": "사용법: /cronicas scale 1|2|3, /cronicas ruler와 /cronicas width <px>(너비 보정), /cronicas image|frame, /cronicas test(둘 다 비교), /cronicas new-moon(식은 캐시 시뮬레이션), /cronicas vigil(달빛을 거의 끝으로, 불침번 보기), /cronicas boss [이름]과 /cronicas hit(보스전 체험), /cronicas elite(다음 전투는 엘리트), /cronicas language(게임 언어).",
+      "trofeus": "트로피: {lista}"
+    },
+    "linha": "줄 높이: {n} px. 마우스 영역을 다시 계산했어요.",
+    "teste": "테스트 켜짐: 띠가 두 번 나와요. A(조작 가능한 프레임)와 B(이미지). /cronicas test를 다시 입력하면 꺼져요.",
+    "teste_a": "A: 조작 가능한 프레임(마우스 말풍선)",
+    "teste_b": "B: 이미지(말풍선 없음)",
+    "ajustada": "띠 조정 완료: 배율 {escala}x, 칸당 {px} px, {modo} 모드.",
+    "idioma": {
+      "titulo": "게임 언어: {nome}.",
+      "em_breve": "준비 중",
+      "como": "바꾸려면: /cronicas language <코드> (예: /cronicas language en). /cronicas language auto는 시스템 언어로 돌아가요.",
+      "trocado": "언어를 {nome}(으)로 바꿨어요.",
+      "auto": "시스템 언어: {nome}.",
+      "sem_traducao": "{nome}은(는) 아직 번역되지 않았어요. 지금은 게임이 {atual}(으)로 계속돼요.",
+      "desconhecido": "\"{pedido}\"라는 언어는 몰라요."
+    }
+  }
+}

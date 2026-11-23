@@ -3,7 +3,8 @@
 // roda no próprio SVG; o mod só redesenha quando o estado muda. Cada
 // animação usa um atraso negativo calculado do relógio, então um redesenho
 // continua exatamente de onde a cena estava (sem pulo).
-import { FONTE, FONTE_LONGA, MARCA, META } from './arte'
+import { MARCA, META } from './arte'
+import { cssFonteLonga, cssTexto, ehCJK, larguraCurta, larguraLonga, quebrarPorLargura } from './fontes'
 import { ANDAR, Doc, P, PARADA, type Q, art, esc, mod, r, sorteio } from './base'
 import type { Caminho, Chefao, Hud, Luta } from '../types'
 import { desenharLuta } from './luta'
@@ -344,17 +345,6 @@ function lua(d: Doc, v: Vista, desmaiada: boolean, naLuta?: { corpo: string; tri
 
 // ---------------------------------------------------------------- HUD
 
-export const CSS_TEXTO =
-  // Silkscreen: grade de 8 px; 12 px = 1,5 px de tela por pixel da fonte (3 pixels físicos na Retina)
-  `@font-face{font-family:'Silkscreen';src:url(${FONTE}) format('woff2')}` +
-  ".t{font-family:'Silkscreen',ui-monospace,monospace;font-size:12px;fill:#fff6d8;stroke:#1d1433;stroke-width:2px;paint-order:stroke;text-rendering:optimizeSpeed}" +
-  '.m{text-anchor:middle}.e{text-anchor:end}.n{fill:#e9d9ff}.b{font-size:12px}' +
-  // textos longos (balões, aviso de lua nova): Pixelify Sans, com minúsculas
-  ".l{font-family:'Pixelify Sans','Silkscreen',ui-monospace,monospace;font-weight:500;font-size:10px}"
-
-/** A Pixelify Sans só entra no desenho quando um texto longo pode aparecer (economiza ~6 mil caracteres). */
-export const CSS_FONTE_LONGA = `@font-face{font-family:'Pixelify Sans';src:url(${FONTE_LONGA}) format('woff2');font-weight:500}`
-
 function texto(x: number, y: number, s: string, classe = 'm'): string {
   return `<text class="t ${classe}" x="${x}" y="${y}">${esc(s)}</text>`
 }
@@ -425,8 +415,8 @@ function barra(d: Doc, x: number, y: number, larguraBarra: number, b: Barra, ago
   // nome e valor das barras: maiores e em caixa alta (leitura melhor). Se não
   // couberem juntos na largura da barra, o nome encurta (LUZ, MANA...).
   // (o "lua nova" do fim da contagem não conta: nessa hora a faixa é redesenhada)
-  const maiorValor = Math.max(...[b.valor, ...(b.valores ?? []).filter(t => Number.isFinite(t[1])).map(t => t[2])].map(v => larguraTexto(v)))
-  const cabe = larguraTexto(b.nome) + 10 + maiorValor <= larguraBarra - 4
+  const maiorValor = Math.max(...[b.valor, ...(b.valores ?? []).filter(t => Number.isFinite(t[1])).map(t => t[2])].map(v => larguraCurta(v)))
+  const cabe = larguraCurta(b.nome) + 10 + maiorValor <= larguraBarra - 4
   const nome = texto(2, 8, (cabe ? b.nome : nomeCurto(b.tipo)).toUpperCase(), 'n b')
   const valor = (s: string) => texto(larguraBarra - 2, 8, s.toUpperCase(), 'e b')
   const textos = nome + (b.valores !== undefined ? textoNoTempo(b.valores, t => valor(t[2])) : valor(b.valor))
@@ -539,11 +529,6 @@ function iconeBotao(d: Doc, b: NomeBotao, bx: number, y: number, e: EstadoBotoes
 const PASSO_BOTAO = 38 // 32 px de botão + 6 de vão, igual entre todos
 export const LARGURA_BOTOES = PASSO_BOTAO * 3 + 32
 
-/** Largura aproximada de um texto na Silkscreen a 12 px (0,75 em por letra): barras. */
-const larguraTexto = (s: string) => Math.ceil(s.length * 9)
-/** Largura de um texto na Pixelify Sans a 10 px (balões): ~5 px por letra, medido; 5,4 dá folga. */
-const PX_LETRA_LONGA = 5.4
-const larguraLonga = (s: string) => Math.ceil(s.length * PX_LETRA_LONGA)
 /** Letras por linha no balão (padrão; o balão solto usa o que cabe em 80% da cena). */
 const LETRAS_BALAO = 34
 
@@ -552,7 +537,10 @@ const LETRAS_BALAO = 34
  * letras; passou disso, quebra entre palavras (de preferência depois de um
  * ponto, onde o texto tem "\n") e o balão cresce na altura.
  */
-export function linhasDoBalao(texto: string, max = LETRAS_BALAO): string[] {
+export function linhasDoBalao(texto: string, max = LETRAS_BALAO, pxLetra = 5.4): string[] {
+  if (ehCJK()) {
+    return linhasCJK(texto, max * pxLetra)
+  }
   const corrido = texto.replace(/\s*\n\s*/g, ' ').trim()
   if (corrido.length <= max) {
     return [corrido]
@@ -586,10 +574,43 @@ export function linhasDoBalao(texto: string, max = LETRAS_BALAO): string[] {
   return linhas
 }
 
+/**
+ * O mesmo em chinês, japonês e coreano, pela largura em px: frases inteiras
+ * (separadas por "\n") enquanto couberem juntas; uma frase maior que a linha
+ * quebra entre letras (sem começar linha com pontuação).
+ */
+function linhasCJK(texto: string, maxPx: number): string[] {
+  const frases = texto.split('\n').map(f => f.trim()).filter(f => f !== '')
+  // em CJK as frases se juntam sem espaço; em coreano (que tem espaços) com espaço
+  const junta = (a: string, b: string) => (/[\u3000-\u30ff\u4e00-\u9fff\uff00-\uffef]$/.test(a) ? a + b : `${a} ${b}`)
+  const corrido = frases.reduce((a, b) => (a === '' ? b : junta(a, b)), '')
+  if (larguraLonga(corrido) <= maxPx) {
+    return [corrido]
+  }
+  const linhas: string[] = []
+  let atual = ''
+  for (const frase of frases) {
+    for (const pedaco of larguraLonga(frase) <= maxPx ? [frase] : quebrarPorLargura(frase, maxPx)) {
+      if (atual === '') {
+        atual = pedaco
+      } else if (larguraLonga(junta(atual, pedaco)) <= maxPx) {
+        atual = junta(atual, pedaco)
+      } else {
+        linhas.push(atual)
+        atual = pedaco
+      }
+    }
+  }
+  if (atual !== '') {
+    linhas.push(atual)
+  }
+  return linhas
+}
+
 /** Tamanho do balão (sem a ponta): o texto quebra em linhas e ele cresce na altura. */
 function medidaBalao(nome: string, desc: string, max = LETRAS_BALAO): { w: number; h: number; linhas: string[] } {
   const linhas = linhasDoBalao(desc, max)
-  const w = Math.max(larguraLonga(nome), ...linhas.map(larguraLonga)) + 14
+  const w = Math.max(larguraLonga(nome), ...linhas.map(l => larguraLonga(l))) + 14
   return { w, h: 12 * (1 + linhas.length) + 5, linhas }
 }
 
@@ -816,8 +837,9 @@ const BT = { letra: 14, linha: 17, px: 2, pad: 10, ponta: 6, pxLetra: 7.6 }
 /** Tamanho do balão solto: uma linha só enquanto couber em 80% da cena; depois quebra entre frases. */
 export function medidaBalaoSolto(nome: string, desc: string, escala: number, larguraCena: number): { w: number; h: number; linhas: string[] } {
   const max = Math.max(16, Math.floor((larguraCena * escala * 0.8 - 2 * BT.pad) / BT.pxLetra))
-  const linhas = linhasDoBalao(desc, max)
-  const texto = Math.ceil(Math.max(nome.length, ...linhas.map(l => l.length)) * BT.pxLetra)
+  const linhas = linhasDoBalao(desc, max, BT.pxLetra)
+  // CJK: a Fusion em 12 px (o tamanho nativo dela; 14 px borraria)
+  const texto = ehCJK() ? Math.max(larguraLonga(nome), ...linhas.map(l => larguraLonga(l))) : Math.ceil(Math.max(nome.length, ...linhas.map(l => l.length)) * BT.pxLetra)
   const w = texto + 2 * BT.pad
   const corpo = 2 * BT.px + 6 + BT.linha * (1 + linhas.length) + 2
   return { w, h: corpo + BT.ponta, linhas }
@@ -849,14 +871,14 @@ export function balaoSolto(nome: string, desc: string, escala: number, larguraCe
     `<rect x="${x - 2 * p}" y="${hc + p}" width="${4 * p}" height="${p}" fill="${fundo}"/>` +
     `<rect x="${x - 2 * p}" y="${hc + 2 * p}" width="${4 * p}" height="${p}" fill="${borda}"/>`
   const base = p + 4 + BT.linha - 3
-  const estilo = `font-size:${BT.letra}px`
+  const estilo = `font-size:${ehCJK() ? 12 : BT.letra}px`
   r += `<text class="t n l" x="${BT.pad}" y="${base}" style="${estilo};fill:#ffe27a">${esc(nome)}</text>`
   linhas.forEach((l, i) => {
     r += `<text class="t n l" x="${BT.pad}" y="${base + BT.linha * (i + 1)}" style="${estilo}">${esc(l)}</text>`
   })
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges">` +
-    `<style>${CSS_TEXTO}${CSS_FONTE_LONGA}</style>${r}</svg>`
+    `<style>${cssTexto()}${cssFonteLonga()}</style>${r}</svg>`
   return { svg, largura: w, altura: h }
 }
 
@@ -870,9 +892,11 @@ function avisoLuaNova(W: number, H: number, frase: string, noMeio: boolean): str
   const l2 = tx('lua_nova.linha2')
   const emoji = 15 // largura do 🌙 a 15 px
   const vao = 8 // espaço entre a lua e a frase
-  const w1 = Math.ceil(frase.length * 8.4) // Pixelify Sans a 15 px
+  // Pixelify Sans a 15 e 12 px; em CJK as duas linhas na Fusion a 12 px (o tamanho nativo dela)
+  const cjk = ehCJK()
+  const w1 = cjk ? larguraLonga(frase) : Math.ceil(frase.length * 8.4)
   const linha1 = emoji + vao + w1
-  const w = Math.min(W - 8, Math.max(linha1, Math.ceil(l2.length * 6.9)) + 28)
+  const w = Math.min(W - 8, Math.max(linha1, cjk ? larguraLonga(l2) : Math.ceil(l2.length * 6.9)) + 28)
   const h = 44
   const x = Math.round((W - w) / 2)
   // no meio: centrado na altura da cena inteira, do topo até a borda de baixo
@@ -885,7 +909,7 @@ function avisoLuaNova(W: number, H: number, frase: string, noMeio: boolean): str
     `<rect x="${x}" y="${y + 1}" width="${w}" height="${h - 2}" fill="${borda}"/>` +
     `<rect x="${x + 1}" y="${y + 1}" width="${w - 2}" height="${h - 2}" fill="${fundo}" opacity="0.94"/>` +
     `<text x="${x1}" y="${y + 19}" style="font-size:14px">🌙</text>` +
-    `<text class="t n l" x="${x1 + emoji + vao}" y="${y + 19}" style="font-size:15px;fill:#ffe27a">${esc(frase)}</text>` +
+    `<text class="t n l" x="${x1 + emoji + vao}" y="${y + 19}" style="font-size:${cjk ? 12 : 15}px;fill:#ffe27a">${esc(frase)}</text>` +
     `<text class="t m l" x="${W / 2}" y="${y + 35}" style="font-size:12px">${esc(l2)}</text></g>`
   )
 }
@@ -981,7 +1005,7 @@ export function montar(v: Vista): { svg: string; largura: number; altura: number
   const s = v.escala
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${v.W * s}" height="${Ht * s}" viewBox="0 0 ${v.W} ${Ht}" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges">` +
-    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${ab?.fase === 1 ? MARCA.css : ''}${CSS_TEXTO}${v.textoLongo === true || l.desmaiada ? CSS_FONTE_LONGA : ''}${CSS_BOTOES}${d.css.join('')}</style>` +
+    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${ab?.fase === 1 ? MARCA.css : ''}${cssTexto()}${v.textoLongo === true || l.desmaiada ? cssFonteLonga() : ''}${CSS_BOTOES}${d.css.join('')}</style>` +
     `<defs>${d.defs.join('')}</defs>` +
     corpo.join('') +
     `</svg>`

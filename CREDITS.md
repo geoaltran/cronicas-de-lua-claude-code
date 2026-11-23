@@ -13,7 +13,9 @@ George Altran, built with [Claude Code](https://claude.com/claude-code). License
 - **Silkscreen**, © 2001 The Silkscreen Project Authors ([googlefonts/silkscreen](https://github.com/googlefonts/silkscreen)): HUD, bars and numbers. License: [`assets/fontes/silkscreen/OFL.txt`](assets/fontes/silkscreen/OFL.txt).
 - **Pixelify Sans**, © 2021 The Pixelify Sans Project Authors ([eifetx/Pixelify-Sans](https://github.com/eifetx/Pixelify-Sans)): long texts and tooltips. License: [`assets/fontes/OFL.txt`](assets/fontes/OFL.txt).
 
-Both fonts are embedded (subset) in the mod; their licenses travel with it in `mod/cronicas-de-lua/fontes/`.
+- **Fusion Pixel Font** (12 px, proportional), © TakWolf ([TakWolf/fusion-pixel-font](https://github.com/TakWolf/fusion-pixel-font)): all game text in Chinese, Japanese and Korean. It combines **Ark Pixel Font** (TakWolf, OFL), **Cubic 11** (based on JF Dot M+H 12 and the M+ bitmap fonts, OFL / free license) and **Galmuri** (Lee Minseo, OFL). Licenses: [`assets/fontes/fusion-pixel/OFL.txt`](assets/fontes/fusion-pixel/OFL.txt) and [`assets/fontes/fusion-pixel/LICENSES/`](assets/fontes/fusion-pixel/LICENSES/).
+
+All fonts are embedded (subset) in the mod; their licenses travel with it in `mod/cronicas-de-lua/fontes/`.
 
 ## Tools · Ferramentas
 Python with [Pillow](https://python-pillow.org), [NumPy](https://numpy.org) and [SciPy](https://scipy.org) for the art pipeline; the Claude Code plugin (mod) API.

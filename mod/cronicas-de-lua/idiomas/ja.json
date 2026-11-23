@@ -1,0 +1,362 @@
+{
+  "_sobre": "ゲームの日本語テキスト。キーと {マーカー} は pt-BR.json（基準）と同じ。固有名（Lua、Vespera、Ignis、Sir Solis、Nébula、Malakor）はラテン文字のまま。編集したら python3 idiomas.py を実行。",
+  "chefoes": {
+    "vespera": "Vespera",
+    "dama_penumbra": "半影の貴婦人",
+    "golem_obsidiana": "黒曜石のゴーレム",
+    "leviata": "リヴァイアサン",
+    "ignis": "Ignis",
+    "relojoeiro": "時計職人",
+    "sir_solis": "Sir Solis",
+    "rei_espelho": "鏡の王",
+    "nebula": "Nébula",
+    "malakor": "Malakor"
+  },
+  "chefao": {
+    "pagina": "+ページ {pagina}/10",
+    "novo_jogo": "強くてニューゲーム"
+  },
+  "luta": {
+    "critico": "クリティカル！",
+    "trofeu": "+トロフィー",
+    "erro_misterioso": "謎のエラー"
+  },
+  "terminal": {
+    "nivel": "🌙 Lv {nivel}",
+    "lua_nova": "新月",
+    "minutos": "{n}分",
+    "luz": "月光 ",
+    "mana": "マナ ",
+    "mochila": "リュック ",
+    "mochila_cheia": "（満杯！）",
+    "desmaio": "🌑 新月：Lua が気絶しました（キャッシュが冷えました）。次のメッセージは割高になります。",
+    "vida_tarefas": " {resta}/{total} タスク",
+    "chefao_caiu": "🏆 {nome} を倒した！ +ページ {pagina}/10",
+    "fugiu": "💥 {alvo} が反撃して逃げた",
+    "defendeu": "🛡 {alvo} が盾で防いだ ",
+    "critico": "💥 クリティカル！ ",
+    "golpe_em": "{alvo} に命中",
+    "derrotado": "{alvo} を倒した",
+    "xp": " +{xp} XP",
+    "trofeu": " +トロフィー",
+    "canaliza": "🔮 Lua が {alvo} に向けて詠唱中…",
+    "enfrenta": "⚔ Lua が {alvo} と対決",
+    "enfrenta_elite": "⚔ Lua が {alvo}（エリート）と対決",
+    "anda": "🌲 Lua が森を歩いている",
+    "descansa": "💤 Lua がひと休み",
+    "chefao_em": {
+      "um": "  ·  ボスまであと {n} 戦",
+      "outros": "  ·  ボスまであと {n} 戦"
+    }
+  },
+  "barras": {
+    "luz": {
+      "nome": "月明かり",
+      "curto": "月光",
+      "minutos": "{n}分",
+      "lua_nova": "新月",
+      "titulo_lua_nova": "月明かり · 新月",
+      "sem_luz": "会話のキャッシュ。\n最初の返答で灯ります。",
+      "explica": "会話のキャッシュ。\n返答のたびに {min} 分もちます。",
+      "lua_nova_explica": "キャッシュが冷えました。\n次のメッセージは割高です。"
+    },
+    "mana": {
+      "nome": "星のマナ",
+      "curto": "マナ",
+      "sem_dado": "プランの上限。\n最初の返答のあとに出ます。",
+      "explica": "プランの上限：残り {livre}%。",
+      "renova": "\n{hora} に回復（5 時間）。",
+      "sete_dias": "\n7 日間：残り {livre}%。"
+    },
+    "mochila": {
+      "nome": "リュック",
+      "nome_cheia": "リュック！",
+      "curto": "リュック",
+      "explica": "会話がどれだけ埋まったか\n（コンテキスト）。",
+      "cheia_explica": "会話がほぼ満杯（{pct}%）。\nそろそろ整理しよう（圧縮）。"
+    },
+    "xp": {
+      "nome": "XP",
+      "curto": "XP",
+      "titulo": "XP · レベル {nivel}",
+      "explica": "レベル {proximo} まであと {faltam} XP。\nページ {paginas}/10。",
+      "chefao_em": {
+        "um": "ボスまであと {n} 戦。",
+        "outros": "ボスまであと {n} 戦。"
+      },
+      "chefao_lista": "タスクが終わるとボスが倒れる：{feitas}/{total}。",
+      "chefao_vida": {
+        "um": "あと {n} 勝でボスが倒れる。",
+        "outros": "あと {n} 勝でボスが倒れる。"
+      }
+    },
+    "selo": {
+      "titulo": "レベル {nivel}",
+      "explica": "合計 {xp} XP。\nページ {paginas}/10 · 勝利 {lutas} 回。"
+    }
+  },
+  "botoes": {
+    "vigilia": {
+      "nome": "夜番",
+      "acesa": "夜番 · 点灯中",
+      "explica": "キャッシュを温かく保ちます。\n上限を少し使います。",
+      "acesa_explica": "温かいキャッシュ：{envios}/{max} 通。\nクリックで消します。"
+    },
+    "mochila": {
+      "nome": "リュック",
+      "cheia": "リュックが満杯",
+      "explica": "会話を整理します\n（コンテキストを圧縮）。",
+      "cheia_explica": "クリックで整理\n（会話を圧縮）。"
+    },
+    "estandarte": {
+      "nome": "旗",
+      "explica": "次のセッションのための\nミッションのまとめ。",
+      "escrevendo": "Claude がミッションの\nまとめを書いています。",
+      "pronto": "ミッションのまとめが完成。"
+    },
+    "livro": {
+      "nome": "本",
+      "explica": "ステータス、ページ、\n図鑑、トロフィー。",
+      "aberto_explica": "クリックで閉じます。"
+    }
+  },
+  "lua_nova": {
+    "frase": "Lua はがんばりすぎて疲れちゃった。",
+    "linha2": "次のメッセージは割高です（キャッシュが冷えています）。"
+  },
+  "livro": {
+    "alt": "Lua の本。{alt}",
+    "abas": {
+      "ficha": "ステータス",
+      "bestiario": "図鑑",
+      "trofeus": "トロフィー",
+      "grimorio": "魔導書"
+    },
+    "ficha": {
+      "titulo": "Lua のステータス",
+      "subtitulo": "月の魔法使い、クロニクルの守り手。",
+      "nivel": "レベル",
+      "nivel_valor": "{nivel} · {xp} XP",
+      "proximo_nivel": "次のレベル",
+      "proximo_nivel_valor": "あと {faltam} XP",
+      "lutas": "勝利数",
+      "chefoes": "倒したボス",
+      "trofeus": "トロフィー",
+      "proximo_chefao": "次のボス",
+      "proximo_chefao_valor": {
+        "um": "{nome}：あと {n} 戦、または次のタスクリストで",
+        "outros": "{nome}：あと {n} 戦、または次のタスクリストで"
+      },
+      "paginas": "クロニクルのページ：{ciclo}/10",
+      "paginas_novo_jogo": "クロニクルのページ：{ciclo}/10（強くてニューゲーム）",
+      "alt": "Lua のステータス：レベル {nivel}、{xp} XP、勝利 {lutas} 回、倒したボス {chefoes}、トロフィー {trofeus}、ページ {ciclo}/10。"
+    },
+    "bestiario": {
+      "titulo": "図鑑",
+      "todos": "10 体のボスをすべて倒した。旅は強くてニューゲームでまた始まる。",
+      "vistos": "10 体中 {vistos} 体のボスを倒した。残りは影の中で待っている。",
+      "pagina": "ページ {n}",
+      "alt": "図鑑：10 体中 {vistos} 体を撃破。",
+      "alt_nomes": "図鑑：10 体中 {vistos} 体を撃破（{nomes}）。"
+    },
+    "trofeus": {
+      "titulo": "トロフィー",
+      "vazio": "エリート（Claude が直したエラー）を倒すと、最初のひとつがもらえます。",
+      "subtitulo": "Claude が直したエラー。カーソルを乗せると名前が読めます。",
+      "nome": {
+        "comando": "命令の杯",
+        "edicao": "編集の歯車",
+        "leitura": "読書の月",
+        "web": "ウェブの宝珠"
+      },
+      "explica": "{nome}\nエラーを修正。",
+      "estante_vazia": "棚はまだ空っぽ。",
+      "estante_cheia": "トロフィー {n} 個：新しい {vagas} 個を棚に飾っています。",
+      "estante": {
+        "um": "棚にトロフィーが {n} 個。",
+        "outros": "棚にトロフィーが {n} 個。"
+      },
+      "alt": "トロフィー：{lista}。",
+      "nenhum": "まだなし"
+    },
+    "grimorio": {
+      "titulo": "魔導書",
+      "subtitulo": "Claude のツールは Lua の呪文。",
+      "ler": { "nome": "ルーメンの瞳", "desc": "ファイルを読んで探す。Vespera を呼び覚ます。" },
+      "editar": { "nome": "改稿のルーン", "desc": "コードを編集して書く。時計職人と Sir Solis を呼び出す。" },
+      "terminal": { "nome": "命令の炎", "desc": "ターミナルのコマンド。Ignis を目覚めさせる。" },
+      "web": { "nome": "星明かりの潮", "desc": "Web を検索して読む。リヴァイアサンと Nébula を連れてくる。" },
+      "integracao": { "nome": "鏡の契約", "desc": "外部連携（MCP）。鏡の王を呼ぶ。" },
+      "subagente": { "nome": "半影のこだま", "desc": "助っ人を呼ぶ（サブエージェント）。半影の貴婦人の分身。" },
+      "total": {
+        "um": "唱えた呪文は合計 {n} 回。",
+        "outros": "唱えた呪文は合計 {n} 回。"
+      },
+      "alt": "魔導書：{lista}。",
+      "alt_item": {
+        "um": "{nome}：{n} 回",
+        "outros": "{nome}：{n} 回"
+      }
+    },
+    "titulo_painel": "Lua の本",
+    "widget": "📖 レベル {nivel} · ページ {paginas}/10 · トロフィー {trofeus}",
+    "texto": {
+      "nivel": "レベル {nivel} · {xp} XP（レベル {proximo} まであと {faltam}）",
+      "paginas": "クロニクルのページ：{ciclo}/10（合計 {total}）",
+      "lutas": {
+        "um": "勝利数 {lutas} · ボスまであと {n} 戦",
+        "outros": "勝利数 {lutas} · ボスまであと {n} 戦"
+      },
+      "trofeus": "トロフィー：{n}"
+    }
+  },
+  "superficies": {
+    "terminal": "ターミナル",
+    "desktop": "デスクトップアプリ",
+    "vscode": "VS Code",
+    "mobile": "スマホ"
+  },
+  "mensagens": {
+    "vigilia": "🌙 Lua の夜番：キャッシュを温めているだけです。何もせず、「ok」とだけ返してください。",
+    "estandarte": "🚩 Lua の旗：新しいセッションで作業を続けられるよう、いまミッションのまとめを書いてください。プロジェクトのルートに NEXT_SESSION.md を作成または更新し、日本語で、簡潔にわかりやすく、次の内容を入れてください：冒頭に新しいセッションにそのまま貼れる文章、何がどこにあるか（ファイル、フォルダ、実行・検証・テストのコマンド）、完了して承認済みのもの（やり直さないため）、決めたことと見つかった制約や落とし穴、次の手順の詳細（番号付きの計画）、残りの作業と未解決の質問。プロジェクトに CLAUDE.md があれば、NEXT_SESSION.md を指す行を 1 行足してください。終わったら、何を保存したかを数行で伝えてください。"
+  },
+  "avisos": {
+    "vigilia": {
+      "apagou_sozinha": "🏮 夜番は {max} 通送ったので自動で消えました。キャッシュを温かく保ちたいなら、もう一度灯してください。",
+      "apagada": "🏮 夜番を消しました。",
+      "acesa": "🔥 夜番を灯しました。月明かりが消えそうになると、Lua がキャッシュを温めるためにごく短いメッセージを送ります（最大 {max} 回、あなたが入力していないときだけ）。1 回ごとにプランの上限を少し使います。もう一度クリックすると消えます。"
+    },
+    "mochila": {
+      "espere": "🎒 リュックを整理する前に、Claude の作業が終わるのを待ってください。",
+      "arrumada": "🎒 リュックを整理しました：会話を要約して、また空きができました。",
+      "nao_arrumada": "🎒 リュックは整理されませんでした：{motivo}",
+      "falhou": "🎒 いまはリュックを整理できませんでした：{erro}"
+    },
+    "estandarte": {
+      "espere": "🚩 旗を掲げる前に、Claude の作業が終わるのを待ってください。",
+      "falhou": "🚩 まとめを頼めませんでした：{erro}"
+    },
+    "livro": {
+      "nao_abriu": "📖 本はまだ開きませんでした：{motivo}"
+    }
+  },
+  "chips": {
+    "vigilia": "夜番",
+    "vigilia_acesa": "夜番 点灯中（{envios}/{max}）",
+    "mochila": "リュック",
+    "estandarte": "旗",
+    "escrevendo": "執筆中…",
+    "livro": "本",
+    "livro_aberto": "本を開いています"
+  },
+  "faixa": {
+    "nova_conversa": {
+      "explica": "いまの会話は画面から消えます（/resume で戻せます）。",
+      "sim": "始める",
+      "nao": "ここに残る",
+      "botao": "🌙 新しい会話"
+    },
+    "lua_nova": {
+      "continuar": "このまま続けてもOK：割高になるのは次のメッセージだけです。"
+    },
+    "mochila": {
+      "explica": "リュックを整理すると会話が要約され、空きができます（/compact と同じ）。",
+      "sim": "リュックを整理する",
+      "nao": "あとで",
+      "arrumando": "🎒 リュックを整理中…"
+    },
+    "estandarte": {
+      "pronto": "🚩 ミッションのまとめが完成（NEXT_SESSION.md）。",
+      "fechar": "閉じる"
+    }
+  },
+  "cena_alt": {
+    "frase": "As Crônicas de Lua：Lua は{acao}。レベル {nivel}。",
+    "cansada": "疲れている（新月、キャッシュが冷えている）",
+    "chefao": "ボス {nome} と対決中（体力 {resta}/{total}）",
+    "luta": "モンスターと戦っている",
+    "anda": "森を歩いている",
+    "descansa": "ひと休みしている"
+  },
+  "regua_alt": "帯の幅を合わせるための定規",
+  "comando": {
+    "descricao": "As Crônicas de Lua：冒険、帯の設定、テスト（ボス、エリート、新月）",
+    "superficies": {
+      "nenhuma": "いまこのセッションを描いている画面はありません。",
+      "lista": "このセッションの描画先：{lista}。"
+    },
+    "abertura": {
+      "desligada": "オープニングをオフにしました：その日最初のセッションでも出なくなります。/cronicas intro on でオンに戻せます。/cronicas intro でいますぐ見られます。",
+      "ligada": "オープニングをオンにしました：毎日最初のセッションで流れます。/cronicas intro でいますぐ見られます。",
+      "mostra": "帯でオープニングを再生中（約 {s} 秒。シーンをクリックするとスキップ）。",
+      "mostra_desligada": "その日最初のセッションではオフになっています：/cronicas intro on でオンにできます。",
+      "mostra_ligada": "/cronicas intro off でオフにできます。"
+    },
+    "largura": {
+      "sem_colunas": "{sup} での帯の列数がまだわかりません：帯が表示されるのを待って、もう一度試してください。",
+      "calibrada": "{sup} の幅を調整しました：{n} px ÷ {colunas} 列 = 1 列あたり {px} px。これからシーンは帯の幅に合わせます（定規はオフ）。"
+    },
+    "prova": {
+      "ligada": "技術テストをオンにしました。(1) マウスの反応範囲に枠が付きます：バーとレベルの印にカーソルを乗せてください（枠が光り、吹き出しが出ます）。(2) シーンに 4 つのボタンのアイコンが出て、その上に見えないクリック範囲があります：それぞれクリックして（お知らせが出ます）、カーソルを乗せてください（ボタンの吹き出しが出ます）。もう一度 /cronicas probe でオフ。",
+      "desligada": "技術テストをオフにしました。",
+      "rodape": "技術テスト：{colunas} 列、1 列 {px} px、1 行 {linha} px。/cronicas probe でオフ。"
+    },
+    "regua": {
+      "ligada": "シーンの下に定規を出しました。右端で欠けずに見える最後の数字を確かめて、/cronicas width <その数字> を実行してください。もう一度 /cronicas ruler でオフ。",
+      "desligada": "定規をオフにしました。"
+    },
+    "chefao": {
+      "desconhecido": "「{pedido}」というボスは知りません。次のどれかを使ってください：{lista}。",
+      "ja_em_cena": "もうボスが登場しています。",
+      "com_lista": {
+        "um": "{nome} が {n} 個のタスクリストを持って登場しました（ページ {pagina}/10）。Claude のツールはどれも盾に当たって少ししか削れません。/cronicas hit でタスクを 1 つ完了します（最後の 1 つはクリティカル）。",
+        "outros": "{nome} が {n} 個のタスクリストを持って登場しました（ページ {pagina}/10）。Claude のツールはどれも盾に当たって少ししか削れません。/cronicas hit でタスクを 1 つ完了します（最後の 1 つはクリティカル）。"
+      },
+      "entrou": "{nome} が登場しました（ページ {pagina}/10）。/cronicas hit で体力を削れます。"
+    },
+    "golpe": {
+      "sem_chefao": "ボスがいません。/cronicas boss で呼び出せます。",
+      "caiu": "{nome} を倒した！ ページ {pagina}/10 を取り戻しました。",
+      "tarefa": "タスク完了！ 残り {resta}/{total}。",
+      "golpe": "命中！ 体力 {resta}/{total}。"
+    },
+    "elite": {
+      "proximo": "次のふつうの戦いは、トロフィー（{trofeu}）を持ったエリート（{elite}）になります。もう一度実行すると次の種類が見られます。",
+      "trofeu": {
+        "comando": "炎の杯（コマンド）",
+        "edicao": "歯車（編集）",
+        "leitura": "三日月（読み取り）",
+        "web": "宝珠（Web）"
+      }
+    },
+    "vigilia": {
+      "acesa": "月明かりを残りわずかにしました：夜番が 10 秒後に短いメッセージを送ります。",
+      "apagada": "月明かりを残りわずかにしました。夜番は消えています：ランタンをクリックすると灯ります（すぐにメッセージが送られます）。"
+    },
+    "lua_nova": "新月を再現しました：次の返答まで帯にお知らせが出ます。",
+    "modo": {
+      "quadro": "フレーム",
+      "quadro_baloes": "フレーム（ホバーの吹き出しあり）",
+      "imagem": "画像"
+    },
+    "ajuda": {
+      "estado": "As Crônicas de Lua：倍率 {escala}x、1 列 {px} px、{modo}モード。レベル {nivel}、{xp} XP、ページ {paginas}/10。",
+      "uso": "使い方：/cronicas scale 1|2|3、/cronicas ruler と /cronicas width <px>（幅の調整）、/cronicas image|frame、/cronicas test（両方を比べる）、/cronicas new-moon（冷えたキャッシュを再現）、/cronicas vigil（月明かりを残りわずかにして夜番を見る）、/cronicas boss [名前] と /cronicas hit（ボス戦を試す）、/cronicas elite（次の戦いがエリートに）、/cronicas language（ゲームの言語）。",
+      "trofeus": "トロフィー：{lista}"
+    },
+    "linha": "行の高さ：{n} px。マウスの反応範囲を計算し直しました。",
+    "teste": "テストをオンにしました：帯が 2 つ出ます。A（操作できるフレーム）と B（画像）。もう一度 /cronicas test でオフ。",
+    "teste_a": "A：操作できるフレーム（ホバーの吹き出しあり）",
+    "teste_b": "B：画像（吹き出しなし）",
+    "ajustada": "帯を調整しました：倍率 {escala}x、1 列 {px} px、{modo}モード。",
+    "idioma": {
+      "titulo": "ゲームの言語：{nome}。",
+      "em_breve": "準備中",
+      "como": "変えるには：/cronicas language <コード>（例：/cronicas language en）。/cronicas language auto でシステムの言語に戻ります。",
+      "trocado": "言語を {nome} に変えました。",
+      "auto": "システムの言語：{nome}。",
+      "sem_traducao": "{nome} はまだ翻訳されていません。いまはゲームを {atual} のままにします。",
+      "desconhecido": "「{pedido}」という言語は知りません。"
+    }
+  }
+}

@@ -9,6 +9,7 @@
 import { META } from './arte'
 import { ANDAR, type Doc, PARADA, type Q, art, esc, mod, r, sorteio } from './base'
 import type { Caminho, Golpe, Luta, TipoTrofeu } from '../types'
+import { ehCJK, larguraCurta } from './fontes'
 import { t } from './t'
 
 /** Um quadro do roteiro (como em previa_luta.py). */
@@ -592,9 +593,12 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
         efeitos += d.janela(i, i + 6 * 55, agora, d.tira('impacto', ax - 15, ay - 15, 31, 31, [0, 1, 2, 3, 4, 5].map(q => [q, 55] as const), agora - i, false))
         const valor = g?.critico ?? critico1(g?.dano ?? 0)
         const num = numero(d, `-${valor}`, 'xp', 3)
-        const cx = r(Math.min(Math.max(mx + mi.w / 2, num.w / 2 + 4), W - num.w / 2 - 4))
+        // CJK: a Fusion em 24 px (o dobro exato do tamanho nativo; 16 borraria), e a palavra inteira dentro da cena
+        const palavra = t('luta.critico')
+        const meia = ehCJK() ? larguraCurta(palavra) : num.w / 2
+        const cx = r(Math.min(Math.max(mx + mi.w / 2, Math.max(num.w / 2, meia) + 4), W - Math.max(num.w / 2, meia) - 4))
         const ny = Math.max(ay - 16, 44)
-        const txt = `<text class="t m" x="${cx}" y="${ny - 6}" style="font-size:16px;fill:#ff3b4e">${esc(t('luta.critico'))}</text>`
+        const txt = `<text class="t m" x="${cx}" y="${ny - 6}" style="font-size:${ehCJK() ? 24 : 16}px;fill:#ff3b4e">${esc(palavra)}</text>`
         efeitos += d.janela(i + 2 * F, i + 22 * F, agora, d.pista(subindo(i + 2 * F, 20, 1), agora, txt + `<g transform="translate(${r(cx - num.w / 2)},${ny})">${num.svg}</g>`))
       }
     } else if (i + 14 * F > agora && cabe(a.a)) {

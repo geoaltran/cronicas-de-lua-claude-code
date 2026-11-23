@@ -66,11 +66,11 @@ Le mod lance seulement deux commandes en lecture seule sur votre machine : `ps` 
 Monstres par outil : lire des fichiers → Vespera · modifier du code → Horloger / Sir Solis · terminal → Ignis · web → Léviathan / Nébula · intégrations (MCP) → Roi Miroir · sous-agents → clones de la Dame Pénombre. Les boss arrivent dans l'ordre, une page des Chroniques chacun, jusqu'à Malakor, puis Nouvelle partie+.
 
 ## Commandes
-`/cronicas` affiche le résumé de Lua. Les plus utiles : `/cronicas ruler` et `/cronicas width <px>` (calibrer la largeur), `/cronicas boss` et `/cronicas hit` (tester un combat de boss), `/cronicas surfaces` (où la session est dessinée), `/cronicas language` (choisir la langue du jeu). Le jeu parle anglais, portugais, espagnol, français et allemand (il suit la langue du système ; `/cronicas language` la change) ; le chinois, le japonais et le coréen arrivent bientôt.
+`/cronicas` affiche le résumé de Lua. Les plus utiles : `/cronicas ruler` et `/cronicas width <px>` (calibrer la largeur), `/cronicas boss` et `/cronicas hit` (tester un combat de boss), `/cronicas surfaces` (où la session est dessinée), `/cronicas language` (choisir la langue du jeu). Le jeu parle anglais, portugais, espagnol, français, allemand, chinois, japonais et coréen (il suit la langue du système ; `/cronicas language` la change).
 
 ## Licence
 - **Code** (scripts Python, `mod/`) : **MIT**, voir [`LICENSE`](LICENSE).
 - **Art et personnages** (tout ce qui se trouve dans `assets/`, l'art intégré au mod, les sons et les aperçus) : **© 2026 George Altran (@geoaltran), [CC BY-NC 4.0](LICENSE-ART)**. Partage-le, remixe-le, fais du fan art : il suffit de créditer **« Art by George Altran (@geoaltran) »** avec un lien. **Pas d'usage commercial** sans autorisation ; une licence commerciale est disponible sur demande.
-- **Polices** : Silkscreen et Pixelify Sans, **SIL Open Font License 1.1** (les licences sont à côté d'elles).
+- **Polices** : Silkscreen, Pixelify Sans et Fusion Pixel Font (chinois, japonais et coréen), **SIL Open Font License 1.1** (les licences sont à côté d'elles).
 
 Seul le texte juridique de la licence en anglais fait foi. Crédits complets dans [`CREDITS.md`](CREDITS.md).

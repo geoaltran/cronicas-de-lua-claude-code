@@ -66,11 +66,11 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 Monsters by tool: reading files → Vespera · editing code → Clockmaker / Sir Solis · terminal → Ignis · web → Leviathan / Nébula · integrations (MCP) → Mirror King · subagents → clones of Lady Penumbra. The bosses come in order, one page of the Chronicles each, up to Malakor, then New Game+.
 
 ## Commands
-`/cronicas` shows Lua's summary. Useful ones: `/cronicas ruler` and `/cronicas width <px>` (calibrate the width), `/cronicas boss` and `/cronicas hit` (try a boss fight), `/cronicas surfaces` (where the session is drawing), `/cronicas language` (pick the game's language). Every subcommand also answers to its Portuguese name (`regua`, `largura`, `chefao`, `golpe`…). The game speaks English, Portuguese, Spanish, French and German (it follows your system language; `/cronicas language` switches it); Chinese, Japanese and Korean are on the way.
+`/cronicas` shows Lua's summary. Useful ones: `/cronicas ruler` and `/cronicas width <px>` (calibrate the width), `/cronicas boss` and `/cronicas hit` (try a boss fight), `/cronicas surfaces` (where the session is drawing), `/cronicas language` (pick the game's language). Every subcommand also answers to its Portuguese name (`regua`, `largura`, `chefao`, `golpe`…). The game speaks English, Portuguese, Spanish, French, German, Chinese, Japanese and Korean (it follows your system language; `/cronicas language` switches it).
 
 ## License
 - **Code** (Python scripts, `mod/`): **MIT**, see [`LICENSE`](LICENSE).
 - **Art and characters** (everything in `assets/`, the art embedded in the mod, the sounds and the previews): **© 2026 George Altran (@geoaltran), [CC BY-NC 4.0](LICENSE-ART)**. Share it, remix it, make fan art: just credit **"Art by George Altran (@geoaltran)"** with a link. **No commercial use** without permission; a commercial license is available on request.
-- **Fonts**: Silkscreen and Pixelify Sans, **SIL Open Font License 1.1** (license files next to them).
+- **Fonts**: Silkscreen, Pixelify Sans and Fusion Pixel Font (Chinese, Japanese and Korean), **SIL Open Font License 1.1** (license files next to them).
 
 Full credits in [`CREDITS.md`](CREDITS.md).

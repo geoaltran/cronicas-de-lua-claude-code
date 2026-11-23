@@ -39,11 +39,11 @@ Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idi
 
 | Comando | O que faz |
 |---|---|
-| `/cronicas language` | Mostra os 8 idiomas do jogo, cada um escrito no próprio idioma (English, Português, Español, Français, Deutsch, 中文, 日本語, 한국어), com o atual marcado (▸) e os que ainda não têm tradução marcados como "em breve". Já traduzidos: inglês, português, espanhol, francês e alemão (`en`, `pt-BR`, `es`, `fr`, `de`); chinês, japonês e coreano em breve. Também funciona como `/cronicas lang` ou `/cronicas idioma`. |
-| `/cronicas language <idioma>` | Troca o idioma de todo o jogo e guarda a escolha para as próximas sessões. Aceita o código ou o nome: `pt-BR` ou `pt` ou `português`, `en`, `es`, `fr`, `de`, `zh`, `ja`, `ko`. Um idioma ainda sem tradução não é trocado (o jogo avisa). |
+| `/cronicas language` | Mostra os 8 idiomas do jogo, cada um escrito no próprio idioma (English, Português, Español, Français, Deutsch, 中文, 日本語, 한국어), com o atual marcado (▸). Todos já traduzidos: inglês, português, espanhol, francês, alemão, chinês, japonês e coreano (`en`, `pt-BR`, `es`, `fr`, `de`, `zh-CN`, `ja`, `ko`). Também funciona como `/cronicas lang` ou `/cronicas idioma`. |
+| `/cronicas language <idioma>` | Troca o idioma de todo o jogo e guarda a escolha para as próximas sessões. Aceita o código ou o nome: `pt-BR` ou `pt` ou `português`, `en`, `es`, `fr`, `de`, `zh`, `ja`, `ko`. Em chinês, japonês e coreano a faixa e o Livro usam a fonte pixel Fusion Pixel. |
 | `/cronicas language auto` | Esquece a escolha e volta ao idioma do sistema (no Mac, o das preferências de idioma; sem tradução, inglês). Também aceita `sistema`. |
 
-**Hoje o jogo fala português e inglês**; os outros 6 chegam nas próximas versões.
+**O jogo fala os 8 idiomas**: inglês, português, espanhol, francês, alemão, chinês, japonês e coreano.
 
 ## 🖼️ Ajustar a faixa
 
@@ -104,4 +104,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 23/11/2026 (o jogo em espanhol, francês e alemão).*
+*Última atualização: 23/11/2026 (o jogo em chinês, japonês e coreano).*

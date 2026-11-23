@@ -8,7 +8,8 @@
 import { META } from './arte'
 import { Doc, PARADA, art, esc, r } from './base'
 import type { AbaDoLivro, Jogo, TipoTrofeu } from '../types'
-import { type Alvo, CSS_FONTE_LONGA, CSS_TEXTO, nivelDe, selo } from './cena'
+import { type Alvo, nivelDe, selo } from './cena'
+import { cssFonteLivro, cssTexto, ehCJK, larguraCurta, quebrarPorLargura } from './fontes'
 import { JORNADA, NOME_CHEFAO, chefaoEm, paginasNoCiclo, proximoChefao } from './chefao'
 import { monstroInfo } from './luta'
 import { t as tx, tp } from './t'
@@ -37,11 +38,35 @@ const ret = (x: number, y: number, w: number, h: number, cor: string) => (w > 0 
 
 /** Texto longo (Pixelify, com minúsculas). */
 const texto = (x: number, y: number, s: string, extra = '', cor?: string) => `<text class="t l${extra}" x="${r(x)}" y="${r(y)}"${cor === undefined ? '' : ` style="fill:${cor}"`}>${esc(s)}</text>`
-/** Título (Silkscreen, caixa alta). */
-const titulo = (x: number, y: number, s: string, tam = 12, extra = '') => `<text class="t${extra}" x="${r(x)}" y="${r(y)}" style="font-size:${tam}px;fill:${OURO}">${esc(s.toUpperCase())}</text>`
+/** Título (Silkscreen, caixa alta). Em CJK a Fusion fica sempre em 12 px, o tamanho nativo (16 borraria). */
+const titulo = (x: number, y: number, s: string, tam = 12, extra = '') => `<text class="t${extra}" x="${r(x)}" y="${r(y)}" style="font-size:${ehCJK() ? 12 : tam}px;fill:${OURO}">${esc(s.toUpperCase())}</text>`
+/** Distância entre as linhas de texto: a Fusion (CJK) a 12 px precisa de 14; a Pixelify a 10 px, 12. */
+const LH = () => (ehCJK() ? 14 : 12)
+
+/**
+ * O nome de um feitiço que cabe em `max` px: inteiro; senão a primeira palavra;
+ * em CJK (sem espaço entre as palavras), cortado com "…".
+ */
+function nomeQueCabe(nome: string, max: number): string {
+  const cabe = (s: string) => larguraCurta(s, PX_LETRA_TITULO) <= max
+  if (cabe(nome)) {
+    return nome
+  }
+  if (!ehCJK()) {
+    return nome.split(' ')[0] ?? nome
+  }
+  const letras = [...nome]
+  while (letras.length > 1 && !cabe(letras.join('') + '…')) {
+    letras.pop()
+  }
+  return letras.join('') + '…'
+}
 
 /** Quebra um texto em linhas que cabem em `max` px (pelas palavras). */
 export function quebrar(s: string, max: number, pxLetra = PX_LETRA): string[] {
+  if (ehCJK()) {
+    return quebrarPorLargura(s, max)
+  }
   const cabe = Math.max(6, Math.floor(max / pxLetra))
   const linhas: string[] = []
   let atual = ''
@@ -83,7 +108,7 @@ function cabecalho(W: number, nome: string, sub: string): { svg: string; y: numb
   let y = 40
   for (const l of quebrar(sub, W - 24)) {
     s += texto(W / 2, y, l, ' m', '#e9d9ff')
-    y += 13
+    y += ehCJK() ? 14 : 13
   }
   return { svg: s + ret(12, y - 4, W - 24, 1, LINHA), y: y + 8 }
 }
@@ -158,10 +183,10 @@ function ficha(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: str
   const larg = W - colX - 14
   for (const [k, v] of linhas) {
     s += texto(colX, ty, k, '', '#cdbdf0')
-    ty += 12
+    ty += LH()
     for (const l of quebrar(v, larg)) {
       s += texto(colX, ty, l)
-      ty += 12
+      ty += LH()
     }
     ty += 5
   }
@@ -171,7 +196,7 @@ function ficha(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: str
   let pl = py
   for (const l of quebrar(tx(j.paginas >= 10 ? 'livro.ficha.paginas_novo_jogo' : 'livro.ficha.paginas', { ciclo }), W - 32)) {
     s += texto(16, pl, l, '', '#cdbdf0')
-    pl += 12
+    pl += LH()
   }
   s += paginas(16, pl - 6, ciclo)
   const H = pl + 20
@@ -250,7 +275,7 @@ function trofeus(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: s
   const resumo = lista.length === 0 ? tx('livro.trofeus.estante_vazia') : lista.length > VAGAS ? tx('livro.trofeus.estante_cheia', { n: lista.length, vagas: VAGAS }) : tp('livro.trofeus.estante', lista.length)
   for (const l of quebrar(resumo, W - 24)) {
     s += texto(W / 2, y, l, ' m', '#cdbdf0')
-    y += 12
+    y += LH()
   }
   return { corpo: s, H: y + 6, alt: tx('livro.trofeus.alt', { lista: lista.length === 0 ? tx('livro.trofeus.nenhum') : lista.slice(0, VAGAS).join(' · ') }), alvos }
 }
@@ -300,12 +325,12 @@ function grimorio(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: 
     const n = usos[f.papel] ?? 0
     const conta = `${n}×`
     s += `<text class="t e" x="${W - 14}" y="${y + 11}" style="fill:${OURO}">${esc(conta)}</text>`
-    const nomeMax = W - 64 - 14 - conta.length * PX_LETRA_TITULO - 6
-    s += titulo(64, y + 11, f.nome.length * PX_LETRA_TITULO <= nomeMax ? f.nome : f.nome.split(' ')[0] ?? f.nome)
+    const nomeMax = W - 64 - 14 - larguraCurta(conta, PX_LETRA_TITULO) - 6
+    s += titulo(64, y + 11, nomeQueCabe(f.nome, nomeMax))
     let ly = y + 24
     for (const l of quebrar(f.desc, W - 64 - 14)) {
       s += texto(64, ly, l, '', '#e9d9ff')
-      ly += 12
+      ly += LH()
     }
     y = Math.max(y + 38, ly + 4)
   }
@@ -339,7 +364,7 @@ export function paginaDoLivro(aba: AbaDoLivro, j: Jogo, W0: number, escala: numb
   const assinatura = `<use href="${d.img('assinatura')}" x="${W - 14 - aw}" y="${H - 19}" opacity="0.85"/>`
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${W * escala}" height="${H * escala}" viewBox="0 0 ${W} ${H}" shape-rendering="crispEdges">` +
-    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${CSS_TEXTO}${CSS_FONTE_LONGA}${d.css.join('')}</style>` +
+    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${cssTexto()}${cssFonteLivro()}${d.css.join('')}</style>` +
     `<defs>${d.defs.join('')}</defs>` +
     moldura(W, H) +
     p.corpo +

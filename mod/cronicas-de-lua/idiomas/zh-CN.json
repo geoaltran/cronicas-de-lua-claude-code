@@ -1,0 +1,362 @@
+{
+  "_sobre": "游戏的简体中文文本。键和 {标记} 与 pt-BR.json（基准）相同。专有名词（Lua、Vespera、Ignis、Sir Solis、Nébula、Malakor）保留拉丁字母。修改后运行 python3 idiomas.py。",
+  "chefoes": {
+    "vespera": "Vespera",
+    "dama_penumbra": "半影夫人",
+    "golem_obsidiana": "黑曜石魔像",
+    "leviata": "利维坦",
+    "ignis": "Ignis",
+    "relojoeiro": "钟表匠",
+    "sir_solis": "Sir Solis",
+    "rei_espelho": "镜之王",
+    "nebula": "Nébula",
+    "malakor": "Malakor"
+  },
+  "chefao": {
+    "pagina": "+书页 {pagina}/10",
+    "novo_jogo": "新游戏+"
+  },
+  "luta": {
+    "critico": "暴击！",
+    "trofeu": "+奖杯",
+    "erro_misterioso": "神秘错误"
+  },
+  "terminal": {
+    "nivel": "🌙 Lv {nivel}",
+    "lua_nova": "新月",
+    "minutos": "{n}分钟",
+    "luz": "月光 ",
+    "mana": "法力 ",
+    "mochila": "背包 ",
+    "mochila_cheia": "（满了！）",
+    "desmaio": "🌑 新月：Lua 晕倒了（缓存已冷）。下一条消息会更贵。",
+    "vida_tarefas": " {resta}/{total} 个任务",
+    "chefao_caiu": "🏆 {nome} 倒下了！+书页 {pagina}/10",
+    "fugiu": "💥 {alvo} 反击后逃走了",
+    "defendeu": "🛡 {alvo} 用护盾挡住了 ",
+    "critico": "💥 暴击！ ",
+    "golpe_em": "击中 {alvo}",
+    "derrotado": "击败 {alvo}",
+    "xp": " +{xp} XP",
+    "trofeu": " +奖杯",
+    "canaliza": "🔮 Lua 正对 {alvo} 引导施法…",
+    "enfrenta": "⚔ Lua 迎战 {alvo}",
+    "enfrenta_elite": "⚔ Lua 迎战 {alvo}（精英）",
+    "anda": "🌲 Lua 在森林里漫步",
+    "descansa": "💤 Lua 在休息",
+    "chefao_em": {
+      "um": "  ·  再打 {n} 场遇到 Boss",
+      "outros": "  ·  再打 {n} 场遇到 Boss"
+    }
+  },
+  "barras": {
+    "luz": {
+      "nome": "月光",
+      "curto": "月光",
+      "minutos": "{n}分钟",
+      "lua_nova": "新月",
+      "titulo_lua_nova": "月光 · 新月",
+      "sem_luz": "对话缓存。\n第一次回复后亮起。",
+      "explica": "对话缓存。\n每次回复后维持 {min} 分钟。",
+      "lua_nova_explica": "缓存已冷。\n下一条消息会更贵。"
+    },
+    "mana": {
+      "nome": "星辰法力",
+      "curto": "法力",
+      "sem_dado": "套餐限额。\n第一次回复后显示。",
+      "explica": "套餐限额：剩余 {livre}%。",
+      "renova": "\n{hora} 恢复（5 小时）。",
+      "sete_dias": "\n7 天：剩余 {livre}%。"
+    },
+    "mochila": {
+      "nome": "背包",
+      "nome_cheia": "背包！",
+      "curto": "背包",
+      "explica": "对话已用掉多少\n（上下文）。",
+      "cheia_explica": "对话快满了（{pct}%）。\n该整理背包了（压缩）。"
+    },
+    "xp": {
+      "nome": "XP",
+      "curto": "XP",
+      "titulo": "XP · {nivel} 级",
+      "explica": "距离 {proximo} 级还差 {faltam} XP。\n书页 {paginas}/10。",
+      "chefao_em": {
+        "um": "再打 {n} 场遇到 Boss。",
+        "outros": "再打 {n} 场遇到 Boss。"
+      },
+      "chefao_lista": "任务完成时 Boss 就会倒下：{feitas}/{total}。",
+      "chefao_vida": {
+        "um": "再赢 {n} 场，Boss 就会倒下。",
+        "outros": "再赢 {n} 场，Boss 就会倒下。"
+      }
+    },
+    "selo": {
+      "titulo": "{nivel} 级",
+      "explica": "总计 {xp} XP。\n书页 {paginas}/10 · 胜利 {lutas} 场。"
+    }
+  },
+  "botoes": {
+    "vigilia": {
+      "nome": "守夜",
+      "acesa": "守夜 · 已点亮",
+      "explica": "让缓存保持温热。\n会消耗一点限额。",
+      "acesa_explica": "缓存温热：{envios}/{max} 条消息。\n点击熄灭。"
+    },
+    "mochila": {
+      "nome": "背包",
+      "cheia": "背包满了",
+      "explica": "整理对话\n（压缩上下文）。",
+      "cheia_explica": "点击整理\n（压缩对话）。"
+    },
+    "estandarte": {
+      "nome": "旗帜",
+      "explica": "为下一次会话\n写任务总结。",
+      "escrevendo": "Claude 正在写\n任务总结。",
+      "pronto": "任务总结写好了。"
+    },
+    "livro": {
+      "nome": "书",
+      "explica": "角色卡、书页、\n图鉴和奖杯。",
+      "aberto_explica": "点击合上。"
+    }
+  },
+  "lua_nova": {
+    "frase": "Lua 奋战了太久，累坏了。",
+    "linha2": "下一条消息会更贵（缓存已冷）。"
+  },
+  "livro": {
+    "alt": "Lua 之书。{alt}",
+    "abas": {
+      "ficha": "角色卡",
+      "bestiario": "图鉴",
+      "trofeus": "奖杯",
+      "grimorio": "魔导书"
+    },
+    "ficha": {
+      "titulo": "Lua 的角色卡",
+      "subtitulo": "月之法师，编年史的守护者。",
+      "nivel": "等级",
+      "nivel_valor": "{nivel} · {xp} XP",
+      "proximo_nivel": "下一级",
+      "proximo_nivel_valor": "还差 {faltam} XP",
+      "lutas": "胜利场数",
+      "chefoes": "击败的 Boss",
+      "trofeus": "奖杯",
+      "proximo_chefao": "下一个 Boss",
+      "proximo_chefao_valor": {
+        "um": "{nome}：再打 {n} 场，或在下一个任务清单时",
+        "outros": "{nome}：再打 {n} 场，或在下一个任务清单时"
+      },
+      "paginas": "编年史书页：{ciclo}/10",
+      "paginas_novo_jogo": "编年史书页：{ciclo}/10（新游戏+）",
+      "alt": "Lua 的角色卡：{nivel} 级，{xp} XP，胜利 {lutas} 场，击败 Boss {chefoes} 个，奖杯 {trofeus} 个，书页 {ciclo}/10。"
+    },
+    "bestiario": {
+      "titulo": "图鉴",
+      "todos": "10 个 Boss 全部击败。旅程将在新游戏+中重新开始。",
+      "vistos": "已击败 10 个 Boss 中的 {vistos} 个。其余的还在暗处等待。",
+      "pagina": "第 {n} 页",
+      "alt": "图鉴：已击败 10 个 Boss 中的 {vistos} 个。",
+      "alt_nomes": "图鉴：已击败 10 个 Boss 中的 {vistos} 个（{nomes}）。"
+    },
+    "trofeus": {
+      "titulo": "奖杯",
+      "vazio": "打败一个精英（Claude 修好的错误）就能赢得第一个奖杯。",
+      "subtitulo": "Claude 修好的错误。把鼠标移上去可以看到名字。",
+      "nome": {
+        "comando": "命令之杯",
+        "edicao": "编辑齿轮",
+        "leitura": "阅读之月",
+        "web": "网络宝珠"
+      },
+      "explica": "{nome}\n错误已修复。",
+      "estante_vazia": "架子还是空的。",
+      "estante_cheia": "共 {n} 个奖杯：最新的 {vagas} 个摆在架子上。",
+      "estante": {
+        "um": "架子上有 {n} 个奖杯。",
+        "outros": "架子上有 {n} 个奖杯。"
+      },
+      "alt": "奖杯：{lista}。",
+      "nenhum": "还没有"
+    },
+    "grimorio": {
+      "titulo": "魔导书",
+      "subtitulo": "Claude 的工具就是 Lua 的咒语。",
+      "ler": { "nome": "流明之眼", "desc": "读取和搜索文件。唤醒 Vespera。" },
+      "editar": { "nome": "改写符文", "desc": "编辑和编写代码。召唤钟表匠和 Sir Solis。" },
+      "terminal": { "nome": "命令之焰", "desc": "终端命令。唤醒 Ignis。" },
+      "web": { "nome": "星光潮汐", "desc": "搜索和阅读网页。引来利维坦和 Nébula。" },
+      "integracao": { "nome": "镜之契约", "desc": "外部集成（MCP）。召唤镜之王。" },
+      "subagente": { "nome": "半影回响", "desc": "呼叫帮手（子代理）。半影夫人的分身。" },
+      "total": {
+        "um": "共施放了 {n} 次咒语。",
+        "outros": "共施放了 {n} 次咒语。"
+      },
+      "alt": "魔导书：{lista}。",
+      "alt_item": {
+        "um": "{nome}：{n} 次",
+        "outros": "{nome}：{n} 次"
+      }
+    },
+    "titulo_painel": "Lua 之书",
+    "widget": "📖 {nivel} 级 · 书页 {paginas}/10 · 奖杯 {trofeus}",
+    "texto": {
+      "nivel": "{nivel} 级 · {xp} XP（距离 {proximo} 级还差 {faltam}）",
+      "paginas": "编年史书页：{ciclo}/10（总计 {total}）",
+      "lutas": {
+        "um": "胜利 {lutas} 场 · 再打 {n} 场遇到 Boss",
+        "outros": "胜利 {lutas} 场 · 再打 {n} 场遇到 Boss"
+      },
+      "trofeus": "奖杯：{n}"
+    }
+  },
+  "superficies": {
+    "terminal": "终端",
+    "desktop": "桌面应用",
+    "vscode": "VS Code",
+    "mobile": "手机"
+  },
+  "mensagens": {
+    "vigilia": "🌙 Lua 的守夜：只是让缓存保持温热。什么都不用做，只回复“ok”。",
+    "estandarte": "🚩 Lua 的旗帜：现在写一份任务总结，好让工作在新的会话中继续。在项目根目录创建或更新文件 NEXT_SESSION.md，用简体中文，简洁明了，内容包括：顶部放一段可以直接粘贴到新会话的文字；每样东西在哪里（文件、文件夹、运行、验证和测试的命令）；哪些已经完成并通过（以免重做）；做出的决定以及发现的限制或坑；下一步的详细计划（编号列出）；以及未完成的任务和待解决的问题。如果项目里有 CLAUDE.md，就在其中加一行指向 NEXT_SESSION.md。完成后，用几行话说明保存了什么。"
+  },
+  "avisos": {
+    "vigilia": {
+      "apagou_sozinha": "🏮 守夜在发送 {max} 条消息后自动熄灭了。如果想让缓存继续保持温热，请再点亮它。",
+      "apagada": "🏮 守夜已熄灭。",
+      "acesa": "🔥 守夜已点亮。月光快要耗尽时，Lua 会发送一条很短的消息让缓存保持温热（最多 {max} 次，且只在你没有输入时）。每次都会消耗一点套餐限额。再点一次即可熄灭。"
+    },
+    "mochila": {
+      "espere": "🎒 请等 Claude 完成任务后再整理背包。",
+      "arrumada": "🎒 背包整理好了：对话已经总结，又有空间了。",
+      "nao_arrumada": "🎒 背包没有整理：{motivo}",
+      "falhou": "🎒 现在无法整理背包：{erro}"
+    },
+    "estandarte": {
+      "espere": "🚩 请等 Claude 完成任务后再举起旗帜。",
+      "falhou": "🚩 无法请求总结：{erro}"
+    },
+    "livro": {
+      "nao_abriu": "📖 书还没有打开：{motivo}"
+    }
+  },
+  "chips": {
+    "vigilia": "守夜",
+    "vigilia_acesa": "守夜已点亮（{envios}/{max}）",
+    "mochila": "背包",
+    "estandarte": "旗帜",
+    "escrevendo": "正在写…",
+    "livro": "书",
+    "livro_aberto": "书已打开"
+  },
+  "faixa": {
+    "nova_conversa": {
+      "explica": "当前对话会离开屏幕（用 /resume 可以找回）。",
+      "sim": "开始",
+      "nao": "留在这里",
+      "botao": "🌙 新对话"
+    },
+    "lua_nova": {
+      "continuar": "也可以继续在这里：只有下一条消息会更贵。"
+    },
+    "mochila": {
+      "explica": "整理背包会总结对话并腾出空间（和 /compact 一样）。",
+      "sim": "整理背包",
+      "nao": "以后再说",
+      "arrumando": "🎒 正在整理背包…"
+    },
+    "estandarte": {
+      "pronto": "🚩 任务总结写好了（NEXT_SESSION.md）。",
+      "fechar": "关闭"
+    }
+  },
+  "cena_alt": {
+    "frase": "As Crônicas de Lua：Lua {acao}；{nivel} 级。",
+    "cansada": "累了（新月，缓存已冷）",
+    "chefao": "正在迎战 Boss {nome}（体力 {resta}/{total}）",
+    "luta": "正在和怪物战斗",
+    "anda": "在森林里漫步",
+    "descansa": "在休息"
+  },
+  "regua_alt": "用来校准横幅宽度的标尺",
+  "comando": {
+    "descricao": "As Crônicas de Lua：冒险、横幅设置和测试（Boss、精英、新月）",
+    "superficies": {
+      "nenhuma": "现在没有任何界面在绘制这个会话。",
+      "lista": "这个会话正在这里绘制：{lista}。"
+    },
+    "abertura": {
+      "desligada": "开场动画已关闭：每天的第一个会话不会再出现。/cronicas intro on 重新打开；/cronicas intro 立即播放。",
+      "ligada": "开场动画已打开：每天的第一个会话都会出现。/cronicas intro 立即播放。",
+      "mostra": "横幅上正在播放开场动画（约 {s} 秒；点击画面可跳过）。",
+      "mostra_desligada": "每天第一个会话的开场动画是关闭的：/cronicas intro on 打开。",
+      "mostra_ligada": "/cronicas intro off 关闭。"
+    },
+    "largura": {
+      "sem_colunas": "我还不知道横幅在{sup}里有多少列：请等横幅出现后再试一次。",
+      "calibrada": "{sup}的宽度已校准：{n} px ÷ {colunas} 列 = 每列 {px} px。画面现在会跟随横幅的宽度（标尺已关闭）。"
+    },
+    "prova": {
+      "ligada": "技术测试已打开。(1) 鼠标区域会加上边框：把鼠标移到各条和等级徽章上（边框会亮起，气泡会出现）。(2) 画面里会出现 4 个按钮图标，上面盖着看不见的可点击区域：逐个点击（会出现提示），再把鼠标移上去（会出现按钮的气泡）。再次输入 /cronicas probe 关闭。",
+      "desligada": "技术测试已关闭。",
+      "rodape": "技术测试：{colunas} 列，每列 {px} px，每行 {linha} px。/cronicas probe 关闭。"
+    },
+    "regua": {
+      "ligada": "标尺已显示在画面下方。记下右边缘最后一个完整显示的数字，然后运行 /cronicas width <那个数字>。再次输入 /cronicas ruler 关闭。",
+      "desligada": "标尺已关闭。"
+    },
+    "chefao": {
+      "desconhecido": "我不认识叫“{pedido}”的 Boss。请用下面之一：{lista}。",
+      "ja_em_cena": "已经有一个 Boss 在场了。",
+      "com_lista": {
+        "um": "{nome} 带着 {n} 个任务的清单登场了（书页 {pagina}/10）。Claude 的每个工具都打在护盾上，只能削掉一点；/cronicas hit 完成一个任务（最后一个是暴击）。",
+        "outros": "{nome} 带着 {n} 个任务的清单登场了（书页 {pagina}/10）。Claude 的每个工具都打在护盾上，只能削掉一点；/cronicas hit 完成一个任务（最后一个是暴击）。"
+      },
+      "entrou": "{nome} 登场了（书页 {pagina}/10）。用 /cronicas hit 削减它的体力。"
+    },
+    "golpe": {
+      "sem_chefao": "场上没有 Boss。/cronicas boss 召唤一个。",
+      "caiu": "{nome} 倒下了！找回了书页 {pagina}/10。",
+      "tarefa": "任务完成！还剩 {resta}/{total}。",
+      "golpe": "命中！体力 {resta}/{total}。"
+    },
+    "elite": {
+      "proximo": "下一场普通战斗会是带着奖杯（{trofeu}）的精英（{elite}）。之后再运行一次，就能看到下一种。",
+      "trofeu": {
+        "comando": "燃着火焰的杯子（命令）",
+        "edicao": "齿轮（编辑）",
+        "leitura": "弯月（读取）",
+        "web": "宝珠（网页）"
+      }
+    },
+    "vigilia": {
+      "acesa": "月光已调到快要耗尽：守夜会在 10 秒后发出那条短消息。",
+      "apagada": "月光已调到快要耗尽。守夜是熄灭的：点击灯笼点亮它（消息会随即发出）。"
+    },
+    "lua_nova": "已模拟新月：提示会显示在横幅上，直到下一次回复。",
+    "modo": {
+      "quadro": "框架",
+      "quadro_baloes": "框架（悬停气泡）",
+      "imagem": "图片"
+    },
+    "ajuda": {
+      "estado": "As Crônicas de Lua：缩放 {escala}x，每列 {px} px，{modo}模式。{nivel} 级，{xp} XP，书页 {paginas}/10。",
+      "uso": "用法：/cronicas scale 1|2|3、/cronicas ruler 和 /cronicas width <px>（校准宽度）、/cronicas image|frame、/cronicas test（对比两种）、/cronicas new-moon（模拟缓存变冷）、/cronicas vigil（让月光快耗尽，看看守夜）、/cronicas boss [名字] 和 /cronicas hit（试玩 Boss 战）、/cronicas elite（下一场是精英）或 /cronicas language（游戏语言）。",
+      "trofeus": "奖杯：{lista}"
+    },
+    "linha": "行高：{n} px。鼠标区域已重新计算。",
+    "teste": "测试已打开：横幅显示两次，A（可交互的框架）和 B（图片）。再次输入 /cronicas test 关闭。",
+    "teste_a": "A：可交互的框架（悬停气泡）",
+    "teste_b": "B：图片（没有气泡）",
+    "ajustada": "横幅已调整：缩放 {escala}x，每列 {px} px，{modo}模式。",
+    "idioma": {
+      "titulo": "游戏语言：{nome}。",
+      "em_breve": "即将推出",
+      "como": "要切换：/cronicas language <代码>（例如 /cronicas language en）。/cronicas language auto 回到系统语言。",
+      "trocado": "语言已切换为 {nome}。",
+      "auto": "系统语言：{nome}。",
+      "sem_traducao": "{nome} 还没有翻译；游戏暂时保持 {atual}。",
+      "desconhecido": "我不认识“{pedido}”这种语言。"
+    }
+  }
+}

@@ -66,11 +66,11 @@ El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuán
 Monstruos por herramienta: leer archivos → Vespera · editar código → Relojero / Sir Solis · terminal → Ignis · web → Leviatán / Nébula · integraciones (MCP) → Rey Espejo · subagentes → clones de Dama Penumbra. Los jefes llegan en orden, una página de las Crónicas cada uno, hasta Malakor, y luego Nueva Partida+.
 
 ## Comandos
-`/cronicas` muestra el resumen de Lua. Los más útiles: `/cronicas ruler` y `/cronicas width <px>` (calibrar el ancho), `/cronicas boss` y `/cronicas hit` (probar un combate contra un jefe), `/cronicas surfaces` (dónde se está dibujando la sesión), `/cronicas language` (elegir el idioma del juego). El juego habla inglés, portugués, español, francés y alemán (sigue el idioma del sistema; `/cronicas language` lo cambia); pronto llegarán el chino, el japonés y el coreano.
+`/cronicas` muestra el resumen de Lua. Los más útiles: `/cronicas ruler` y `/cronicas width <px>` (calibrar el ancho), `/cronicas boss` y `/cronicas hit` (probar un combate contra un jefe), `/cronicas surfaces` (dónde se está dibujando la sesión), `/cronicas language` (elegir el idioma del juego). El juego habla inglés, portugués, español, francés, alemán, chino, japonés y coreano (sigue el idioma del sistema; `/cronicas language` lo cambia).
 
 ## Licencia
 - **Código** (scripts de Python, `mod/`): **MIT**, ver [`LICENSE`](LICENSE).
 - **Arte y personajes** (todo lo que hay en `assets/`, el arte incrustado en el mod, los sonidos y las previsualizaciones): **© 2026 George Altran (@geoaltran), [CC BY-NC 4.0](LICENSE-ART)**. Compártelo, haz remixes, haz fan art: solo da el crédito **"Art by George Altran (@geoaltran)"** con un enlace. **Sin uso comercial** sin autorización; hay licencia comercial bajo consulta.
-- **Fuentes**: Silkscreen y Pixelify Sans, **SIL Open Font License 1.1** (las licencias están junto a ellas).
+- **Fuentes**: Silkscreen, Pixelify Sans y Fusion Pixel Font (chino, japonés y coreano), **SIL Open Font License 1.1** (las licencias están junto a ellas).
 
 El texto legal válido es el de la licencia en inglés. Créditos completos en [`CREDITS.md`](CREDITS.md).

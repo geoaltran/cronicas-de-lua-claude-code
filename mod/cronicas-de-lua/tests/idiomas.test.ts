@@ -33,7 +33,7 @@ test('todo texto do padrão existe e os nomes montados por código têm chave', 
 
 const CMD = { origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } } as const
 
-test('/cronicas language: lista os 8 idiomas, troca, recusa o que ainda não tem tradução', async ($, on) => {
+test('/cronicas language: lista os 8 idiomas e troca entre eles', async ($, on) => {
   mock.clock(on, { now: 1_800_000_000_000 })
   const guardado = mock.store(on, { jogo: { xp: 0, paginas: 0, lutas: 0 }, ajustes: { abertura: false } })
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 1000, percent: 1 }, rateLimits: [] } }))
@@ -51,20 +51,24 @@ test('/cronicas language: lista os 8 idiomas, troca, recusa o que ainda não tem
   }
   expect(lista).toContain('  English (en)\n')
   expect(lista).toContain('  Español (es)\n')
-  expect(lista).toContain('日本語 (ja) · em breve')
-  expect(await rodar('lang ja')).toBe('日本語 ainda não tem tradução; o jogo continua em Português por enquanto.')
+  // os 8 idiomas já têm tradução: nenhum aparece como "em breve"
+  expect(lista).not.toContain('em breve')
+  expect(lista).toContain('  日本語 (ja)\n')
   expect(await rodar('idioma klingon')).toContain('Não conheço o idioma "klingon".')
   // espanhol, francês e alemão já respondem no próprio idioma
   expect(await rodar('lang es')).toBe('Idioma cambiado a Español.')
   expect(await rodar('lang fr')).toBe('Langue changée : Français.')
   expect(await rodar('lang de')).toBe('Sprache gewechselt zu Deutsch.')
-  expect(await rodar('lang ja')).toBe('日本語 ist noch nicht übersetzt; das Spiel bleibt vorerst auf Deutsch.')
+  // chinês, japonês e coreano (Fusion Pixel no desenho)
+  expect(await rodar('lang zh')).toBe('语言已切换为 中文。')
+  expect(await rodar('lang ja')).toBe('言語を 日本語 に変えました。')
+  expect(await rodar('lang ko')).toBe('언어를 한국어(으)로 바꿨어요.')
   expect(await rodar('idioma português')).toBe('Idioma trocado para Português.')
   expect(await rodar('language auto')).toBe('Idioma do sistema: Português.')
   void guardado
 })
 
-test('o idioma pelo que se digita ou pelo sistema; sem tradução, inglês', () => {
+test('o idioma pelo que se digita ou pelo sistema; desconhecido, inglês', () => {
   expect(codigoDe('pt_BR.UTF-8')).toBe('pt-BR')
   expect(codigoDe('pt-PT')).toBe('pt-BR')
   expect(codigoDe('es-MX')).toBe('es')
@@ -76,7 +80,9 @@ test('o idioma pelo que se digita ou pelo sistema; sem tradução, inglês', () 
   // a primeira variável que diz um idioma vale (LC_ALL, LC_MESSAGES, LANG, LANGUAGE)
   expect(idiomaDoSistema([undefined, 'C', 'pt_BR.UTF-8'])).toBe('pt-BR')
   expect(idiomaDoSistema([undefined, undefined, 'de_DE.UTF-8'])).toBe('de')
-  expect(idiomaDoSistema([undefined, undefined, 'ja_JP.UTF-8'])).toBe('en') // sem tradução ainda
+  expect(idiomaDoSistema([undefined, undefined, 'ja_JP.UTF-8'])).toBe('ja')
+  expect(idiomaDoSistema([undefined, undefined, 'ko_KR.UTF-8'])).toBe('ko')
+  expect(idiomaDoSistema([undefined, undefined, 'zh_CN.UTF-8'])).toBe('zh-CN')
   expect(idiomaDoSistema([])).toBe('en')
 })
 

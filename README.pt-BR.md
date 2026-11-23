@@ -66,11 +66,11 @@ O mod roda só dois comandos de leitura na sua máquina: `ps` (para saber quando
 Monstros por ferramenta: ler arquivos → Vespera · editar código → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · integrações (MCP) → Rei Espelho · subagentes → clones da Dama Penumbra. Os chefões vêm em ordem, uma página das Crônicas cada, até o Malakor; depois, Novo Jogo+.
 
 ## Comandos
-`/cronicas` mostra o resumo da Lua. Os úteis: `/cronicas regua` e `/cronicas largura <px>` (calibram a largura), `/cronicas chefao` e `/cronicas golpe` (testam uma luta de chefão), `/cronicas superficies` (onde a sessão está desenhando), `/cronicas idioma` (o idioma do jogo). Todos têm também um nome em inglês (`ruler`, `width`, `boss`, `hit`, `language`…). O jogo fala inglês, português, espanhol, francês e alemão (segue o idioma do sistema; `/cronicas idioma` troca); chinês, japonês e coreano estão a caminho. A lista completa está em [`COMANDOS_CRONICAS.md`](COMANDOS_CRONICAS.md).
+`/cronicas` mostra o resumo da Lua. Os úteis: `/cronicas regua` e `/cronicas largura <px>` (calibram a largura), `/cronicas chefao` e `/cronicas golpe` (testam uma luta de chefão), `/cronicas superficies` (onde a sessão está desenhando), `/cronicas idioma` (o idioma do jogo). Todos têm também um nome em inglês (`ruler`, `width`, `boss`, `hit`, `language`…). O jogo fala inglês, português, espanhol, francês, alemão, chinês, japonês e coreano (segue o idioma do sistema; `/cronicas idioma` troca). A lista completa está em [`COMANDOS_CRONICAS.md`](COMANDOS_CRONICAS.md).
 
 ## Licença
 - **Código** (scripts Python, `mod/`): **MIT**, ver [`LICENSE`](LICENSE).
 - **Arte e personagens** (tudo em `assets/`, a arte embutida no mod, os sons e as prévias): **© 2026 George Altran (@geoaltran), [CC BY-NC 4.0](LICENSE-ART)**. Compartilhe, faça remix, fan art: só dê o crédito **"Arte de George Altran (@geoaltran)"** com o link. **Uso comercial só com autorização**; licença comercial sob consulta. O texto legal que vale é o da Creative Commons, em inglês.
-- **Fontes**: Silkscreen e Pixelify Sans, **SIL Open Font License 1.1** (as licenças ficam junto delas).
+- **Fontes**: Silkscreen, Pixelify Sans e Fusion Pixel Font (chinês, japonês e coreano), **SIL Open Font License 1.1** (as licenças ficam junto delas).
 
 Créditos completos em [`CREDITS.md`](CREDITS.md).

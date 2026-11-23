@@ -63,14 +63,14 @@ Claude Code 세션에서 다음을 입력하세요.
 
 ![보스전](previa_chefao.gif)
 
-도구별 몬스터: 파일 읽기 → Vespera · 코드 편집 → Relojoeiro / Sir Solis · 터미널 → Ignis · 웹 → Leviatã / Nébula · 외부 연동(MCP) → Rei Espelho · 서브에이전트 → Dama Penumbra의 분신. 보스는 차례대로 나오며 각자 연대기의 한 페이지를 맡고, 마지막은 Malakor, 그다음은 '회차 플레이(뉴 게임+)'입니다.
+도구별 몬스터: 파일 읽기 → Vespera · 코드 편집 → 시계공 / Sir Solis · 터미널 → Ignis · 웹 → 리바이어던 / Nébula · 외부 연동(MCP) → 거울 왕 · 서브에이전트 → 반그림자 부인의 분신. 보스는 차례대로 나오며 각자 연대기의 한 페이지를 맡고, 마지막은 Malakor, 그다음은 '회차 플레이(뉴 게임+)'입니다.
 
 ## 명령어
-`/cronicas`는 Lua의 요약을 보여 줍니다. 자주 쓰는 것: `/cronicas ruler`·`/cronicas width <px>`(너비 보정), `/cronicas boss`·`/cronicas hit`(보스전 체험), `/cronicas surfaces`(세션이 어디에 그려지고 있는지), `/cronicas language`(게임 언어 선택). 게임 텍스트는 영어, 포르투갈어, 스페인어, 프랑스어, 독일어를 지원하며(시스템 언어를 따르고, `/cronicas language`로 바꿀 수 있습니다), 한국어, 중국어, 일본어는 준비 중입니다.
+`/cronicas`는 Lua의 요약을 보여 줍니다. 자주 쓰는 것: `/cronicas ruler`·`/cronicas width <px>`(너비 보정), `/cronicas boss`·`/cronicas hit`(보스전 체험), `/cronicas surfaces`(세션이 어디에 그려지고 있는지), `/cronicas language`(게임 언어 선택). 게임 텍스트는 영어, 포르투갈어, 스페인어, 프랑스어, 독일어, 중국어, 일본어, 한국어를 지원합니다(시스템 언어를 따르고, `/cronicas language`로 바꿀 수 있습니다).
 
 ## 라이선스
 - **코드**(Python 스크립트, `mod/`): **MIT**, [`LICENSE`](LICENSE) 참고.
 - **아트와 캐릭터**(`assets/`의 모든 것, 모드에 내장된 아트, 사운드, 미리보기): **© 2026 George Altran (@geoaltran), [CC BY-NC 4.0](LICENSE-ART)**. 공유, 리믹스, 팬아트 모두 환영합니다. 링크와 함께 **"Art by George Altran (@geoaltran)"**이라고 출처만 밝혀 주세요. 허가 없이 **상업적으로 이용할 수 없습니다**. 상업용 라이선스는 문의해 주세요.
-- **글꼴**: Silkscreen과 Pixelify Sans, **SIL Open Font License 1.1**(라이선스 파일은 글꼴과 같은 곳에 있습니다).
+- **글꼴**: Silkscreen, Pixelify Sans, Fusion Pixel Font(중국어·일본어·한국어), **SIL Open Font License 1.1**(라이선스 파일은 글꼴과 같은 곳에 있습니다).
 
 법적 효력이 있는 것은 영어로 된 라이선스 원문입니다. 전체 크레디트는 [`CREDITS.md`](CREDITS.md)에 있습니다.

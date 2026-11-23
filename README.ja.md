@@ -63,14 +63,14 @@ Mod に対応した最新の Claude Code が必要です（2.1.330 で開発・�
 
 ![ボス戦](previa_chefao.gif)
 
-ツールごとのモンスター：ファイルを読む → Vespera · コードを編集 → Relojoeiro / Sir Solis · ターミナル → Ignis · Web → Leviatã / Nébula · 外部連携（MCP）→ Rei Espelho · サブエージェント → Dama Penumbra の分身。ボスは順番に登場し、それぞれがクロニクルの 1 ページ。最後の Malakor を倒すと「強くてニューゲーム」へ。
+ツールごとのモンスター：ファイルを読む → Vespera · コードを編集 → 時計職人 / Sir Solis · ターミナル → Ignis · Web → リヴァイアサン / Nébula · 外部連携（MCP）→ 鏡の王 · サブエージェント → 半影の貴婦人の分身。ボスは順番に登場し、それぞれがクロニクルの 1 ページ。最後の Malakor を倒すと「強くてニューゲーム」へ。
 
 ## コマンド
-`/cronicas` で Lua のまとめを表示します。よく使うもの：`/cronicas ruler` と `/cronicas width <px>`（幅の調整）、`/cronicas boss` と `/cronicas hit`（ボス戦のお試し）、`/cronicas surfaces`（セッションがどこに描画されているか）、`/cronicas language`（ゲームの言語を選ぶ）。ゲーム内のテキストは英語・ポルトガル語・スペイン語・フランス語・ドイツ語に対応しています（システムの言語に合わせて切り替わり、`/cronicas language` で変更できます）。日本語・中国語・韓国語は準備中です。
+`/cronicas` で Lua のまとめを表示します。よく使うもの：`/cronicas ruler` と `/cronicas width <px>`（幅の調整）、`/cronicas boss` と `/cronicas hit`（ボス戦のお試し）、`/cronicas surfaces`（セッションがどこに描画されているか）、`/cronicas language`（ゲームの言語を選ぶ）。ゲーム内のテキストは英語・ポルトガル語・スペイン語・フランス語・ドイツ語・中国語・日本語・韓国語に対応しています（システムの言語に合わせて切り替わり、`/cronicas language` で変更できます）。
 
 ## ライセンス
 - **コード**（Python スクリプト、`mod/`）：**MIT**。[`LICENSE`](LICENSE) を参照。
 - **アートとキャラクター**（`assets/` のすべて、Mod に埋め込まれたアート、サウンド、プレビュー）：**© 2026 George Altran (@geoaltran)、[CC BY-NC 4.0](LICENSE-ART)**。共有、リミックス、ファンアートは大歓迎です。リンクとともに **「Art by George Altran (@geoaltran)」** とクレジットしてください。許可なく**商用利用はできません**。商用ライセンスはご相談ください。
-- **フォント**：Silkscreen と Pixelify Sans、**SIL Open Font License 1.1**（ライセンスファイルはフォントと同じ場所にあります）。
+- **フォント**：Silkscreen、Pixelify Sans、Fusion Pixel Font（中国語・日本語・韓国語）、**SIL Open Font License 1.1**（ライセンスファイルはフォントと同じ場所にあります）。
 
 法的に有効なのは英語のライセンス本文です。クレジットの全文は [`CREDITS.md`](CREDITS.md) にあります。

@@ -9,6 +9,7 @@ Uso:  .venv/bin/python construir_mod.py [pasta_do_mod]
 import base64
 import io
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -173,7 +174,7 @@ LETRAS = "".join(chr(c) for c in range(0x20, 0x7F)) + "áàâãéêíóôõúü�
 LETRAS += "¡¿ñÑèëîïûùÿœæÈËÎÏÛÙŸŒÆäößÄÖÜ«»’"
 
 
-def _woff2(f) -> str:
+def _woff2(f, letras: str = LETRAS) -> str:
     from fontTools import subset
 
     op = subset.Options()
@@ -181,7 +182,7 @@ def _woff2(f) -> str:
     op.layout_features = ["kern"]
     op.name_IDs = [0, 1, 2, 3, 4, 5, 6]
     s = subset.Subsetter(op)
-    s.populate(text=LETRAS)
+    s.populate(text=letras)
     s.subset(f)
     b = io.BytesIO()
     f.flavor = "woff2"
@@ -214,6 +215,60 @@ def fonte_longa(mod: Path) -> str:
     return _woff2(instancer.instantiateVariableFont(TTFont(A / "fontes" / "PixelifySans[wght].ttf"), {"wght": 500}))
 
 
+# Chinês, japonês e coreano (opção A, escolhida pelo usuário em 23/11/2026): a
+# Fusion Pixel 12 px (OFL) entra NO LUGAR da Silkscreen e da Pixelify nesses
+# idiomas. Três recortes por idioma, cada um com ASCII + as letras dos textos
+# que aparecem naquele desenho (o orçamento da cena é apertado):
+#   cena   barras, chefão, luta (o que a faixa desenha sempre)
+#   baloes balões do hover e aviso de lua nova (só no modo quadro / lua nova)
+#   livro  o Livro inteiro (títulos e textos)
+# Na cena o CSS lista as famílias em sequência; a letra que falta numa cai na seguinte.
+FUSION = {"zh-CN": "zh_hans", "ja": "ja", "ko": "ko"}
+ASCII = LETRAS  # ASCII e os acentos latinos (nomes de erro no troféu, Nébula)
+CENA_CHAVES = re.compile(r"^(chefoes|chefao|luta)\.|^barras\.[a-z]+\.(nome|nome_cheia|curto|minutos|lua_nova)$")
+BALOES_CHAVES = re.compile(r"^(barras|botoes|lua_nova|chefoes)\.")
+LIVRO_CHAVES = re.compile(r"^(livro|chefoes|luta)\.")
+
+
+def _achatar(obj, prefixo=""):
+    for k, v in obj.items():
+        if k.startswith("_"):
+            continue
+        if isinstance(v, dict):
+            yield from _achatar(v, f"{prefixo}{k}.")
+        else:
+            yield f"{prefixo}{k}", v
+
+
+def fontes_cjk(mod: Path) -> dict:
+    """Os recortes da Fusion para cada idioma CJK que já tem tradução."""
+    from fontTools.ttLib import TTFont
+
+    pasta = A / "fontes" / "fusion-pixel"
+    out = {}
+    for idioma, variante in FUSION.items():
+        arq = mod / "idiomas" / f"{idioma}.json"
+        if not arq.exists():
+            continue
+        textos = dict(_achatar(json.loads(arq.read_text(encoding="utf-8"))))
+        def letras(chaves):
+            # sem os marcadores {x}, que viram números ou nomes
+            s = "".join(re.sub(r"\{[a-z_]+\}", "", v) for k, v in textos.items() if chaves.match(k))
+            return ASCII + "".join(sorted(set(s) - set(ASCII) - {"\n"}))
+        fonte_arq = pasta / f"fusion-pixel-12px-proportional-{variante}.otf.woff2"
+        out[idioma] = {parte: _woff2(TTFont(fonte_arq), letras(ch))
+                       for parte, ch in (("cena", CENA_CHAVES), ("baloes", BALOES_CHAVES), ("livro", LIVRO_CHAVES))}
+        print(f"Fusion {idioma}: " + " · ".join(f"{p} {len(v) / 1000:.1f} mil" for p, v in out[idioma].items()))
+    if out:
+        (mod / "fontes" / "OFL-FusionPixel.txt").write_bytes((pasta / "OFL.txt").read_bytes())
+        for sub in (pasta / "LICENSES").iterdir():
+            if sub.is_dir():
+                for lic in sub.iterdir():
+                    if lic.is_file():
+                        (mod / "fontes" / f"OFL-{sub.name}.txt").write_bytes(lic.read_bytes())
+    return out
+
+
 def marca():
     """A marca animada da abertura (assets/marca/animacao/, via marca_svg.py)."""
     import marca_svg  # aqui dentro: marca_svg importa este arquivo
@@ -239,9 +294,12 @@ def main():
         "// Arte e personagens: (c) 2026 George Altran (@geoaltran), CC BY-NC 4.0, sem uso comercial sem autorização (LICENSE-ART).",
         "// Fonte: Silkscreen, (c) 2001 The Silkscreen Project Authors, SIL Open Font License 1.1 (fontes/OFL.txt).",
         "// Fonte dos textos longos: Pixelify Sans, (c) 2021 The Pixelify Sans Project Authors, SIL Open Font License 1.1 (fontes/OFL-PixelifySans.txt).",
+        "// Fonte do chinês, japonês e coreano: Fusion Pixel Font, (c) TakWolf, SIL Open Font License 1.1 (fontes/OFL-FusionPixel.txt; inclui Ark Pixel, Cubic 11 e Galmuri, licenças em fontes/OFL-*.txt).",
         "export type Arte = { u: string; w: number; h: number; [k: string]: unknown }",
         f"export const FONTE = {json.dumps(fonte(mod))}",
         f"export const FONTE_LONGA = {json.dumps(fonte_longa(mod))}",
+        "// Fusion Pixel por idioma (zh-CN, ja, ko): recortes da cena, dos balões e do Livro.",
+        f"export const FONTES_CJK: Record<string, {{ cena: string; baloes: string; livro: string }}> = {json.dumps(fontes_cjk(mod))}",
         f"export const META = {json.dumps(meta, ensure_ascii=False)} as const",
         "// Marca animada (marca_svg.py): miolo em px nativos + CSS; usada na tela de abertura.",
         f"export const MARCA = {json.dumps(marca())} as const",
