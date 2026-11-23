@@ -169,6 +169,8 @@ def monstros():
 
 
 LETRAS = "".join(chr(c) for c in range(0x20, 0x7F)) + "áàâãéêíóôõúüçÁÀÂÃÉÊÍÓÔÕÚÇ·–—…ªº°"
+# espanhol, francês e alemão (etapa d da tradução)
+LETRAS += "¡¿ñÑèëîïûùÿœæÈËÎÏÛÙŸŒÆäößÄÖÜ«»’"
 
 
 def _woff2(f) -> str:

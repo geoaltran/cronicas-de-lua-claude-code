@@ -111,7 +111,7 @@ export function tipoTrofeu(chave: string): TipoTrofeu {
 export const TIPOS_TROFEU: readonly TipoTrofeu[] = ['comando', 'edicao', 'leitura', 'web']
 
 /** As letras que a Silkscreen embutida tem (o resto vira espaço). */
-const LETRAS = /[^ -~áàâãéêíóôõúüçÁÀÂÃÉÊÍÓÔÕÚÇ·–—…]/g
+const LETRAS = /[^ -~áàâãéêíóôõúüçÁÀÂÃÉÊÍÓÔÕÚÇ·–—…¡¿ñÑèëîïûùÿœæÈËÎÏÛÙŸŒÆäößÄÖÜ«»’]/g
 /** Até quantas letras o troféu mostra (a plaquinha cabe sobre o Golem). */
 export const TROFEU_MAX = 24
 

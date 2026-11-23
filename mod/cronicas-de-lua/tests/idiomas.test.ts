@@ -50,9 +50,15 @@ test('/cronicas language: lista os 8 idiomas, troca, recusa o que ainda não tem
     expect(lista).toContain(nome)
   }
   expect(lista).toContain('  English (en)\n')
-  expect(lista).toContain('Español (es) · em breve')
-  expect(await rodar('lang fr')).toBe('Français ainda não tem tradução; o jogo continua em Português por enquanto.')
+  expect(lista).toContain('  Español (es)\n')
+  expect(lista).toContain('日本語 (ja) · em breve')
+  expect(await rodar('lang ja')).toBe('日本語 ainda não tem tradução; o jogo continua em Português por enquanto.')
   expect(await rodar('idioma klingon')).toContain('Não conheço o idioma "klingon".')
+  // espanhol, francês e alemão já respondem no próprio idioma
+  expect(await rodar('lang es')).toBe('Idioma cambiado a Español.')
+  expect(await rodar('lang fr')).toBe('Langue changée : Français.')
+  expect(await rodar('lang de')).toBe('Sprache gewechselt zu Deutsch.')
+  expect(await rodar('lang ja')).toBe('日本語 ist noch nicht übersetzt; das Spiel bleibt vorerst auf Deutsch.')
   expect(await rodar('idioma português')).toBe('Idioma trocado para Português.')
   expect(await rodar('language auto')).toBe('Idioma do sistema: Português.')
   void guardado
@@ -69,7 +75,8 @@ test('o idioma pelo que se digita ou pelo sistema; sem tradução, inglês', () 
   expect(codigoDe('xx')).toBeUndefined()
   // a primeira variável que diz um idioma vale (LC_ALL, LC_MESSAGES, LANG, LANGUAGE)
   expect(idiomaDoSistema([undefined, 'C', 'pt_BR.UTF-8'])).toBe('pt-BR')
-  expect(idiomaDoSistema([undefined, undefined, 'de_DE.UTF-8'])).toBe('en') // sem tradução ainda
+  expect(idiomaDoSistema([undefined, undefined, 'de_DE.UTF-8'])).toBe('de')
+  expect(idiomaDoSistema([undefined, undefined, 'ja_JP.UTF-8'])).toBe('en') // sem tradução ainda
   expect(idiomaDoSistema([])).toBe('en')
 })
 

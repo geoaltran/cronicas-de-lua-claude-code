@@ -64,7 +64,7 @@ Claude Code 세션에서 다음을 입력하세요.
 도구별 몬스터: 파일 읽기 → Vespera · 코드 편집 → Relojoeiro / Sir Solis · 터미널 → Ignis · 웹 → Leviatã / Nébula · 외부 연동(MCP) → Rei Espelho · 서브에이전트 → Dama Penumbra의 분신. 보스는 차례대로 나오며 각자 연대기의 한 페이지를 맡고, 마지막은 Malakor, 그다음은 '회차 플레이(뉴 게임+)'입니다.
 
 ## 명령어
-`/cronicas`는 Lua의 요약을 보여 줍니다. 자주 쓰는 것: `/cronicas ruler`·`/cronicas width <px>`(너비 보정), `/cronicas boss`·`/cronicas hit`(보스전 체험), `/cronicas surfaces`(세션이 어디에 그려지고 있는지), `/cronicas language`(게임 언어 선택). 게임 텍스트는 아직 영어와 포르투갈어만 있으며(시스템 언어를 따르고, `/cronicas language`로 바꿀 수 있습니다), 다른 언어도 준비 중입니다.
+`/cronicas`는 Lua의 요약을 보여 줍니다. 자주 쓰는 것: `/cronicas ruler`·`/cronicas width <px>`(너비 보정), `/cronicas boss`·`/cronicas hit`(보스전 체험), `/cronicas surfaces`(세션이 어디에 그려지고 있는지), `/cronicas language`(게임 언어 선택). 게임 텍스트는 영어, 포르투갈어, 스페인어, 프랑스어, 독일어를 지원하며(시스템 언어를 따르고, `/cronicas language`로 바꿀 수 있습니다), 한국어, 중국어, 일본어는 준비 중입니다.
 
 ## 라이선스
 - **코드**(Python 스크립트, `mod/`): **MIT**, [`LICENSE`](LICENSE) 참고.
