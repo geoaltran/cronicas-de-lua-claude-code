@@ -4,6 +4,29 @@ Todos os comandos do mod começam com **`/cronicas`** e são digitados na caixa 
 
 Os comandos servem pra três coisas: **ver como está a jornada**, **ajustar a faixa** na tela e **testar partes do jogo** sem esperar elas acontecerem sozinhas.
 
+## 🌍 Nomes em inglês
+
+Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idioma do jogo (é o que os READMEs em outras línguas ensinam). O nome em português continua valendo. Maiúsculas não importam.
+
+| Inglês | Português |
+|---|---|
+| `language` (`lang`) | `idioma` |
+| `intro` | `abertura` |
+| `scale` | `escala` |
+| `ruler` | `regua` |
+| `width` | `largura` (e `phone` além de `celular` no fim) |
+| `column` | `coluna` |
+| `image` · `frame` | `imagem` · `quadro` |
+| `test` | `teste` |
+| `line` | `linha` |
+| `probe` | `prova` |
+| `boss` (`boss list`) | `chefao` (`chefao lista`) |
+| `hit` | `golpe` |
+| `elite` | `elite` |
+| `vigil` | `vigilia` |
+| `new-moon` | `lua-nova` |
+| `surfaces` | `superficies` |
+
 ## 📜 Ver a jornada
 
 | Comando | O que faz |
@@ -81,4 +104,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 23/11/2026 (idioma do jogo: `/cronicas language`, `lang`, `idioma` e `auto`).*
+*Última atualização: 23/11/2026 (nomes em inglês para todos os subcomandos; idioma do jogo: `/cronicas language`).*

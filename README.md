@@ -64,7 +64,7 @@ Requires a recent Claude Code with mod support (built and tested on 2.1.330).
 Monsters by tool: reading files → Vespera · editing code → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · integrations (MCP) → Rei Espelho · subagents → clones of Dama Penumbra. The bosses come in order, one page of the Chronicles each, up to Malakor, then New Game+.
 
 ## Commands
-`/cronicas` shows Lua's summary. Useful ones: `/cronicas regua` and `/cronicas largura <px>` (calibrate the width), `/cronicas chefao` and `/cronicas golpe` (try a boss fight), `/cronicas superficies` (where the session is drawing). The game text is in Portuguese for now; more languages are on the way.
+`/cronicas` shows Lua's summary. Useful ones: `/cronicas ruler` and `/cronicas width <px>` (calibrate the width), `/cronicas boss` and `/cronicas hit` (try a boss fight), `/cronicas surfaces` (where the session is drawing), `/cronicas language` (pick the game's language). Every subcommand also answers to its Portuguese name (`regua`, `largura`, `chefao`, `golpe`…). The game text is in Portuguese for now; more languages are on the way.
 
 ## License
 - **Code** (Python scripts, `mod/`): **MIT**, see [`LICENSE`](LICENSE).

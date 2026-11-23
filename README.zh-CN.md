@@ -64,7 +64,7 @@
 各工具对应的怪物：读取文件 → Vespera · 编辑代码 → Relojoeiro / Sir Solis · 终端 → Ignis · 网页 → Leviatã / Nébula · 外部集成（MCP）→ Rei Espelho · 子代理 → Dama Penumbra 的分身。Boss 按顺序登场，每个对应编年史中的一页，直到 Malakor，之后进入"新游戏+"。
 
 ## 命令
-`/cronicas` 显示 Lua 的概况。常用命令：`/cronicas regua` 和 `/cronicas largura <px>`（校准宽度）、`/cronicas chefao` 和 `/cronicas golpe`（试玩 Boss 战）、`/cronicas superficies`（查看会话正在哪里绘制）。游戏文字目前为葡萄牙语，更多语言即将推出。
+`/cronicas` 显示 Lua 的概况。常用命令：`/cronicas ruler` 和 `/cronicas width <px>`（校准宽度）、`/cronicas boss` 和 `/cronicas hit`（试玩 Boss 战）、`/cronicas surfaces`（查看会话正在哪里绘制）、`/cronicas language`（选择游戏语言）。游戏文字目前为葡萄牙语，更多语言即将推出。
 
 ## 许可
 - **代码**（Python 脚本、`mod/`）：**MIT**，见 [`LICENSE`](LICENSE)。

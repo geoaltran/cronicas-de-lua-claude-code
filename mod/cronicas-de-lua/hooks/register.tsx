@@ -80,7 +80,7 @@ for (const s of ['desktop', 'vscode', 'mobile'] as const) {
 /** "vscode", "celular"... no fim de um comando. */
 function supDoTexto(t: string | undefined): Sup | undefined {
   const x = (t ?? '').toLowerCase()
-  return x === 'vscode' || x === 'editor' ? 'vscode' : x === 'celular' || x === 'mobile' ? 'mobile' : x === 'desktop' || x === 'app' ? 'desktop' : undefined
+  return x === 'vscode' || x === 'editor' ? 'vscode' : x === 'celular' || x === 'mobile' || x === 'phone' ? 'mobile' : x === 'desktop' || x === 'app' ? 'desktop' : undefined
 }
 // 8,9 px por coluna: medido no app desktop (85 colunas = ~752 px), com uns px de folga
 // 20 px por linha: medido no app desktop (print da prova técnica, 22/11/2026)
@@ -1134,6 +1134,27 @@ function listaDeIdiomas(): string {
   return [tx('comando.idioma.titulo', { nome: nomeDaLingua(idioma()) }), ...linhas, tx('comando.idioma.como')].join('\n')
 }
 
+/**
+ * Os subcomandos do /cronicas em inglês (para quem não fala português), cada
+ * um apontando para o nome português de sempre, que continua valendo.
+ */
+export const SUBCOMANDOS: Readonly<Record<string, string>> = {
+  surfaces: 'superficies',
+  scale: 'escala',
+  column: 'coluna',
+  width: 'largura',
+  frame: 'quadro',
+  image: 'imagem',
+  test: 'teste',
+  probe: 'prova',
+  line: 'linha',
+  ruler: 'regua',
+  boss: 'chefao',
+  hit: 'golpe',
+  vigil: 'vigilia',
+  'new-moon': 'lua-nova',
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await aplicarIdioma($)
@@ -1161,13 +1182,15 @@ export const register: Register = on => {
     await $.command.register({
       name: 'cronicas',
       description: tx('comando.descricao'),
-      argumentHint: 'language [en|pt-BR|…] | abertura [on|off] | escala 2 | largura 690 | regua | quadro | imagem | teste | lua-nova | vigilia | chefao [lista N] [nome] | golpe | elite',
+      argumentHint: 'language [en|pt-BR|…] | intro [on|off] | scale 2 | ruler | width 690 | image | frame | test | new-moon | vigil | boss [list N] [name] | hit | elite | surfaces',
     })
     return next(e)
   })
 
   on('command.run', { command: 'cronicas' }, async ($, e) => {
-    const [chave, valor] = String(e.args ?? '').trim().split(/\s+/)
+    const [bruta, valor] = String(e.args ?? '').trim().split(/\s+/)
+    // nome em inglês (funciona em qualquer idioma) ou o português de sempre
+    const chave = SUBCOMANDOS[(bruta ?? '').toLowerCase()] ?? bruta
     const a = await lerAjustes($)
     const n = Number(valor)
     if (chave === 'language' || chave === 'lang' || chave === 'idioma') {
@@ -1249,7 +1272,7 @@ export const register: Register = on => {
       // Com "lista" (/cronicas chefao lista 3 relojoeiro): um chefão de lista de mentira
       // com N tarefas (padrão 3), com escudo; /cronicas golpe conclui uma tarefa.
       let palavras = String(e.args ?? '').trim().split(/\s+/).slice(1)
-      const comLista = palavras[0]?.toLowerCase() === 'lista'
+      const comLista = ['lista', 'list'].includes(palavras[0]?.toLowerCase() ?? '')
       let tarefas: Chefao['tarefas'] | undefined
       if (comLista) {
         palavras = palavras.slice(1)

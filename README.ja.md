@@ -64,7 +64,7 @@ Mod に対応した最新の Claude Code が必要です（2.1.330 で開発・�
 ツールごとのモンスター：ファイルを読む → Vespera · コードを編集 → Relojoeiro / Sir Solis · ターミナル → Ignis · Web → Leviatã / Nébula · 外部連携（MCP）→ Rei Espelho · サブエージェント → Dama Penumbra の分身。ボスは順番に登場し、それぞれがクロニクルの 1 ページ。最後の Malakor を倒すと「強くてニューゲーム」へ。
 
 ## コマンド
-`/cronicas` で Lua のまとめを表示します。よく使うもの：`/cronicas regua` と `/cronicas largura <px>`（幅の調整）、`/cronicas chefao` と `/cronicas golpe`（ボス戦のお試し）、`/cronicas superficies`（セッションがどこに描画されているか）。ゲーム内のテキストは今のところポルトガル語ですが、ほかの言語も準備中です。
+`/cronicas` で Lua のまとめを表示します。よく使うもの：`/cronicas ruler` と `/cronicas width <px>`（幅の調整）、`/cronicas boss` と `/cronicas hit`（ボス戦のお試し）、`/cronicas surfaces`（セッションがどこに描画されているか）、`/cronicas language`（ゲームの言語を選ぶ）。ゲーム内のテキストは今のところポルトガル語ですが、ほかの言語も準備中です。
 
 ## ライセンス
 - **コード**（Python スクリプト、`mod/`）：**MIT**。[`LICENSE`](LICENSE) を参照。

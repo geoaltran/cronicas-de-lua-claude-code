@@ -64,7 +64,7 @@ Precisa de um Claude Code recente, com suporte a mods (feito e testado na 2.1.33
 Monstros por ferramenta: ler arquivos → Vespera · editar código → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · integrações (MCP) → Rei Espelho · subagentes → clones da Dama Penumbra. Os chefões vêm em ordem, uma página das Crônicas cada, até o Malakor; depois, Novo Jogo+.
 
 ## Comandos
-`/cronicas` mostra o resumo da Lua. Os úteis: `/cronicas regua` e `/cronicas largura <px>` (calibram a largura), `/cronicas chefao` e `/cronicas golpe` (testam uma luta de chefão), `/cronicas superficies` (onde a sessão está desenhando). A lista completa está em [`COMANDOS_CRONICAS.md`](COMANDOS_CRONICAS.md).
+`/cronicas` mostra o resumo da Lua. Os úteis: `/cronicas regua` e `/cronicas largura <px>` (calibram a largura), `/cronicas chefao` e `/cronicas golpe` (testam uma luta de chefão), `/cronicas superficies` (onde a sessão está desenhando), `/cronicas idioma` (o idioma do jogo). Todos têm também um nome em inglês (`ruler`, `width`, `boss`, `hit`, `language`…). A lista completa está em [`COMANDOS_CRONICAS.md`](COMANDOS_CRONICAS.md).
 
 ## Licença
 - **Código** (scripts Python, `mod/`): **MIT**, ver [`LICENSE`](LICENSE).

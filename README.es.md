@@ -64,7 +64,7 @@ Requiere un Claude Code reciente con soporte para mods (creado y probado en la 2
 Monstruos por herramienta: leer archivos → Vespera · editar código → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · integraciones (MCP) → Rei Espelho · subagentes → clones de Dama Penumbra. Los jefes llegan en orden, una página de las Crónicas cada uno, hasta Malakor, y luego Nueva Partida+.
 
 ## Comandos
-`/cronicas` muestra el resumen de Lua. Los más útiles: `/cronicas regua` y `/cronicas largura <px>` (calibrar el ancho), `/cronicas chefao` y `/cronicas golpe` (probar un combate contra un jefe), `/cronicas superficies` (dónde se está dibujando la sesión). Por ahora el texto del juego está en portugués; pronto llegarán más idiomas.
+`/cronicas` muestra el resumen de Lua. Los más útiles: `/cronicas ruler` y `/cronicas width <px>` (calibrar el ancho), `/cronicas boss` y `/cronicas hit` (probar un combate contra un jefe), `/cronicas surfaces` (dónde se está dibujando la sesión), `/cronicas language` (elegir el idioma del juego). Por ahora el texto del juego está en portugués; pronto llegarán más idiomas.
 
 ## Licencia
 - **Código** (scripts de Python, `mod/`): **MIT**, ver [`LICENSE`](LICENSE).

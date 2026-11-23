@@ -2,6 +2,7 @@ import { expect, mock, test } from 'claude-code/testing'
 
 import { JORNADA, NOME_CHEFAO } from '../hooks/chefao'
 import { ABAS, FEITICOS, NOME_TROFEU } from '../hooks/livro'
+import { SUBCOMANDOS } from '../hooks/register'
 import { chaves, codigoDe, idioma, idiomaDoSistema, t, tp } from '../hooks/t'
 
 test('t troca os marcadores e tp escolhe o plural', () => {
@@ -69,4 +70,26 @@ test('o idioma pelo que se digita ou pelo sistema; sem tradução, inglês', () 
   expect(idiomaDoSistema([undefined, 'C', 'pt_BR.UTF-8'])).toBe('pt-BR')
   expect(idiomaDoSistema([undefined, undefined, 'de_DE.UTF-8'])).toBe('en') // sem tradução ainda
   expect(idiomaDoSistema([])).toBe('en')
+})
+
+test('subcomandos em inglês funcionam igual aos portugueses', async ($, on) => {
+  mock.clock(on, { now: 1_800_000_000_000 })
+  mock.store(on, { jogo: { xp: 0, paginas: 0, lutas: 0 }, ajustes: { abertura: false } })
+  on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 1000, percent: 1 }, rateLimits: [] } }))
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('command.register', () => ({ value: { command: 'cronicas' } }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const rodar = async (args: string) => String((await $.command.run({ command: 'cronicas', args, ...CMD }))?.text ?? '')
+
+  expect(await rodar('ruler')).toContain('Régua ligada')
+  expect(await rodar('regua')).toBe('Régua desligada.')
+  expect(await rodar('boss vespera')).toBe('Vespera entrou em cena (página 1/10). Use /cronicas golpe para tirar vida.')
+  expect(await rodar('Hit')).toBe('Golpe! Vida 2/3.')
+  expect(await rodar('golpe')).toBe('Golpe! Vida 1/3.')
+  expect(await rodar('scale 2')).toContain('escala 2x')
+  expect(await rodar('new-moon')).toBe(await rodar('lua-nova'))
+  // todo nome em inglês aponta para um subcomando que existe
+  for (const pt of Object.values(SUBCOMANDOS)) {
+    expect(['superficies', 'escala', 'coluna', 'largura', 'quadro', 'imagem', 'teste', 'prova', 'linha', 'regua', 'chefao', 'golpe', 'vigilia', 'lua-nova']).toContain(pt)
+  }
 })
