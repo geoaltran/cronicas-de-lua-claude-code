@@ -50,6 +50,8 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 | 🚩 **Banner** | Bittet Claude um eine Zusammenfassung der Mission, damit du in einer neuen Sitzung weitermachen kannst. |
 | 📖 **Buch** | Öffnet Luas Buch: ihr Charakterblatt, das Bestiarium der besiegten Bosse, das Trophäenregal und das Grimoire (Claudes Tools als Zauber). |
 
+![Luas Buch: Charakterblatt, Bestiarium, Trophäen und Grimoire](previa_livro.gif)
+
 ## Was im Spiel passiert
 | Echtes Ereignis | Im Spiel |
 |---|---|
@@ -61,7 +63,9 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 | Ein später behobener Fehler | Elite (Obsidiangolem); wenn er fällt, bleibt eine Trophäe fürs Regal |
 | Eine Aufgabenliste wird erstellt, oder alle 12 Kämpfe | **Boss**: Leben in Blöcken, einer pro Aufgabe. Normale Treffer prallen an seinem **Schild** ab (Lua kratzt sich am Kopf ❓💧); eine erledigte Aufgabe räumt einen Block ab; die letzte ist ein **KRITISCHER** Treffer. Der Boss fällt mit einer wiedergefundenen Seite (x/10) und einem Levelaufstieg |
 
-![Ein Bosskampf](previa_chefao.gif)
+![Kampf gegen Dame Penumbra: der Schild hält, eine Aufgabe nimmt einen Block, kritischer Treffer](previa_chefao_penumbra.gif)
+
+![Kampf gegen den Uhrmacher](previa_chefao_relojoeiro.gif)
 
 Monster nach Tool: Dateien lesen → Vespera · Code bearbeiten → Uhrmacher / Sir Solis · Terminal → Ignis · Web → Leviathan / Nébula · Integrationen (MCP) → Spiegelkönig · Subagenten → Klone der Dame Penumbra. Die Bosse kommen der Reihe nach, jeder mit einer Seite der Chroniken, bis zu Malakor, danach Neues Spiel+.
 

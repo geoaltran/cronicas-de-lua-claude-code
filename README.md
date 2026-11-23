@@ -50,6 +50,8 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 | 🚩 **Banner** | Asks Claude to write a mission summary so you can continue in a new session. |
 | 📖 **Book** | Opens Lua's Book: her sheet, the bestiary of defeated bosses, the trophy shelf and the grimoire (Claude's tools as spells). |
 
+![Lua's Book: sheet, bestiary, trophies and grimoire](previa_livro.gif)
+
 ## What happens in the game
 | Real event | In the game |
 |---|---|
@@ -61,7 +63,9 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 | An error fixed later | Elite (Obsidian Golem); its fall leaves a trophy for the shelf |
 | A task list is created, or every 12 fights | **Boss**: life in blocks, one per task. Ordinary hits bounce off its **shield** (Lua scratches her head ❓💧); a finished task drops a block; the last one is a **CRITICAL** hit. The boss falls with a recovered page (x/10) and a level up |
 
-![A boss fight](previa_chefao.gif)
+![Boss fight against Lady Penumbra: the shield holds, a task drops a block, critical hit](previa_chefao_penumbra.gif)
+
+![Boss fight against the Clockmaker](previa_chefao_relojoeiro.gif)
 
 Monsters by tool: reading files → Vespera · editing code → Clockmaker / Sir Solis · terminal → Ignis · web → Leviathan / Nébula · integrations (MCP) → Mirror King · subagents → clones of Lady Penumbra. The bosses come in order, one page of the Chronicles each, up to Malakor, then New Game+.
 

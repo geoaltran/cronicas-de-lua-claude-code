@@ -10,7 +10,10 @@ from PIL import Image, ImageSequence
 
 RAIZ = Path(__file__).parent
 ORIG = RAIZ / "previa_faixa" / "gif_sem_assinatura"
-GIFS = {"previa_luta.gif": 2, "previa_caminhada.gif": 2, "previa_chefao.gif": 2}   # escala de cada prévia
+# Os GIFs do README (luta, caminhada, chefões, Livro) agora saem de gravar_gifs.mjs, gravados
+# do próprio jogo, que já desenha a assinatura na cena e no pé do Livro: não entram aqui.
+# Use esta lista só para um GIF novo feito por fora do jogo.
+GIFS: dict[str, int] = {}   # nome -> escala da prévia
 OPACIDADE = 0.72
 
 

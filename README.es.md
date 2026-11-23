@@ -50,6 +50,8 @@ El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuán
 | 🚩 **Estandarte** | Pide a Claude un resumen de la misión para continuar en una sesión nueva. |
 | 📖 **Libro** | Abre el Libro de Lua: su ficha, el bestiario de jefes derrotados, la estantería de trofeos y el grimorio (las herramientas de Claude como hechizos). |
 
+![El Libro de Lua: ficha, bestiario, trofeos y grimorio](previa_livro.gif)
+
 ## Qué pasa en el juego
 | Evento real | En el juego |
 |---|---|
@@ -61,7 +63,9 @@ El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuán
 | Un error corregido después | Élite (Gólem de Obsidiana); al caer deja un trofeo para la estantería |
 | Se crea una lista de tareas, o cada 12 combates | **Jefe**: vida en bloques, uno por tarea. Los golpes normales rebotan en su **escudo** (Lua se rasca la cabeza ❓💧); una tarea terminada tumba un bloque; la última es un golpe **CRÍTICO**. El jefe cae con una página recuperada (x/10) y una subida de nivel |
 
-![Un combate contra un jefe](previa_chefao.gif)
+![Combate contra Dama Penumbra: el escudo aguanta, una tarea tumba un bloque, golpe crítico](previa_chefao_penumbra.gif)
+
+![Combate contra el Relojero](previa_chefao_relojoeiro.gif)
 
 Monstruos por herramienta: leer archivos → Vespera · editar código → Relojero / Sir Solis · terminal → Ignis · web → Leviatán / Nébula · integraciones (MCP) → Rey Espejo · subagentes → clones de Dama Penumbra. Los jefes llegan en orden, una página de las Crónicas cada uno, hasta Malakor, y luego Nueva Partida+.
 

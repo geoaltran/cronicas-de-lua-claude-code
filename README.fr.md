@@ -50,6 +50,8 @@ Le mod lance seulement deux commandes en lecture seule sur votre machine : `ps` 
 | 🚩 **Étendard** | Demande à Claude un résumé de la mission pour continuer dans une nouvelle session. |
 | 📖 **Livre** | Ouvre le Livre de Lua : sa fiche, le bestiaire des boss vaincus, l'étagère à trophées et le grimoire (les outils de Claude en guise de sorts). |
 
+![Le Livre de Lua : fiche, bestiaire, trophées et grimoire](previa_livro.gif)
+
 ## Ce qui se passe dans le jeu
 | Événement réel | Dans le jeu |
 |---|---|
@@ -61,7 +63,9 @@ Le mod lance seulement deux commandes en lecture seule sur votre machine : `ps` 
 | Une erreur corrigée plus tard | Élite (Golem d'Obsidienne) ; en tombant, il laisse un trophée pour l'étagère |
 | Une liste de tâches est créée, ou tous les 12 combats | **Boss** : vie en blocs, un par tâche. Les coups ordinaires rebondissent sur son **bouclier** (Lua se gratte la tête ❓💧) ; une tâche terminée fait tomber un bloc ; la dernière est un coup **CRITIQUE**. Le boss tombe avec une page retrouvée (x/10) et un niveau en plus |
 
-![Un combat de boss](previa_chefao.gif)
+![Combat contre Dame Pénombre : le bouclier tient, une tâche fait tomber un bloc, coup critique](previa_chefao_penumbra.gif)
+
+![Combat contre l'Horloger](previa_chefao_relojoeiro.gif)
 
 Monstres par outil : lire des fichiers → Vespera · modifier du code → Horloger / Sir Solis · terminal → Ignis · web → Léviathan / Nébula · intégrations (MCP) → Roi Miroir · sous-agents → clones de la Dame Pénombre. Les boss arrivent dans l'ordre, une page des Chroniques chacun, jusqu'à Malakor, puis Nouvelle partie+.
 

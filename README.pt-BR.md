@@ -50,6 +50,8 @@ O mod roda só dois comandos de leitura na sua máquina: `ps` (para saber quando
 | 🚩 **Estandarte** | Pede ao Claude um resumo da missão para continuar numa sessão nova. |
 | 📖 **Livro** | Abre o Livro da Lua: a ficha dela, o bestiário dos chefões derrotados, a estante de troféus e o grimório (as ferramentas do Claude como feitiços). |
 
+![O Livro da Lua: ficha, bestiário, troféus e grimório](previa_livro.gif)
+
 ## O que acontece no jogo
 | Evento real | No jogo |
 |---|---|
@@ -61,7 +63,9 @@ O mod roda só dois comandos de leitura na sua máquina: `ps` (para saber quando
 | Um erro consertado depois | Elite (Golem de Obsidiana); quando cai, deixa um troféu para a estante |
 | Lista de tarefas criada, ou a cada 12 lutas | **Chefão**: vida em blocos, um por tarefa. Golpes comuns batem no **escudo** (a Lua coça a cabeça ❓💧); tarefa concluída derruba um bloco; a última é o golpe **CRÍTICO**. O chefão cai com uma página recuperada (x/10) e um nível a mais |
 
-![Uma luta de chefão](previa_chefao.gif)
+![Luta contra a Dama Penumbra: o escudo segura, uma tarefa derruba um bloco, golpe crítico](previa_chefao_penumbra.gif)
+
+![Luta contra o Relojoeiro](previa_chefao_relojoeiro.gif)
 
 Monstros por ferramenta: ler arquivos → Vespera · editar código → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · integrações (MCP) → Rei Espelho · subagentes → clones da Dama Penumbra. Os chefões vêm em ordem, uma página das Crônicas cada, até o Malakor; depois, Novo Jogo+.
 
