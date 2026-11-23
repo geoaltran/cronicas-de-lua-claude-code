@@ -45,10 +45,10 @@ Claude Code 세션에서 다음을 입력하세요.
 ## 버튼
 | 버튼 | 기능 |
 |---|---|
-| 🏮 **불침번** | 달빛이 꺼지기 직전에 아주 짧은 메시지를 보내 캐시를 따뜻하게 유지합니다(최대 6번, 자리를 비운 동안에만). **기본값은 꺼짐: 요금제 한도를 소모합니다.** |
-| 🎒 **배낭** | 대화 압축(`/compact`와 같음)을 확인 절차와 함께 제안합니다. |
-| 🚩 **깃발** | 새 세션에서 이어 갈 수 있도록 Claude에게 임무 요약을 부탁합니다. |
-| 📖 **책** | Lua의 책을 엽니다. 캐릭터 시트, 물리친 보스 도감, 트로피 선반, 그리고 마법서(Claude의 도구를 주문으로). |
+| 🏮&nbsp;**불침번** | 달빛이 꺼지기 직전에 아주 짧은 메시지를 보내 캐시를 따뜻하게 유지합니다(최대 6번, 자리를 비운 동안에만). **기본값은 꺼짐: 요금제 한도를 소모합니다.** |
+| 🎒&nbsp;**배낭** | 대화 압축(`/compact`와 같음)을 확인 절차와 함께 제안합니다. |
+| 🚩&nbsp;**깃발** | 새 세션에서 이어 갈 수 있도록 Claude에게 임무 요약을 부탁합니다. |
+| 📖&nbsp;**책** | Lua의 책을 엽니다. 캐릭터 시트, 물리친 보스 도감, 트로피 선반, 그리고 마법서(Claude의 도구를 주문으로). |
 
 ![Lua의 책: 능력치, 도감, 트로피, 마법서](previa_livro.gif)
 
@@ -70,7 +70,26 @@ Claude Code 세션에서 다음을 입력하세요.
 도구별 몬스터: 파일 읽기 → Vespera · 코드 편집 → 시계공 / Sir Solis · 터미널 → Ignis · 웹 → 리바이어던 / Nébula · 외부 연동(MCP) → 거울 왕 · 서브에이전트 → 반그림자 부인의 분신. 보스는 차례대로 나오며 각자 연대기의 한 페이지를 맡고, 마지막은 Malakor, 그다음은 '회차 플레이(뉴 게임+)'입니다.
 
 ## 명령어
-`/cronicas`는 Lua의 요약을 보여 줍니다. 자주 쓰는 것: `/cronicas ruler`·`/cronicas width <px>`(너비 보정), `/cronicas boss`·`/cronicas hit`(보스전 체험), `/cronicas surfaces`(세션이 어디에 그려지고 있는지), `/cronicas language`(게임 언어 선택). 게임 텍스트는 영어, 포르투갈어, 스페인어, 프랑스어, 독일어, 중국어, 일본어, 한국어를 지원합니다(시스템 언어를 따르고, `/cronicas language`로 바꿀 수 있습니다).
+보통 메시지처럼 Claude의 입력창에 입력하면 됩니다. 답은 당신에게만 보이고, Claude는 아무것도 받지 않으며 요금제 한도도 쓰지 않습니다. 모든 하위 명령어는 포르투갈어 이름(`regua`, `largura`, `chefao`, `golpe`…)으로도 동작합니다.
+
+| 명령어 | 하는 일 |
+|---|---|
+| <code>/cronicas</code> | Lua의 요약: 레벨, 경험치, 되찾은 페이지(x/10), 최근 트로피와 띠 설정. 모든 명령어 목록도 보여 줍니다. |
+| <code>/cronicas&nbsp;language&nbsp;[code]</code> | 게임 언어 목록을 보여 주거나 바꿉니다: `en`, `pt-BR`, `es`, `fr`, `de`, `zh`, `ja`, `ko` (`auto`는 시스템 언어로 돌아가요). |
+| <code>/cronicas&nbsp;ruler</code> | 장면 아래에 자를 띄워 띠의 너비를 잽니다. 다시 입력하면 사라져요. |
+| <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | 자의 오른쪽 끝에서 온전히 보이는 마지막 숫자로 너비를 맞춥니다(예: `/cronicas width 752`). |
+| <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | 장면의 픽셀 크기: 1x, 2x, 3x. |
+| <code>/cronicas&nbsp;intro</code> | 오프닝을 지금 재생합니다(클릭하면 건너뛰어요). `intro off` / `intro on`으로 자동 재생(그날 첫 세션)을 끄거나 켭니다. |
+| <code>/cronicas&nbsp;surfaces</code> | 이 세션이 어디에 그려지고 있는지 알려 줍니다(데스크톱 앱, VS Code, 터미널, 휴대폰). |
+| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | 여정의 다음 보스나 고른 보스(`vespera`, `ignis`, `malakor`…)를 불러냅니다. `/cronicas boss list`는 방패를 든 할 일 목록 보스. |
+| <code>/cronicas&nbsp;hit</code> | 나와 있는 보스를 공격합니다. 할 일 목록 보스라면 할 일 하나를 끝내요. 마지막 일격은 크리티컬. |
+| <code>/cronicas&nbsp;elite</code> | 다음 일반 전투가 트로피를 든 엘리트(흑요석 골렘)가 됩니다. |
+| <code>/cronicas&nbsp;vigil</code> | 달빛을 거의 끝으로 맞춰 불침번이 일하는 모습을 볼 수 있어요(랜턴이 켜져 있으면 진짜 짧은 메시지를 보냅니다). |
+| <code>/cronicas&nbsp;new-moon</code> | Claude의 다음 답변까지 신월(식은 캐시)을 흉내 냅니다. |
+
+⚠️ 테스트 명령어(`boss`, `hit`, `elite`)는 진짜로 반영됩니다. 이렇게 물리친 보스도 페이지와 레벨을 줍니다.
+
+게임 텍스트는 영어, 포르투갈어, 스페인어, 프랑스어, 독일어, 중국어, 일본어, 한국어를 지원합니다(시스템 언어를 따르고, `/cronicas language`로 바꿀 수 있습니다).
 
 ## 라이선스
 - **코드**(Python 스크립트, `mod/`): **MIT**, [`LICENSE`](LICENSE) 참고.

@@ -45,10 +45,10 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 ## The buttons
 | Button | Does |
 |---|---|
-| 🏮 **Vigil** | Keeps the cache warm by sending a tiny message just before the moonlight runs out (at most 6 times, only while you are away). **Off by default: it spends your plan limit.** |
-| 🎒 **Backpack** | Offers to compact the conversation (like `/compact`), with a confirmation. |
-| 🚩 **Banner** | Asks Claude to write a mission summary so you can continue in a new session. |
-| 📖 **Book** | Opens Lua's Book: her sheet, the bestiary of defeated bosses, the trophy shelf and the grimoire (Claude's tools as spells). |
+| 🏮&nbsp;**Vigil** | Keeps the cache warm by sending a tiny message just before the moonlight runs out (at most 6 times, only while you are away). **Off by default: it spends your plan limit.** |
+| 🎒&nbsp;**Backpack** | Offers to compact the conversation (like `/compact`), with a confirmation. |
+| 🚩&nbsp;**Banner** | Asks Claude to write a mission summary so you can continue in a new session. |
+| 📖&nbsp;**Book** | Opens Lua's Book: her sheet, the bestiary of defeated bosses, the trophy shelf and the grimoire (Claude's tools as spells). |
 
 ![Lua's Book: sheet, bestiary, trophies and grimoire](previa_livro.gif)
 
@@ -70,7 +70,26 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 Monsters by tool: reading files → Vespera · editing code → Clockmaker / Sir Solis · terminal → Ignis · web → Leviathan / Nébula · integrations (MCP) → Mirror King · subagents → clones of Lady Penumbra. The bosses come in order, one page of the Chronicles each, up to Malakor, then New Game+.
 
 ## Commands
-`/cronicas` shows Lua's summary. Useful ones: `/cronicas ruler` and `/cronicas width <px>` (calibrate the width), `/cronicas boss` and `/cronicas hit` (try a boss fight), `/cronicas surfaces` (where the session is drawing), `/cronicas language` (pick the game's language). Every subcommand also answers to its Portuguese name (`regua`, `largura`, `chefao`, `golpe`…). The game speaks English, Portuguese, Spanish, French, German, Chinese, Japanese and Korean (it follows your system language; `/cronicas language` switches it).
+Type them in Claude's message box, like a normal message. The answer shows up only for you: Claude receives nothing and no plan limit is spent. Every subcommand also answers to its Portuguese name (`regua`, `largura`, `chefao`, `golpe`…).
+
+| Command | What it does |
+|---|---|
+| <code>/cronicas</code> | Lua's summary: level, XP, recovered pages (x/10), latest trophies and the band settings. It also lists every command. |
+| <code>/cronicas&nbsp;language&nbsp;[code]</code> | Lists the game's languages or switches to one: `en`, `pt-BR`, `es`, `fr`, `de`, `zh`, `ja`, `ko` (`auto` goes back to the system language). |
+| <code>/cronicas&nbsp;ruler</code> | Shows a ruler under the scene to measure the band. Type it again to hide it. |
+| <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | Calibrates the width with the last whole number at the ruler's right edge (e.g. `/cronicas width 752`). |
+| <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | Pixel size of the scene: 1x, 2x or 3x. |
+| <code>/cronicas&nbsp;intro</code> | Plays the opening now (a click skips it). `intro off` / `intro on` turns the automatic one (first session of the day) off or on. |
+| <code>/cronicas&nbsp;surfaces</code> | Tells where this session is being drawn (desktop app, VS Code, terminal, phone). |
+| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Calls the next boss of the journey, or a chosen one (`vespera`, `ignis`, `malakor`…). `/cronicas boss list` calls a task-list boss with a shield. |
+| <code>/cronicas&nbsp;hit</code> | Hits the boss on stage; against a task-list boss it completes a task. The last hit is the critical one. |
+| <code>/cronicas&nbsp;elite</code> | The next regular fight becomes the elite (Obsidian Golem) carrying a trophy. |
+| <code>/cronicas&nbsp;vigil</code> | Brings the moonlight close to its end so you can watch the Vigil work (with the lantern lit it sends a real, tiny message). |
+| <code>/cronicas&nbsp;new-moon</code> | Simulates the new moon (cold cache) until Claude's next reply. |
+
+⚠️ The test commands (`boss`, `hit`, `elite`) count for real: a boss beaten this way also gives back a page and a level.
+
+The game speaks English, Portuguese, Spanish, French, German, Chinese, Japanese and Korean (it follows your system language; `/cronicas language` switches it).
 
 ## License
 - **Code** (Python scripts, `mod/`): **MIT**, see [`LICENSE`](LICENSE).

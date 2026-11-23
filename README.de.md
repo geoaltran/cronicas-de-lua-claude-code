@@ -45,10 +45,10 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 ## Die Buttons
 | Button | Macht |
 |---|---|
-| 🏮 **Nachtwache** | Hält den Cache warm, indem sie kurz vor dem Erlöschen des Mondlichts eine winzige Nachricht schickt (höchstens 6-mal und nur, während du weg bist). **Standardmäßig aus: Sie verbraucht das Limit deines Plans.** |
-| 🎒 **Rucksack** | Bietet an, das Gespräch zu komprimieren (wie `/compact`), mit Bestätigung. |
-| 🚩 **Banner** | Bittet Claude um eine Zusammenfassung der Mission, damit du in einer neuen Sitzung weitermachen kannst. |
-| 📖 **Buch** | Öffnet Luas Buch: ihr Charakterblatt, das Bestiarium der besiegten Bosse, das Trophäenregal und das Grimoire (Claudes Tools als Zauber). |
+| 🏮&nbsp;**Nachtwache** | Hält den Cache warm, indem sie kurz vor dem Erlöschen des Mondlichts eine winzige Nachricht schickt (höchstens 6-mal und nur, während du weg bist). **Standardmäßig aus: Sie verbraucht das Limit deines Plans.** |
+| 🎒&nbsp;**Rucksack** | Bietet an, das Gespräch zu komprimieren (wie `/compact`), mit Bestätigung. |
+| 🚩&nbsp;**Banner** | Bittet Claude um eine Zusammenfassung der Mission, damit du in einer neuen Sitzung weitermachen kannst. |
+| 📖&nbsp;**Buch** | Öffnet Luas Buch: ihr Charakterblatt, das Bestiarium der besiegten Bosse, das Trophäenregal und das Grimoire (Claudes Tools als Zauber). |
 
 ![Luas Buch: Charakterblatt, Bestiarium, Trophäen und Grimoire](previa_livro.gif)
 
@@ -70,7 +70,26 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 Monster nach Tool: Dateien lesen → Vespera · Code bearbeiten → Uhrmacher / Sir Solis · Terminal → Ignis · Web → Leviathan / Nébula · Integrationen (MCP) → Spiegelkönig · Subagenten → Klone der Dame Penumbra. Die Bosse kommen der Reihe nach, jeder mit einer Seite der Chroniken, bis zu Malakor, danach Neues Spiel+.
 
 ## Befehle
-`/cronicas` zeigt Luas Übersicht. Die nützlichsten: `/cronicas ruler` und `/cronicas width <px>` (Breite kalibrieren), `/cronicas boss` und `/cronicas hit` (einen Bosskampf ausprobieren), `/cronicas surfaces` (wo die Sitzung gerade gezeichnet wird), `/cronicas language` (die Spielsprache wählen). Das Spiel spricht Englisch, Portugiesisch, Spanisch, Französisch, Deutsch, Chinesisch, Japanisch und Koreanisch (es folgt der Systemsprache; `/cronicas language` wechselt sie).
+Tipp sie wie eine normale Nachricht in Claudes Eingabefeld. Die Antwort siehst nur du: Claude bekommt nichts davon mit und dein Plan-Limit wird nicht angetastet. Jeder Unterbefehl hört auch auf seinen portugiesischen Namen (`regua`, `largura`, `chefao`, `golpe`…).
+
+| Befehl | Was er macht |
+|---|---|
+| <code>/cronicas</code> | Luas Übersicht: Level, XP, zurückgeholte Seiten (x/10), neueste Trophäen und die Einstellungen des Bands. Listet auch alle Befehle. |
+| <code>/cronicas&nbsp;language&nbsp;[code]</code> | Zeigt die Sprachen des Spiels oder wechselt zu einer: `en`, `pt-BR`, `es`, `fr`, `de`, `zh`, `ja`, `ko` (`auto` geht zurück zur Systemsprache). |
+| <code>/cronicas&nbsp;ruler</code> | Zeigt ein Lineal unter der Szene, um das Band zu messen. Nochmal tippen blendet es aus. |
+| <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | Kalibriert die Breite mit der letzten ganzen Zahl am rechten Rand des Lineals (z. B. `/cronicas width 752`). |
+| <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | Pixelgröße der Szene: 1x, 2x oder 3x. |
+| <code>/cronicas&nbsp;intro</code> | Spielt das Intro jetzt ab (ein Klick überspringt es). `intro off` / `intro on` schaltet das automatische Intro (erste Sitzung des Tages) aus oder ein. |
+| <code>/cronicas&nbsp;surfaces</code> | Sagt, wo diese Sitzung gerade gezeichnet wird (Desktop-App, VS Code, Terminal, Handy). |
+| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Ruft den nächsten Boss der Reise oder einen bestimmten (`vespera`, `ignis`, `malakor`…). `/cronicas boss list` ruft einen Aufgabenlisten-Boss mit Schild. |
+| <code>/cronicas&nbsp;hit</code> | Trifft den Boss auf der Bühne; beim Aufgabenlisten-Boss erledigt er eine Aufgabe. Der letzte Treffer ist der kritische. |
+| <code>/cronicas&nbsp;elite</code> | Der nächste normale Kampf wird zum Elite-Gegner (Obsidiangolem) mit einer Trophäe. |
+| <code>/cronicas&nbsp;vigil</code> | Bringt das Mondlicht fast ans Ende, damit du die Nachtwache arbeiten siehst (mit brennender Laterne schickt sie eine echte, winzige Nachricht). |
+| <code>/cronicas&nbsp;new-moon</code> | Simuliert den Neumond (kalter Cache) bis zu Claudes nächster Antwort. |
+
+⚠️ Die Testbefehle (`boss`, `hit`, `elite`) zählen wirklich: Ein so besiegter Boss bringt auch eine Seite und ein Level.
+
+Das Spiel spricht Englisch, Portugiesisch, Spanisch, Französisch, Deutsch, Chinesisch, Japanisch und Koreanisch (es folgt der Systemsprache; `/cronicas language` wechselt sie).
 
 ## Lizenz
 - **Code** (Python-Skripte, `mod/`): **MIT**, siehe [`LICENSE`](LICENSE).

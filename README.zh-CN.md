@@ -45,10 +45,10 @@
 ## 按钮
 | 按钮 | 作用 |
 |---|---|
-| 🏮 **守夜** | 在月光熄灭前发送一条很短的消息，让缓存保持温热（最多 6 次，且只在你离开时进行）。**默认关闭：它会消耗你的套餐限额。** |
-| 🎒 **背包** | 提议压缩对话（类似 `/compact`），需要确认。 |
-| 🚩 **旗帜** | 请 Claude 写一份任务总结，方便你在新会话中继续。 |
-| 📖 **书** | 打开 Lua 之书：她的角色卡、已击败 Boss 的图鉴、奖杯架，以及魔导书（把 Claude 的工具当作咒语）。 |
+| 🏮&nbsp;**守夜** | 在月光熄灭前发送一条很短的消息，让缓存保持温热（最多 6 次，且只在你离开时进行）。**默认关闭：它会消耗你的套餐限额。** |
+| 🎒&nbsp;**背包** | 提议压缩对话（类似 `/compact`），需要确认。 |
+| 🚩&nbsp;**旗帜** | 请 Claude 写一份任务总结，方便你在新会话中继续。 |
+| 📖&nbsp;**书** | 打开 Lua 之书：她的角色卡、已击败 Boss 的图鉴、奖杯架，以及魔导书（把 Claude 的工具当作咒语）。 |
 
 ![Lua 之书：角色卡、图鉴、奖杯和魔导书](previa_livro.gif)
 
@@ -70,7 +70,26 @@
 各工具对应的怪物：读取文件 → Vespera · 编辑代码 → 钟表匠 / Sir Solis · 终端 → Ignis · 网页 → 利维坦 / Nébula · 外部集成（MCP）→ 镜之王 · 子代理 → 半影夫人的分身。Boss 按顺序登场，每个对应编年史中的一页，直到 Malakor，之后进入"新游戏+"。
 
 ## 命令
-`/cronicas` 显示 Lua 的概况。常用命令：`/cronicas ruler` 和 `/cronicas width <px>`（校准宽度）、`/cronicas boss` 和 `/cronicas hit`（试玩 Boss 战）、`/cronicas surfaces`（查看会话正在哪里绘制）、`/cronicas language`（选择游戏语言）。游戏支持英语、葡萄牙语、西班牙语、法语、德语、中文、日语和韩语（默认跟随系统语言，可用 `/cronicas language` 切换）。
+像普通消息一样在 Claude 的输入框里输入即可。回复只有你能看到：Claude 收不到任何内容，也不会消耗套餐限额。每个子命令也接受葡萄牙语名字（`regua`、`largura`、`chefao`、`golpe`…）。
+
+| 命令 | 作用 |
+|---|---|
+| <code>/cronicas</code> | Lua 的概况：等级、经验值、找回的书页（x/10）、最新的奖杯和横幅设置。也会列出所有命令。 |
+| <code>/cronicas&nbsp;language&nbsp;[code]</code> | 列出游戏语言或切换到其中一种：`en`、`pt-BR`、`es`、`fr`、`de`、`zh`、`ja`、`ko`（`auto` 回到系统语言）。 |
+| <code>/cronicas&nbsp;ruler</code> | 在画面下方显示标尺，用来测量横幅。再输入一次即可隐藏。 |
+| <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | 用标尺右边缘最后一个完整的数字校准宽度（例如 `/cronicas width 752`）。 |
+| <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | 画面的像素大小：1x、2x 或 3x。 |
+| <code>/cronicas&nbsp;intro</code> | 立即播放开场动画（点击即可跳过）。`intro off` / `intro on` 关闭或打开自动播放（每天的第一个会话）。 |
+| <code>/cronicas&nbsp;surfaces</code> | 显示这个会话正在哪里绘制（桌面应用、VS Code、终端、手机）。 |
+| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | 召唤旅程中的下一个 Boss，或指定的 Boss（`vespera`、`ignis`、`malakor`…）。`/cronicas boss list` 召唤带护盾的任务清单 Boss。 |
+| <code>/cronicas&nbsp;hit</code> | 攻击场上的 Boss；面对任务清单 Boss 时完成一个任务。最后一击是暴击。 |
+| <code>/cronicas&nbsp;elite</code> | 下一场普通战斗变成带着奖杯的精英（黑曜石魔像）。 |
+| <code>/cronicas&nbsp;vigil</code> | 让月光快要耗尽，好看看守夜如何工作（灯笼点亮时，它会真的发出一条很短的消息）。 |
+| <code>/cronicas&nbsp;new-moon</code> | 模拟新月（缓存变冷），直到 Claude 下一次回复。 |
+
+⚠️ 测试命令（`boss`、`hit`、`elite`）是真的算数的：这样打败的 Boss 也会带来书页和等级。
+
+游戏支持英语、葡萄牙语、西班牙语、法语、德语、中文、日语和韩语（默认跟随系统语言，可用 `/cronicas language` 切换）。
 
 ## 许可
 - **代码**（Python 脚本、`mod/`）：**MIT**，见 [`LICENSE`](LICENSE)。
