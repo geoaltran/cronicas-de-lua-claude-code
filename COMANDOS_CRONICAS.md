@@ -43,7 +43,7 @@ Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idi
 | `/cronicas language <idioma>` | Troca o idioma de todo o jogo e guarda a escolha para as próximas sessões. Aceita o código ou o nome: `pt-BR` ou `pt` ou `português`, `en`, `es`, `fr`, `de`, `zh`, `ja`, `ko`. Um idioma ainda sem tradução não é trocado (o jogo avisa). |
 | `/cronicas language auto` | Esquece a escolha e volta ao idioma do sistema (no Mac, o das preferências de idioma; sem tradução, inglês). Também aceita `sistema`. |
 
-**Hoje só o português tem tradução**; os outros 7 chegam nas próximas versões.
+**Hoje o jogo fala português e inglês**; os outros 6 chegam nas próximas versões.
 
 ## 🖼️ Ajustar a faixa
 
@@ -104,4 +104,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 23/11/2026 (nomes em inglês para todos os subcomandos; idioma do jogo: `/cronicas language`).*
+*Última atualização: 23/11/2026 (o jogo em inglês; nomes em inglês para todos os subcomandos).*

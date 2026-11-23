@@ -16,7 +16,7 @@ const FAIXA = {
 
 test('no desktop a faixa desenha a cena em SVG, com a Lua parada', async ($, on) => {
   mock.clock(on, { now: 1_800_000_000_000 })
-  mock.store(on, { jogo: { xp: 137, paginas: 2, lutas: 5 } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5 } })
   on('session.usage', () => ({
     value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [{ kind: 'five_hour', percentUsed: 28 }] },
   }))
@@ -43,7 +43,7 @@ test('no desktop a faixa desenha a cena em SVG, com a Lua parada', async ($, on)
 
 test('na lua nova a faixa mostra o aviso e pede confirmação antes do /clear', async ($, on) => {
   mock.clock(on, { now: 1_800_000_000_000 })
-  mock.store(on)
+  mock.store(on, { idioma: 'pt-BR' })
   const rodados: string[] = []
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000 }, rateLimits: [] } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
@@ -67,7 +67,7 @@ test('na lua nova a faixa mostra o aviso e pede confirmação antes do /clear', 
 
 test('prova técnica (Fase 4): áreas de hover com borda e botões invisíveis sobre os 4 ícones', async ($, on) => {
   mock.clock(on, { now: 1_800_000_000_000 })
-  mock.store(on, { jogo: { xp: 137, paginas: 2, lutas: 5 } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5 } })
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [{ kind: 'five_hour', percentUsed: 28 }] } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: { command: 'cronicas' } }))
@@ -93,7 +93,7 @@ test('prova técnica (Fase 4): áreas de hover com borda e botões invisíveis s
 
 test('o palpite antigo de 18 px por linha, gravado nos ajustes, vira o medido (20)', async ($, on) => {
   mock.clock(on, { now: 1_800_000_000_000 })
-  mock.store(on, { jogo: { xp: 137, paginas: 2, lutas: 5 }, ajustes: { escala: 1, pxColuna: 8.89, quadro: false, teste: false, prova: true, pxLinha: 18 } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5 }, ajustes: { escala: 1, pxColuna: 8.89, quadro: false, teste: false, prova: true, pxLinha: 18 } })
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [] } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: { command: 'cronicas' } }))

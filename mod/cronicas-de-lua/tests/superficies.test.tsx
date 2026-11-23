@@ -28,7 +28,7 @@ const livro = (surface: Sup) =>
 
 async function preparar($: Dolar, on: On) {
   mock.clock(on, { now: 1_800_000_000_000 })
-  mock.store(on, { jogo: { xp: 137, paginas: 2, lutas: 5, trofeus: ['COMMAND NOT FOUND'], trofeusTipos: ['comando'] } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5, trofeus: ['COMMAND NOT FOUND'], trofeusTipos: ['comando'] } })
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [{ kind: 'five_hour', percentUsed: 28 }] } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: { command: 'cronicas' } }))

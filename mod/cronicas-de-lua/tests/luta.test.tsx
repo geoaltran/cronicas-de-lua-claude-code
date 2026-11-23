@@ -28,7 +28,7 @@ async function comecar($: Dolar, on: On, ferramentas: readonly Ferramenta[] = []
   for (const [tool, ms, erro] of ferramentas) {
     ferramenta(on, clock, tool, ms, erro === true)
   }
-  mock.store(on, { jogo: { xp: 137, paginas: 2, lutas: 5 } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5 } })
   on('session.usage', () => ({
     value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [{ kind: 'five_hour', percentUsed: 28 }] },
   }))

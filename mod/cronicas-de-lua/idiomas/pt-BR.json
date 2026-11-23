@@ -85,7 +85,10 @@
       "curto": "XP",
       "titulo": "XP · nível {nivel}",
       "explica": "Faltam {faltam} XP para o nível {proximo}.\nPáginas {paginas}/10.",
-      "chefao_em": "Chefão em {n} lutas.",
+      "chefao_em": {
+        "um": "Chefão em {n} luta.",
+        "outros": "Chefão em {n} lutas."
+      },
       "chefao_lista": "O chefão cai quando as tarefas acabarem: {feitas} de {total}.",
       "chefao_vida": {
         "um": "O chefão cai em {n} vitória.",
@@ -148,7 +151,10 @@
       "chefoes": "Chefões derrotados",
       "trofeus": "Troféus",
       "proximo_chefao": "Próximo chefão",
-      "proximo_chefao_valor": "{nome}, em {n} lutas ou na próxima lista de tarefas",
+      "proximo_chefao_valor": {
+        "um": "{nome}, em {n} luta ou na próxima lista de tarefas",
+        "outros": "{nome}, em {n} lutas ou na próxima lista de tarefas"
+      },
       "paginas": "Páginas das Crônicas: {ciclo}/10",
       "paginas_novo_jogo": "Páginas das Crônicas: {ciclo}/10 (Novo Jogo+)",
       "alt": "Ficha da Lua: nível {nivel}, {xp} XP, {lutas} lutas vencidas, {chefoes} chefões derrotados, {trofeus} troféus, páginas {ciclo}/10."
@@ -208,9 +214,15 @@
         "nome": "Eco da Penumbra",
         "desc": "Chamar ajudantes (subagentes). Clones da Dama Penumbra."
       },
-      "total": "{total} feitiços lançados ao todo.",
+      "total": {
+        "um": "{n} feitiço lançado ao todo.",
+        "outros": "{n} feitiços lançados ao todo."
+      },
       "alt": "Grimório: {lista}.",
-      "alt_item": "{nome} {n} vezes"
+      "alt_item": {
+        "um": "{nome} {n} vez",
+        "outros": "{nome} {n} vezes"
+      }
     },
     "titulo_painel": "O Livro da Lua",
     "widget": "📖 Nível {nivel} · páginas {paginas}/10 · {trofeus} troféus",
@@ -218,7 +230,10 @@
       "_sobre": "o Livro em texto (terminal)",
       "nivel": "Nível {nivel} · {xp} XP (faltam {faltam} para o {proximo})",
       "paginas": "Páginas das Crônicas: {ciclo}/10 ({total} no total)",
-      "lutas": "Lutas vencidas: {lutas} · chefão em {n} lutas",
+      "lutas": {
+        "um": "Lutas vencidas: {lutas} · chefão em {n} luta",
+        "outros": "Lutas vencidas: {lutas} · chefão em {n} lutas"
+      },
       "trofeus": "Troféus: {n}"
     }
   },
@@ -326,7 +341,10 @@
     "chefao": {
       "desconhecido": "Não conheço o chefão \"{pedido}\". Use um destes: {lista}.",
       "ja_em_cena": "Já há um chefão em cena.",
-      "com_lista": "{nome} entrou em cena com uma lista de {total} tarefas (página {pagina}/10). Cada ferramenta do Claude bate no escudo e tira pouco; /cronicas golpe conclui uma tarefa (a última é o golpe crítico).",
+      "com_lista": {
+        "um": "{nome} entrou em cena com uma lista de {n} tarefa (página {pagina}/10). Cada ferramenta do Claude bate no escudo e tira pouco; /cronicas golpe conclui uma tarefa (a última é o golpe crítico).",
+        "outros": "{nome} entrou em cena com uma lista de {n} tarefas (página {pagina}/10). Cada ferramenta do Claude bate no escudo e tira pouco; /cronicas golpe conclui uma tarefa (a última é o golpe crítico)."
+      },
       "entrou": "{nome} entrou em cena (página {pagina}/10). Use /cronicas golpe para tirar vida."
     },
     "golpe": {

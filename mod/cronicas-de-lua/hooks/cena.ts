@@ -895,7 +895,7 @@ function avisoLuaNova(W: number, H: number, frase: string, noMeio: boolean): str
 /** A última frase do balão do XP: quando vem o próximo chefão, ou quando cai o que está em cena. */
 function sobreChefao(c: Chefao | undefined, lutas: number): string {
   if (c === undefined || c.caiu !== undefined) {
-    return tx('barras.xp.chefao_em', { n: chefaoEm(lutas) })
+    return tp('barras.xp.chefao_em', chefaoEm(lutas))
   }
   if (c.origem === 'lista') {
     const t = c.tarefas

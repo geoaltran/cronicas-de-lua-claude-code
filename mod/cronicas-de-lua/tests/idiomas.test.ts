@@ -49,7 +49,8 @@ test('/cronicas language: lista os 8 idiomas, troca, recusa o que ainda não tem
   for (const nome of ['English', 'Español', 'Français', 'Deutsch', '中文', '日本語', '한국어']) {
     expect(lista).toContain(nome)
   }
-  expect(lista).toContain('English (en) · em breve')
+  expect(lista).toContain('  English (en)\n')
+  expect(lista).toContain('Español (es) · em breve')
   expect(await rodar('lang fr')).toBe('Français ainda não tem tradução; o jogo continua em Português por enquanto.')
   expect(await rodar('idioma klingon')).toContain('Não conheço o idioma "klingon".')
   expect(await rodar('idioma português')).toBe('Idioma trocado para Português.')
@@ -74,7 +75,7 @@ test('o idioma pelo que se digita ou pelo sistema; sem tradução, inglês', () 
 
 test('subcomandos em inglês funcionam igual aos portugueses', async ($, on) => {
   mock.clock(on, { now: 1_800_000_000_000 })
-  mock.store(on, { jogo: { xp: 0, paginas: 0, lutas: 0 }, ajustes: { abertura: false } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 0, paginas: 0, lutas: 0 }, ajustes: { abertura: false } })
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 1000, percent: 1 }, rateLimits: [] } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: { command: 'cronicas' } }))
@@ -92,4 +93,22 @@ test('subcomandos em inglês funcionam igual aos portugueses', async ($, on) => 
   for (const pt of Object.values(SUBCOMANDOS)) {
     expect(['superficies', 'escala', 'coluna', 'largura', 'quadro', 'imagem', 'teste', 'prova', 'linha', 'regua', 'chefao', 'golpe', 'vigilia', 'lua-nova']).toContain(pt)
   }
+})
+
+test('em inglês: o jogo responde e nomeia os chefões em inglês; a escolha vale na sessão seguinte', async ($, on) => {
+  mock.clock(on, { now: 1_800_000_000_000 })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 0, paginas: 0, lutas: 0 }, ajustes: { abertura: false } })
+  on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 1000, percent: 1 }, rateLimits: [] } }))
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('command.register', () => ({ value: { command: 'cronicas' } }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const rodar = async (args: string) => String((await $.command.run({ command: 'cronicas', args, ...CMD }))?.text ?? '')
+
+  expect(await rodar('language en')).toBe('Language changed to English.')
+  expect(await rodar('boss relojoeiro')).toBe('Clockmaker entered the stage (page 6/10). Use /cronicas hit to take health away.')
+  expect(await rodar('hit')).toBe('Hit! Health 2/3.')
+  // nova sessão: a escolha guardada continua valendo
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  expect(await rodar('language')).toContain('▸ English (en)')
+  expect(await rodar('idioma pt')).toBe('Idioma trocado para Português.')
 })

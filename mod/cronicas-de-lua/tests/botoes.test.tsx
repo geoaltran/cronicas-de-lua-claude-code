@@ -26,7 +26,7 @@ const CMD = { origin: { kind: 'composer' }, presentation: { isFullscreen: false,
 /** Prepara a sessão e guarda o que o mod pediu ao app: mensagens, sons, avisos, compactações, painéis. */
 async function preparar($: Dolar, on: On) {
   const clock = mock.clock(on, { now: T0 })
-  mock.store(on, { jogo: { xp: 137, paginas: 2, lutas: 5 } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5 } })
   const r = { enviados: [] as string[], sons: [] as string[], avisos: [] as string[], compactou: 0, abertos: [] as string[], fechados: [] as string[] }
   let paineis: string[] = []
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [{ kind: 'five_hour', percentUsed: 28 }] } }))

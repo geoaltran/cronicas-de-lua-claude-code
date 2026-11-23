@@ -28,7 +28,7 @@ async function preparar($: Dolar, on: On, jogo: Jogo) {
   // os ganchos de teste antes do primeiro uso de $
   on('tool.call', { tool: 'Bash' }, () => ({ result: 'ok', text: 'ok' }))
   mock.clock(on, { now: 1_800_000_000_000 })
-  mock.store(on, { jogo })
+  mock.store(on, { idioma: 'pt-BR', jogo })
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [] } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: { command: 'cronicas' } }))

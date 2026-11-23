@@ -1,0 +1,362 @@
+{
+  "_sobre": "Game texts in English. Same keys and {markers} as pt-BR.json (the reference). After editing, run: python3 idiomas.py",
+  "chefoes": {
+    "vespera": "Vespera",
+    "dama_penumbra": "Lady Penumbra",
+    "golem_obsidiana": "Obsidian Golem",
+    "leviata": "Leviathan",
+    "ignis": "Ignis",
+    "relojoeiro": "Clockmaker",
+    "sir_solis": "Sir Solis",
+    "rei_espelho": "Mirror King",
+    "nebula": "Nébula",
+    "malakor": "Malakor"
+  },
+  "chefao": {
+    "pagina": "+PAGE {pagina}/10",
+    "novo_jogo": "NEW GAME+"
+  },
+  "luta": {
+    "critico": "CRITICAL!",
+    "trofeu": "+TROPHY",
+    "erro_misterioso": "MYSTERY ERROR"
+  },
+  "terminal": {
+    "nivel": "🌙 Lv {nivel}",
+    "lua_nova": "new moon",
+    "minutos": "{n} min",
+    "luz": "LIGHT ",
+    "mana": "MANA ",
+    "mochila": "BACKPACK ",
+    "mochila_cheia": " (full!)",
+    "desmaio": "🌑 New moon: Lua fainted (the cache went cold). The next message costs more.",
+    "vida_tarefas": " {resta}/{total} tasks",
+    "chefao_caiu": "🏆 {nome} fell! +PAGE {pagina}/10",
+    "fugiu": "💥 {alvo} struck back and fled",
+    "defendeu": "🛡 {alvo} blocked with its shield ",
+    "critico": "💥 CRITICAL! ",
+    "golpe_em": "hit on {alvo}",
+    "derrotado": "{alvo} defeated",
+    "xp": " +{xp} XP",
+    "trofeu": " +TROPHY",
+    "canaliza": "🔮 Lua channels against {alvo}…",
+    "enfrenta": "⚔ Lua faces {alvo}",
+    "enfrenta_elite": "⚔ Lua faces {alvo} (elite)",
+    "anda": "🌲 Lua walks through the forest",
+    "descansa": "💤 Lua rests",
+    "chefao_em": {
+      "um": "  ·  boss in {n} fight",
+      "outros": "  ·  boss in {n} fights"
+    }
+  },
+  "barras": {
+    "luz": {
+      "nome": "Moonlight",
+      "curto": "Light",
+      "minutos": "{n} min",
+      "lua_nova": "new moon",
+      "titulo_lua_nova": "Moonlight · new moon",
+      "sem_luz": "Conversation cache.\nLights up on the first reply.",
+      "explica": "Conversation cache.\nLasts {min} min after each reply.",
+      "lua_nova_explica": "Cold cache.\nThe next message costs more."
+    },
+    "mana": {
+      "nome": "Star Mana",
+      "curto": "Mana",
+      "sem_dado": "Plan limit.\nShows up after the 1st reply.",
+      "explica": "Plan limit: {livre}% free.",
+      "renova": "\nRefills at {hora} (5 h).",
+      "sete_dias": "\n7 days: {livre}% free."
+    },
+    "mochila": {
+      "nome": "Backpack",
+      "nome_cheia": "Backpack!",
+      "curto": "Pack",
+      "explica": "How much of the conversation\nis used (the context).",
+      "cheia_explica": "Conversation almost full ({pct}%).\nTime to pack up (compact)."
+    },
+    "xp": {
+      "nome": "XP",
+      "curto": "XP",
+      "titulo": "XP · level {nivel}",
+      "explica": "{faltam} XP to level {proximo}.\nPages {paginas}/10.",
+      "chefao_em": {
+        "um": "Boss in {n} fight.",
+        "outros": "Boss in {n} fights."
+      },
+      "chefao_lista": "The boss falls when the tasks are done: {feitas} of {total}.",
+      "chefao_vida": {
+        "um": "The boss falls in {n} win.",
+        "outros": "The boss falls in {n} wins."
+      }
+    },
+    "selo": {
+      "titulo": "Level {nivel}",
+      "explica": "{xp} XP in total.\nPages {paginas}/10 · fights won: {lutas}."
+    }
+  },
+  "botoes": {
+    "vigilia": {
+      "nome": "Vigil",
+      "acesa": "Vigil · lit",
+      "explica": "Keeps the cache warm.\nSpends a bit of the limit.",
+      "acesa_explica": "Warm cache: {envios}/{max} messages.\nClick to put it out."
+    },
+    "mochila": {
+      "nome": "Backpack",
+      "cheia": "Backpack full",
+      "explica": "Packs up the conversation\n(compacts the context).",
+      "cheia_explica": "Click to pack up\n(compact the conversation)."
+    },
+    "estandarte": {
+      "nome": "Banner",
+      "explica": "Mission summary\nfor the next session.",
+      "escrevendo": "Claude is writing\nthe mission summary.",
+      "pronto": "Mission summary ready."
+    },
+    "livro": {
+      "nome": "Book",
+      "explica": "Stats, pages,\nbestiary and trophies.",
+      "aberto_explica": "Click to close."
+    }
+  },
+  "lua_nova": {
+    "frase": "Lua fought hard and got tired.",
+    "linha2": "The next message costs more (cold cache)."
+  },
+  "livro": {
+    "alt": "Lua's Book. {alt}",
+    "abas": {
+      "ficha": "Stats",
+      "bestiario": "Bestiary",
+      "trofeus": "Trophies",
+      "grimorio": "Grimoire"
+    },
+    "ficha": {
+      "titulo": "Lua's Stats",
+      "subtitulo": "Moon mage, keeper of the Chronicles.",
+      "nivel": "Level",
+      "nivel_valor": "{nivel} · {xp} XP",
+      "proximo_nivel": "Next level",
+      "proximo_nivel_valor": "{faltam} XP to go",
+      "lutas": "Fights won",
+      "chefoes": "Bosses defeated",
+      "trofeus": "Trophies",
+      "proximo_chefao": "Next boss",
+      "proximo_chefao_valor": {
+        "um": "{nome}, in {n} fight or at the next task list",
+        "outros": "{nome}, in {n} fights or at the next task list"
+      },
+      "paginas": "Pages of the Chronicles: {ciclo}/10",
+      "paginas_novo_jogo": "Pages of the Chronicles: {ciclo}/10 (New Game+)",
+      "alt": "Lua's stats: level {nivel}, {xp} XP, fights won: {lutas}, bosses defeated: {chefoes}, trophies: {trofeus}, pages {ciclo}/10."
+    },
+    "bestiario": {
+      "titulo": "Bestiary",
+      "todos": "All 10 bosses defeated. The journey starts over in New Game+.",
+      "vistos": "{vistos} of 10 bosses defeated. The others wait in the shadows.",
+      "pagina": "Page {n}",
+      "alt": "Bestiary: {vistos} of 10 bosses defeated.",
+      "alt_nomes": "Bestiary: {vistos} of 10 bosses defeated ({nomes})."
+    },
+    "trofeus": {
+      "titulo": "Trophies",
+      "vazio": "Beat an elite (an error Claude fixed) to win the first one.",
+      "subtitulo": "Errors Claude fixed. Hover to read the name.",
+      "nome": {
+        "comando": "Cup of Command",
+        "edicao": "Gear of Editing",
+        "leitura": "Moon of Reading",
+        "web": "Orb of the Web"
+      },
+      "explica": "{nome}\nError fixed.",
+      "estante_vazia": "The shelf is empty.",
+      "estante_cheia": "{n} trophies: the {vagas} newest are on the shelf.",
+      "estante": {
+        "um": "{n} trophy on the shelf.",
+        "outros": "{n} trophies on the shelf."
+      },
+      "alt": "Trophies: {lista}.",
+      "nenhum": "none yet"
+    },
+    "grimorio": {
+      "titulo": "Grimoire",
+      "subtitulo": "Claude's tools are Lua's spells.",
+      "ler": { "nome": "Lumen's Gaze", "desc": "Read and search files. Awakens Vespera." },
+      "editar": { "nome": "Rune of Rewriting", "desc": "Edit and write code. Summons the Clockmaker and Sir Solis." },
+      "terminal": { "nome": "Flame of Command", "desc": "Terminal commands. Wakes Ignis." },
+      "web": { "nome": "Starlight Tide", "desc": "Search and read the web. Brings the Leviathan and Nébula." },
+      "integracao": { "nome": "Mirror Pact", "desc": "External integrations (MCP). Calls the Mirror King." },
+      "subagente": { "nome": "Penumbra's Echo", "desc": "Call helpers (subagents). Clones of Lady Penumbra." },
+      "total": {
+        "um": "{n} spell cast in all.",
+        "outros": "{n} spells cast in all."
+      },
+      "alt": "Grimoire: {lista}.",
+      "alt_item": {
+        "um": "{nome}, cast {n} time",
+        "outros": "{nome}, cast {n} times"
+      }
+    },
+    "titulo_painel": "Lua's Book",
+    "widget": "📖 Level {nivel} · pages {paginas}/10 · trophies: {trofeus}",
+    "texto": {
+      "nivel": "Level {nivel} · {xp} XP ({faltam} to level {proximo})",
+      "paginas": "Pages of the Chronicles: {ciclo}/10 ({total} in total)",
+      "lutas": {
+        "um": "Fights won: {lutas} · boss in {n} fight",
+        "outros": "Fights won: {lutas} · boss in {n} fights"
+      },
+      "trofeus": "Trophies: {n}"
+    }
+  },
+  "superficies": {
+    "terminal": "terminal",
+    "desktop": "desktop app",
+    "vscode": "VS Code",
+    "mobile": "phone"
+  },
+  "mensagens": {
+    "vigilia": "🌙 Lua's Vigil: just keeping the cache warm. Don't do anything; reply only \"ok\".",
+    "estandarte": "🚩 Lua's Banner: write the mission summary now so the work can continue in a new session. Create or update the file NEXT_SESSION.md at the project root, in English, clean and to the point, with: at the top, the text ready to paste into the new session; where everything is (files, folders, commands to run, validate and test); what is done and approved (so it isn't redone); the decisions made and the constraints or gotchas found; the next step in detail, as a numbered plan; and the open tasks and questions. If the project has a CLAUDE.md, add a line to it pointing to NEXT_SESSION.md. When you're done, say in a few lines what was saved."
+  },
+  "avisos": {
+    "vigilia": {
+      "apagou_sozinha": "🏮 The Vigil went out on its own after {max} messages. Light it again if you want to keep the cache warm.",
+      "apagada": "🏮 Vigil out.",
+      "acesa": "🔥 Vigil lit. When the moonlight is about to run out, Lua sends a tiny message to keep the cache warm (up to {max} times, only while you're not typing). Each one spends a bit of your plan limit. Click again to put it out."
+    },
+    "mochila": {
+      "espere": "🎒 Wait for Claude to finish the task before packing up the backpack.",
+      "arrumada": "🎒 Backpack packed: the conversation was summarized and there's room again.",
+      "nao_arrumada": "🎒 The backpack wasn't packed: {motivo}",
+      "falhou": "🎒 Couldn't pack up the backpack right now: {erro}"
+    },
+    "estandarte": {
+      "espere": "🚩 Wait for Claude to finish the task before raising the banner.",
+      "falhou": "🚩 Couldn't ask for the summary: {erro}"
+    },
+    "livro": {
+      "nao_abriu": "📖 The Book didn't open yet: {motivo}"
+    }
+  },
+  "chips": {
+    "vigilia": "Vigil",
+    "vigilia_acesa": "Vigil lit ({envios}/{max})",
+    "mochila": "Backpack",
+    "estandarte": "Banner",
+    "escrevendo": "Writing…",
+    "livro": "Book",
+    "livro_aberto": "Book open"
+  },
+  "faixa": {
+    "nova_conversa": {
+      "explica": "The current conversation leaves the screen (bring it back with /resume).",
+      "sim": "Start",
+      "nao": "Stay here",
+      "botao": "🌙 New conversation"
+    },
+    "lua_nova": {
+      "continuar": "or keep going here: only the next message costs more."
+    },
+    "mochila": {
+      "explica": "Packing up the backpack summarizes the conversation and frees space (like /compact).",
+      "sim": "Pack up the backpack",
+      "nao": "Not now",
+      "arrumando": "🎒 Packing up the backpack…"
+    },
+    "estandarte": {
+      "pronto": "🚩 Mission summary ready (NEXT_SESSION.md).",
+      "fechar": "Close"
+    }
+  },
+  "cena_alt": {
+    "frase": "As Crônicas de Lua: Lua {acao}; level {nivel}.",
+    "cansada": "is tired (new moon, cold cache)",
+    "chefao": "faces the boss {nome} ({resta}/{total} health)",
+    "luta": "fights a monster",
+    "anda": "walks through the forest",
+    "descansa": "rests"
+  },
+  "regua_alt": "Ruler to calibrate the band's width",
+  "comando": {
+    "descricao": "As Crônicas de Lua: journey, band settings and tests (boss, elite, new moon)",
+    "superficies": {
+      "nenhuma": "No surface is drawing this session right now.",
+      "lista": "This session draws on: {lista}."
+    },
+    "abertura": {
+      "desligada": "Intro off: it no longer shows up in the first session of the day. /cronicas intro on turns it back on; /cronicas intro shows it now.",
+      "ligada": "Intro on: it shows up in the first session of each day. /cronicas intro shows it now.",
+      "mostra": "Intro on the band (about {s} s; a click on the scene skips it).",
+      "mostra_desligada": "It's off for the first session of the day: /cronicas intro on turns it on.",
+      "mostra_ligada": "/cronicas intro off turns it off."
+    },
+    "largura": {
+      "sem_colunas": "I don't know yet how many columns the band has in the {sup}: wait for it to show up and try again.",
+      "calibrada": "Width calibrated in the {sup}: {n} px over {colunas} columns = {px} px per column. The scene now follows the band's width (ruler off)."
+    },
+    "prova": {
+      "ligada": "Technical probe on. (1) The mouse areas get a border: hover over the bars and the level badge (the border lights up and the balloon appears). (2) The 4 button icons appear in the scene, with an invisible clickable area on top: click each one (a notice appears) and hover over it (the button's balloon appears). /cronicas probe again turns it off.",
+      "desligada": "Technical probe off.",
+      "rodape": "Technical probe: {colunas} columns, {px} px per column, {linha} px per line. /cronicas probe turns it off."
+    },
+    "regua": {
+      "ligada": "Ruler on below the scene. Note the last number that shows whole at the right edge and run /cronicas width <that number>. /cronicas ruler again turns it off.",
+      "desligada": "Ruler off."
+    },
+    "chefao": {
+      "desconhecido": "I don't know the boss \"{pedido}\". Use one of these: {lista}.",
+      "ja_em_cena": "There's already a boss on stage.",
+      "com_lista": {
+        "um": "{nome} entered the stage with a list of {n} task (page {pagina}/10). Each Claude tool hits the shield and takes little; /cronicas hit completes a task (the last one is the critical hit).",
+        "outros": "{nome} entered the stage with a list of {n} tasks (page {pagina}/10). Each Claude tool hits the shield and takes little; /cronicas hit completes a task (the last one is the critical hit)."
+      },
+      "entrou": "{nome} entered the stage (page {pagina}/10). Use /cronicas hit to take health away."
+    },
+    "golpe": {
+      "sem_chefao": "There's no boss on stage. /cronicas boss summons one.",
+      "caiu": "{nome} fell! Page {pagina}/10 recovered.",
+      "tarefa": "Task done! {resta} of {total} left.",
+      "golpe": "Hit! Health {resta}/{total}."
+    },
+    "elite": {
+      "proximo": "The next regular fight will be the elite ({elite}) carrying the trophy: {trofeu}. Run it again afterwards to see the next kind.",
+      "trofeu": {
+        "comando": "cup with a flame (command)",
+        "edicao": "gear (editing)",
+        "leitura": "crescent moon (reading)",
+        "web": "orb (web)"
+      }
+    },
+    "vigilia": {
+      "acesa": "Moonlight set close to its end: the Vigil sends the tiny message in 10 s.",
+      "apagada": "Moonlight set close to its end. The Vigil is out: click the lantern to light it (the message goes out right after)."
+    },
+    "lua_nova": "New moon simulated: the notice shows on the band until the next reply.",
+    "modo": {
+      "quadro": "frame",
+      "quadro_baloes": "frame (hover balloons)",
+      "imagem": "image"
+    },
+    "ajuda": {
+      "estado": "As Crônicas de Lua: scale {escala}x, {px} px per column, {modo} mode. Level {nivel}, {xp} XP, {paginas}/10 pages.",
+      "uso": "Use /cronicas scale 1|2|3, /cronicas ruler and /cronicas width <px> (calibrate the width), /cronicas image|frame, /cronicas test (compare both), /cronicas new-moon (simulate a cold cache), /cronicas vigil (moonlight near its end, to see the Vigil), /cronicas boss [name] and /cronicas hit (try the boss), /cronicas elite (the next fight is the elite) or /cronicas language (game language).",
+      "trofeus": "Trophies: {lista}"
+    },
+    "linha": "Line height: {n} px. The mouse areas were recalculated.",
+    "teste": "Test on: the band shows twice, A (interactive frame) and B (image). /cronicas test again turns it off.",
+    "teste_a": "A: interactive frame (hover balloons)",
+    "teste_b": "B: image (no balloons)",
+    "ajustada": "Band adjusted: scale {escala}x, {px} px per column, {modo} mode.",
+    "idioma": {
+      "titulo": "Game language: {nome}.",
+      "em_breve": "coming soon",
+      "como": "To change it: /cronicas language <code> (e.g. /cronicas language pt-BR). /cronicas language auto goes back to the system language.",
+      "trocado": "Language changed to {nome}.",
+      "auto": "System language: {nome}.",
+      "sem_traducao": "{nome} isn't translated yet; the game stays in {atual} for now.",
+      "desconhecido": "I don't know the language \"{pedido}\"."
+    }
+  }
+}

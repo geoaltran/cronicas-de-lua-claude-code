@@ -46,7 +46,7 @@ test('erro consertado: a mesma ação dá certo e a próxima luta é o Golem com
     await clock.sleep(100)
     return { result: 'ok', text: 'conteúdo' }
   })
-  mock.store(on, { jogo: { xp: 0, paginas: 1, lutas: 0 } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 0, paginas: 1, lutas: 0 } })
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 1000, percent: 1 }, rateLimits: [] } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: { command: 'cronicas' } }))
@@ -93,7 +93,7 @@ test('a teia da Vespera gira (4 quadros) e cabe no limite', async ($, on) => {
     await clock.sleep(2600)
     return { result: 'ok', text: 'conteúdo' }
   })
-  mock.store(on, { jogo: { xp: 0, paginas: 0, lutas: 0 } })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 0, paginas: 0, lutas: 0 } })
   on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 1000, percent: 1 }, rateLimits: [] } }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('command.register', () => ({ value: { command: 'cronicas' } }))

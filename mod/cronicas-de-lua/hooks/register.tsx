@@ -6,7 +6,7 @@ import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
 import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
 import { ABERTURA, BOTOES, FIM_ABERTURA, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
-import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, usarIdioma } from './t'
+import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, tp, usarIdioma } from './t'
 import { ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu } from './luta'
 import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, vidaEmTarefas } from './chefao'
 
@@ -1043,7 +1043,7 @@ function livroEmTexto(els: Elementos, jogo: Jogo) {
       <Box flexDirection="column">
         <Text>{tx('livro.texto.nivel', { nivel: nv.nivel, xp: jogo.xp, faltam: nv.precisa - nv.dentro, proximo: nv.nivel + 1 })}</Text>
         <Text>{tx('livro.texto.paginas', { ciclo: paginasNoCiclo(jogo.paginas), total: jogo.paginas })}</Text>
-        <Text>{tx('livro.texto.lutas', { lutas: jogo.lutas, n: A_CADA - (jogo.lutas % A_CADA) })}</Text>
+        <Text>{tp('livro.texto.lutas', A_CADA - (jogo.lutas % A_CADA), { lutas: jogo.lutas })}</Text>
         <Text>{tx('livro.texto.trofeus', { n: trofeus.length })}</Text>
       </Box>
       {trofeus.length > 0 ? (
@@ -1296,7 +1296,7 @@ export const register: Register = on => {
       const nome = NOME_CHEFAO[ch.nome] ?? ch.nome
       return {
         text: comLista
-          ? tx('comando.chefao.com_lista', { nome, total: tarefas?.total ?? 0, pagina: ch.pagina })
+          ? tp('comando.chefao.com_lista', tarefas?.total ?? 0, { nome, pagina: ch.pagina })
           : tx('comando.chefao.entrou', { nome, pagina: ch.pagina }),
       }
     } else if (chave === 'golpe') {

@@ -153,7 +153,7 @@ function ficha(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: str
     [tx('livro.ficha.lutas'), String(j.lutas)],
     [tx('livro.ficha.chefoes'), String(j.paginas)],
     [tx('livro.ficha.trofeus'), String(trofeus)],
-    [tx('livro.ficha.proximo_chefao'), tx('livro.ficha.proximo_chefao_valor', { nome: NOME_CHEFAO[prox.nome] ?? prox.nome, n: chefaoEm(j.lutas) })],
+    [tx('livro.ficha.proximo_chefao'), tp('livro.ficha.proximo_chefao_valor', chefaoEm(j.lutas), { nome: NOME_CHEFAO[prox.nome] ?? prox.nome })],
   ]
   const larg = W - colX - 14
   for (const [k, v] of linhas) {
@@ -310,8 +310,8 @@ function grimorio(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: 
     y = Math.max(y + 38, ly + 4)
   }
   const total = Object.values(usos).reduce((t, v) => t + v, 0)
-  s += texto(W / 2, y + 6, tx('livro.grimorio.total', { total }), ' m', '#cdbdf0')
-  return { corpo: s, H: y + 18, alt: tx('livro.grimorio.alt', { lista: FEITICOS.map(f => tx('livro.grimorio.alt_item', { nome: f.nome, n: usos[f.papel] ?? 0 })).join(', ') }) }
+  s += texto(W / 2, y + 6, tp('livro.grimorio.total', total), ' m', '#cdbdf0')
+  return { corpo: s, H: y + 18, alt: tx('livro.grimorio.alt', { lista: FEITICOS.map(f => tp('livro.grimorio.alt_item', usos[f.papel] ?? 0, { nome: f.nome })).join(', ') }) }
 }
 
 // ---------------------------------------------------------------- tudo junto
