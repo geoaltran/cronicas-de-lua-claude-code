@@ -12,6 +12,16 @@ Os comandos servem pra três coisas: **ver como está a jornada**, **ajustar a f
 | `/cronicas abertura` | Mostra agora a **tela de abertura** na faixa (uns 7 s): a marca "As Crônicas de Lua" animada no céu (a lua balança na corrente, as estrelas piscam, um reflexo passa no metal), a noite fecha, a floresta clareia e a Lua chega andando. **Um clique na cena pula.** Ela aparece sozinha na **primeira sessão do dia** e na **primeira sessão depois que você reinicia o app**. Também funciona como `/cronicas intro`. |
 | `/cronicas abertura off` · `on` | Desliga (ou liga de novo) a abertura automática (primeira sessão do dia e depois de reiniciar o app). `/cronicas abertura` continua mostrando quando você pedir. Também aceita `desligar`/`ligar`. |
 
+## 🌐 Idioma
+
+| Comando | O que faz |
+|---|---|
+| `/cronicas language` | Mostra os 8 idiomas do jogo, cada um escrito no próprio idioma (English, Português, Español, Français, Deutsch, 中文, 日本語, 한국어), com o atual marcado (▸) e os que ainda não têm tradução marcados como "em breve". Também funciona como `/cronicas lang` ou `/cronicas idioma`. |
+| `/cronicas language <idioma>` | Troca o idioma de todo o jogo e guarda a escolha para as próximas sessões. Aceita o código ou o nome: `pt-BR` ou `pt` ou `português`, `en`, `es`, `fr`, `de`, `zh`, `ja`, `ko`. Um idioma ainda sem tradução não é trocado (o jogo avisa). |
+| `/cronicas language auto` | Esquece a escolha e volta ao idioma do sistema (no Mac, o das preferências de idioma; sem tradução, inglês). Também aceita `sistema`. |
+
+**Hoje só o português tem tradução**; os outros 7 chegam nas próximas versões.
+
 ## 🖼️ Ajustar a faixa
 
 | Comando | O que faz |
@@ -70,12 +80,5 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | 🌙 **Nova conversa** | Aparece na lua nova e depois do resumo do Estandarte. Pede confirmação e limpa a conversa (`/clear`), pra começar com o cache novo. |
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
-## 🗓️ Em breve (planejado, ainda não funciona)
-
-| Comando | O que vai fazer |
-|---|---|
-| `/cronicas language` | Mostra a lista de idiomas do jogo, com o atual marcado, e explica como trocar. Também funciona como `/cronicas idioma` ou `/cronicas lang`. |
-| `/cronicas language <código>` | Troca o idioma de todo o jogo e guarda a escolha. Idiomas previstos: `pt-BR` (português), `en` (inglês), `es` (espanhol), `fr` (francês), `de` (alemão), `zh` (mandarim), `ja` (japonês), `ko` (coreano). |
-
 ---
-*Última atualização: 23/11/2026 (tela de abertura com a marca animada: `/cronicas abertura`, `on` e `off`).*
+*Última atualização: 23/11/2026 (idioma do jogo: `/cronicas language`, `lang`, `idioma` e `auto`).*

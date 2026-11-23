@@ -363,6 +363,16 @@
     "teste": "Teste ligado: a faixa aparece duas vezes, A (quadro interativo) e B (imagem). /cronicas teste de novo desliga.",
     "teste_a": "A: quadro interativo (balões no hover)",
     "teste_b": "B: imagem (sem balões)",
-    "ajustada": "Faixa ajustada: escala {escala}x, {px} px por coluna, modo {modo}."
+    "ajustada": "Faixa ajustada: escala {escala}x, {px} px por coluna, modo {modo}.",
+    "idioma": {
+      "_sobre": "/cronicas language (lang, idioma); os nomes dos idiomas ficam no próprio idioma, no código",
+      "titulo": "Idioma do jogo: {nome}.",
+      "em_breve": "em breve",
+      "como": "Para trocar: /cronicas language <código> (ex.: /cronicas language en). /cronicas language auto volta ao idioma do sistema.",
+      "trocado": "Idioma trocado para {nome}.",
+      "auto": "Idioma do sistema: {nome}.",
+      "sem_traducao": "{nome} ainda não tem tradução; o jogo continua em {atual} por enquanto.",
+      "desconhecido": "Não conheço o idioma \"{pedido}\"."
+    }
   }
 }

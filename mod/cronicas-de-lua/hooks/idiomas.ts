@@ -231,6 +231,13 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.teste": "Teste ligado: a faixa aparece duas vezes, A (quadro interativo) e B (imagem). /cronicas teste de novo desliga.",
   "comando.teste_a": "A: quadro interativo (balões no hover)",
   "comando.teste_b": "B: imagem (sem balões)",
-  "comando.ajustada": "Faixa ajustada: escala {escala}x, {px} px por coluna, modo {modo}."
+  "comando.ajustada": "Faixa ajustada: escala {escala}x, {px} px por coluna, modo {modo}.",
+  "comando.idioma.titulo": "Idioma do jogo: {nome}.",
+  "comando.idioma.em_breve": "em breve",
+  "comando.idioma.como": "Para trocar: /cronicas language <código> (ex.: /cronicas language en). /cronicas language auto volta ao idioma do sistema.",
+  "comando.idioma.trocado": "Idioma trocado para {nome}.",
+  "comando.idioma.auto": "Idioma do sistema: {nome}.",
+  "comando.idioma.sem_traducao": "{nome} ainda não tem tradução; o jogo continua em {atual} por enquanto.",
+  "comando.idioma.desconhecido": "Não conheço o idioma \"{pedido}\"."
  }
 }

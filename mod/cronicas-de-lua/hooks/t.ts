@@ -18,6 +18,60 @@ export function usarIdioma(cod: string): void {
   atual = IDIOMAS[cod] !== undefined ? cod : PADRAO
 }
 
+/** Os idiomas do jogo, cada um escrito no próprio idioma (a lista do /cronicas language). */
+export const LINGUAS: readonly { cod: string; nome: string }[] = [
+  { cod: 'en', nome: 'English' },
+  { cod: 'pt-BR', nome: 'Português' },
+  { cod: 'es', nome: 'Español' },
+  { cod: 'fr', nome: 'Français' },
+  { cod: 'de', nome: 'Deutsch' },
+  { cod: 'zh-CN', nome: '中文' },
+  { cod: 'ja', nome: '日本語' },
+  { cod: 'ko', nome: '한국어' },
+]
+
+/** Se o idioma já tem tradução. */
+export function temTraducao(cod: string): boolean {
+  return IDIOMAS[cod] !== undefined
+}
+
+/** O nome do idioma no próprio idioma ("Português"), ou o código. */
+export function nomeDaLingua(cod: string): string {
+  return LINGUAS.find(l => l.cod === cod)?.nome ?? cod
+}
+
+const sem = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+
+/**
+ * O código do idioma pelo que foi digitado ou pela variável do sistema:
+ * "pt", "pt-br", "pt_BR.UTF-8", "portugues", "English", "zh", "日本語"...
+ * Undefined se não for nenhum dos 8.
+ */
+export function codigoDe(texto: string | undefined): string | undefined {
+  const x = sem((texto ?? '').trim()).replace(/\..*$/, '').replace(/_/g, '-')
+  if (x === '' || x === 'c' || x === 'posix') {
+    return undefined
+  }
+  const porNome = LINGUAS.find(l => sem(l.nome) === x || sem(l.cod) === x)
+  if (porNome !== undefined) {
+    return porNome.cod
+  }
+  // só a língua ("pt", "zh"), ou língua com outra região ("pt-PT", "es-MX")
+  const base = x.split('-')[0]
+  return LINGUAS.find(l => sem(l.cod).split('-')[0] === base)?.cod
+}
+
+/** O idioma do sistema (LANG...), se tiver tradução; senão inglês. */
+export function idiomaDoSistema(vars: readonly (string | undefined)[]): string {
+  for (const v of vars) {
+    const cod = codigoDe(v)
+    if (cod !== undefined) {
+      return temTraducao(cod) ? cod : 'en'
+    }
+  }
+  return 'en'
+}
+
 /** Todas as chaves do idioma padrão (para os testes). */
 export function chaves(): string[] {
   return Object.keys(IDIOMAS[PADRAO] ?? {})

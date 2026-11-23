@@ -1,7 +1,7 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 
-import { MSG_VIGILIA, PEDIDO_RESUMO, VIGILIA_MAX } from '../hooks/register'
+import { VIGILIA_MAX, msgVigilia, pedidoResumo } from '../hooks/register'
 
 const FAIXA = {
   plugin: 'cronicas-de-lua',
@@ -95,7 +95,7 @@ test('Vigília: acende com aviso de custo e som; manda a mensagem perto do fim d
     await clock.advance(1_500)
     expect(r.enviados.length).toBe(i)
   }
-  expect(r.enviados.every(t => t === MSG_VIGILIA)).toBe(true)
+  expect(r.enviados.every(t => t === msgVigilia())).toBe(true)
   await clock.advance(1_000)
   expect(r.avisos.some(a => a.includes('apagou sozinha'))).toBe(true)
   expect(r.sons[r.sons.length - 1]).toBe('sons/apagou.wav')
@@ -139,7 +139,7 @@ test('Estandarte: pede o resumo, a bandeira ondula e no fim oferece a conversa n
   const { r } = await preparar($, on)
   const ui = await $.ui.mount(FAIXA)
   await ui.press({ key: 'bt_estandarte' })
-  expect(r.enviados).toEqual([PEDIDO_RESUMO])
+  expect(r.enviados).toEqual([pedidoResumo()])
   expect(await fonteDe(ui)).toContain('bt_estandarte_ativo_3f')
   await $.turn.complete({ turnId: 't1', answer: 'ok', text: 'ok', reason: 'end_turn' } as never)
   expect(await fonteDe(ui)).toContain('bt_botao_estandarte_ativo')

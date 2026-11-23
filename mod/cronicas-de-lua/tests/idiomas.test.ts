@@ -1,8 +1,8 @@
-import { expect, test } from 'claude-code/testing'
+import { expect, mock, test } from 'claude-code/testing'
 
 import { JORNADA, NOME_CHEFAO } from '../hooks/chefao'
 import { ABAS, FEITICOS, NOME_TROFEU } from '../hooks/livro'
-import { chaves, idioma, t, tp } from '../hooks/t'
+import { chaves, codigoDe, idioma, idiomaDoSistema, t, tp } from '../hooks/t'
 
 test('t troca os marcadores e tp escolhe o plural', () => {
   expect(idioma()).toBe('pt-BR')
@@ -28,4 +28,45 @@ test('todo texto do padrão existe e os nomes montados por código têm chave', 
     expect(f.desc.startsWith('livro.')).toBe(false)
   }
   expect(ABAS.map(a => a.nome)).toEqual(['Ficha', 'Bestiário', 'Troféus', 'Grimório'])
+})
+
+const CMD = { origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } } as const
+
+test('/cronicas language: lista os 8 idiomas, troca, recusa o que ainda não tem tradução', async ($, on) => {
+  mock.clock(on, { now: 1_800_000_000_000 })
+  const guardado = mock.store(on, { jogo: { xp: 0, paginas: 0, lutas: 0 }, ajustes: { abertura: false } })
+  on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 1000, percent: 1 }, rateLimits: [] } }))
+  on('env.get', (_, e) => ({ value: e.name === 'LANG' ? 'pt_BR.UTF-8' : undefined }))
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('command.register', () => ({ value: { command: 'cronicas' } }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const rodar = async (args: string) => String((await $.command.run({ command: 'cronicas', args, ...CMD }))?.text ?? '')
+
+  const lista = await rodar('language')
+  expect(lista).toContain('Idioma do jogo: Português.')
+  expect(lista).toContain('▸ Português (pt-BR)')
+  for (const nome of ['English', 'Español', 'Français', 'Deutsch', '中文', '日本語', '한국어']) {
+    expect(lista).toContain(nome)
+  }
+  expect(lista).toContain('English (en) · em breve')
+  expect(await rodar('lang fr')).toBe('Français ainda não tem tradução; o jogo continua em Português por enquanto.')
+  expect(await rodar('idioma klingon')).toContain('Não conheço o idioma "klingon".')
+  expect(await rodar('idioma português')).toBe('Idioma trocado para Português.')
+  expect(await rodar('language auto')).toBe('Idioma do sistema: Português.')
+  void guardado
+})
+
+test('o idioma pelo que se digita ou pelo sistema; sem tradução, inglês', () => {
+  expect(codigoDe('pt_BR.UTF-8')).toBe('pt-BR')
+  expect(codigoDe('pt-PT')).toBe('pt-BR')
+  expect(codigoDe('es-MX')).toBe('es')
+  expect(codigoDe('zh')).toBe('zh-CN')
+  expect(codigoDe('日本語')).toBe('ja')
+  expect(codigoDe('Français')).toBe('fr')
+  expect(codigoDe('C')).toBeUndefined()
+  expect(codigoDe('xx')).toBeUndefined()
+  // a primeira variável que diz um idioma vale (LC_ALL, LC_MESSAGES, LANG, LANGUAGE)
+  expect(idiomaDoSistema([undefined, 'C', 'pt_BR.UTF-8'])).toBe('pt-BR')
+  expect(idiomaDoSistema([undefined, undefined, 'de_DE.UTF-8'])).toBe('en') // sem tradução ainda
+  expect(idiomaDoSistema([])).toBe('en')
 })

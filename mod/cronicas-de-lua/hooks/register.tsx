@@ -6,7 +6,7 @@ import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
 import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
 import { ABERTURA, BOTOES, FIM_ABERTURA, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
-import { t as tx } from './t'
+import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, usarIdioma } from './t'
 import { ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu } from './luta'
 import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, vidaEmTarefas } from './chefao'
 
@@ -653,10 +653,10 @@ function provaTecnica($: $, els: Elementos, colunas: number, W: number, a: Ajust
 const LIVRO = 'livro'
 /** A Vigília manda no máximo 6 mensagens por vez que é acesa; depois apaga sozinha. */
 export const VIGILIA_MAX = 6
-/** A mensagem curtinha da Vigília (reacende o cache). */
-export const MSG_VIGILIA = tx('mensagens.vigilia')
+/** A mensagem curtinha da Vigília (reacende o cache), no idioma em uso. */
+export const msgVigilia = (): string => tx('mensagens.vigilia')
 /** O pedido do Estandarte: o resumo da missão para continuar numa sessão nova. */
-export const PEDIDO_RESUMO = tx('mensagens.estandarte')
+export const pedidoResumo = (): string => tx('mensagens.estandarte')
 
 /** Quanto antes de o luar acabar a Vigília manda a mensagem: 5 min (cache de 1 h) ou 1 min (cache de 5 min). */
 const antecedencia = (ttlMs: number) => (ttlMs >= 1_800_000 ? 300_000 : 60_000)
@@ -710,7 +710,7 @@ async function vigiar($: $, luzAt: number): Promise<void> {
   const apaga = envios >= VIGILIA_MAX
   await update($, botoes, (b): Botoes => ({ ...b, vigilia: { ligada: !apaga, envios, pisca: agora } }))
   void tocar($, 'vigilia')
-  void $.prompt.submit({ text: MSG_VIGILIA })
+  void $.prompt.submit({ text: msgVigilia() })
   if (apaga) {
     $.clock.after(900, () => {
       void avisarApagou($)
@@ -765,7 +765,7 @@ async function erguerEstandarte($: $): Promise<void> {
   }
   await update($, botoes, (b): Botoes => ({ ...b, estandarte: 'escrevendo' }))
   try {
-    await $.prompt.submit({ text: PEDIDO_RESUMO })
+    await $.prompt.submit({ text: pedidoResumo() })
   } catch (err) {
     await update($, botoes, (b): Botoes => ({ ...b, estandarte: 'nada' }))
     $.ui.toast(tx('avisos.estandarte.falhou', { erro: err instanceof Error ? err.message : String(err) }))
@@ -1057,8 +1057,86 @@ function livroEmTexto(els: Elementos, jogo: Jogo) {
   )
 }
 
+/** Lê uma variável do sistema sem deixar um erro parar a sessão. */
+async function variavel(ler: () => Promise<string | undefined>): Promise<string | undefined> {
+  try {
+    return await ler()
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * O primeiro idioma das preferências do macOS (`defaults read -g
+ * AppleLanguages`, só leitura). O app desktop não recebe LANG, então é por
+ * aqui que ele sabe o idioma no Mac. Fora do Mac (ou se falhar): undefined.
+ */
+async function idiomaDoMac($: $): Promise<string | undefined> {
+  try {
+    const { exitCode, stdout } = await $.process.run(['/usr/bin/defaults', 'read', '-g', 'AppleLanguages'], { timeoutMs: 3000 })
+    return exitCode === 0 ? /([A-Za-z]{2,3}(?:-[A-Za-z0-9]+)*)/.exec(stdout.replace(/^\s*\(/, ''))?.[1] : undefined
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Põe em uso o idioma escolhido com /cronicas language (guardado em $.store),
+ * ou, sem escolha, o do sistema (LC_ALL, LC_MESSAGES, LANG, LANGUAGE; sem
+ * nenhuma, as preferências do macOS) se tiver tradução; senão, inglês.
+ */
+async function aplicarIdioma($: $): Promise<void> {
+  const escolhido = (await $.store.get('idioma')) as string | undefined
+  if (typeof escolhido === 'string' && temTraducao(escolhido)) {
+    usarIdioma(escolhido)
+    return
+  }
+  const sistema = await Promise.all([
+    variavel(() => $.env.get('LC_ALL')),
+    variavel(() => $.env.get('LC_MESSAGES')),
+    variavel(() => $.env.get('LANG')),
+    variavel(() => $.env.get('LANGUAGE')),
+  ])
+  if (sistema.every(v => codigoDe(v) === undefined)) {
+    sistema.push(await idiomaDoMac($))
+  }
+  usarIdioma(idiomaDoSistema(sistema))
+}
+
+/** A resposta do /cronicas language: troca o idioma ou mostra a lista. */
+async function comandoIdioma($: $, pedido: string | undefined): Promise<string> {
+  const p = (pedido ?? '').trim()
+  if (['auto', 'sistema', 'system'].includes(p.toLowerCase())) {
+    await $.store.delete('idioma')
+    await aplicarIdioma($)
+    await update($, tique, t => t + 1)
+    return tx('comando.idioma.auto', { nome: nomeDaLingua(idioma()) })
+  }
+  if (p !== '') {
+    const cod = codigoDe(p)
+    if (cod === undefined) {
+      return tx('comando.idioma.desconhecido', { pedido: p }) + '\n' + listaDeIdiomas()
+    }
+    if (!temTraducao(cod)) {
+      return tx('comando.idioma.sem_traducao', { nome: nomeDaLingua(cod), atual: nomeDaLingua(idioma()) })
+    }
+    await $.store.set('idioma', cod)
+    usarIdioma(cod)
+    await update($, tique, t => t + 1)
+    return tx('comando.idioma.trocado', { nome: nomeDaLingua(cod) })
+  }
+  return listaDeIdiomas()
+}
+
+/** Os 8 idiomas, cada um no próprio idioma, o atual marcado, e como escolher. */
+function listaDeIdiomas(): string {
+  const linhas = LINGUAS.map(l => `${l.cod === idioma() ? '▸' : ' '} ${l.nome} (${l.cod})${temTraducao(l.cod) ? '' : ' · ' + tx('comando.idioma.em_breve')}`)
+  return [tx('comando.idioma.titulo', { nome: nomeDaLingua(idioma()) }), ...linhas, tx('comando.idioma.como')].join('\n')
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
+    await aplicarIdioma($)
     const salvo = (await $.store.get('jogo')) as Partial<Jogo> | undefined
     const uso = await $.session.usage()
     await update($, hud, h => ({
@@ -1083,7 +1161,7 @@ export const register: Register = on => {
     await $.command.register({
       name: 'cronicas',
       description: tx('comando.descricao'),
-      argumentHint: 'abertura [on|off] | escala 2 | largura 690 | regua | quadro | imagem | teste | lua-nova | vigilia | chefao [lista N] [nome] | golpe | elite',
+      argumentHint: 'language [en|pt-BR|…] | abertura [on|off] | escala 2 | largura 690 | regua | quadro | imagem | teste | lua-nova | vigilia | chefao [lista N] [nome] | golpe | elite',
     })
     return next(e)
   })
@@ -1092,6 +1170,9 @@ export const register: Register = on => {
     const [chave, valor] = String(e.args ?? '').trim().split(/\s+/)
     const a = await lerAjustes($)
     const n = Number(valor)
+    if (chave === 'language' || chave === 'lang' || chave === 'idioma') {
+      return { text: await comandoIdioma($, valor) }
+    }
     if (chave === 'superficies' || chave === 'superfícies') {
       // diagnóstico da Fase 5: onde esta sessão está desenhando agora
       const lista = await $.session.surfaces()
