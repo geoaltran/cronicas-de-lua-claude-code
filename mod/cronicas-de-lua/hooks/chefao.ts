@@ -11,21 +11,15 @@
 import { type Doc, esc, r } from './base'
 import type { Chefao } from '../types'
 import { DESFAZ, F, corpoMonstro, desfazer, monstroInfo } from './luta'
+import { t } from './t'
 
 /** A ordem da jornada: uma página das Crônicas por chefão. */
 export const JORNADA = ['vespera', 'dama_penumbra', 'golem_obsidiana', 'leviata', 'ignis', 'relojoeiro', 'sir_solis', 'rei_espelho', 'nebula', 'malakor'] as const
 
-export const NOME_CHEFAO: Record<string, string> = {
-  vespera: 'Vespera',
-  dama_penumbra: 'Dama Penumbra',
-  golem_obsidiana: 'Golem de Obsidiana',
-  leviata: 'Leviatã',
-  ignis: 'Ignis',
-  relojoeiro: 'Relojoeiro',
-  sir_solis: 'Sir Solis',
-  rei_espelho: 'Rei Espelho',
-  nebula: 'Nébula',
-  malakor: 'Malakor',
+export const NOME_CHEFAO: Record<string, string> = {}
+// cada nome vem do idioma em uso, na hora em que é lido (idiomas/*.json, "chefoes")
+for (const n of JORNADA) {
+  Object.defineProperty(NOME_CHEFAO, n, { get: () => t(`chefoes.${n}`), enumerable: true })
 }
 
 /** O tom que tinge a cena durante a luta de cada chefão. */
@@ -304,9 +298,9 @@ export function paginaRecuperada(d: Doc, c: Chefao, p: PalcoChefao): string {
   }
   const de = c.caiu + 6 * F
   const cx = Math.floor(p.W / 2)
-  const linhas = [`+PÁGINA ${c.pagina}/10`]
+  const linhas = [t('chefao.pagina', { pagina: c.pagina })]
   if (c.pagina === 10) {
-    linhas.push('NOVO JOGO+')
+    linhas.push(t('chefao.novo_jogo'))
   }
   const txt = linhas.map((l, i) => `<text class="t m" x="${cx}" y="${44 + i * 16}" style="fill:#ffe27a">${esc(l)}</text>`).join('')
   const sobe: [number, string][] = Array.from({ length: 8 }, (_, k) => [de + k * 2 * F, `translateY(${-k}px)`])

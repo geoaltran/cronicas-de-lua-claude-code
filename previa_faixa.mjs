@@ -1,7 +1,7 @@
 // Prévia da faixa do mod no navegador, sem precisar do app.
 // Gera a cena (o mesmo SVG que o mod desenha) em alguns estados e escreve
 // previa_faixa/index.html. Uso: node previa_faixa.mjs [pasta_do_mod]
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const arg = process.argv[2]
@@ -9,8 +9,8 @@ const MOD = arg !== undefined && !arg.startsWith('--') ? arg : join(import.meta.
 const SAIDA = join(import.meta.dirname, 'previa_faixa')
 const COD = join(SAIDA, '_cod')
 mkdirSync(COD, { recursive: true })
-for (const f of ['cena.ts', 'arte.ts', 'base.ts', 'luta.ts', 'chefao.ts']) {
-  writeFileSync(join(COD, f), readFileSync(join(MOD, 'hooks', f), 'utf8').replace(/from '\.\/(arte|base|luta|cena|chefao)'/g, "from './$1.ts'"))
+for (const f of ['cena.ts', 'arte.ts', 'base.ts', 'luta.ts', 'chefao.ts', ...['t.ts', 'idiomas.ts'].filter(f => existsSync(join(MOD, 'hooks', f)))]) {
+  writeFileSync(join(COD, f), readFileSync(join(MOD, 'hooks', f), 'utf8').replace(/from '\.\/(arte|base|luta|cena|chefao|t|idiomas)'/g, "from './$1.ts'"))
 }
 const { montar } = await import(join(COD, 'cena.ts'))
 const { monstroInfo, marcos } = await import(join(COD, 'luta.ts'))

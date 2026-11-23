@@ -6,6 +6,7 @@ import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
 import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
 import { ABERTURA, BOTOES, FIM_ABERTURA, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
+import { t as tx } from './t'
 import { ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu } from './luta'
 import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, vidaEmTarefas } from './chefao'
 
@@ -72,7 +73,10 @@ type Remota = Exclude<Sup, 'desktop'>
  */
 const PX_COLUNA_REMOTA: Record<Remota, number> = { vscode: 13.2, mobile: 8.4 }
 const pxColunaDe = (a: Ajustes, sup: Sup): number => (sup === 'desktop' ? a.pxColuna : (a.pxColunaPor?.[sup] ?? PX_COLUNA_REMOTA[sup]))
-const NOME_SUP: Record<Sup, string> = { desktop: 'app desktop', vscode: 'VS Code', mobile: 'celular' }
+const NOME_SUP = {} as Record<Sup, string>
+for (const s of ['desktop', 'vscode', 'mobile'] as const) {
+  Object.defineProperty(NOME_SUP, s, { get: () => tx(`superficies.${s}`), enumerable: true })
+}
 /** "vscode", "celular"... no fim de um comando. */
 function supDoTexto(t: string | undefined): Sup | undefined {
   const x = (t ?? '').toLowerCase()
@@ -638,7 +642,7 @@ function provaTecnica($: $, els: Elementos, colunas: number, W: number, a: Ajust
         {icones.map(botao)}
         {alvos.filter(t => botoes.includes(t.id)).map(t => balaoDoAlvo(els, a, colunas, W, t))}
       </Box>
-      <Text dimColor>{`Prova técnica: ${colunas} colunas, ${PX_CELULA} px por coluna, ${pxL} px por linha. /cronicas prova desliga.`}</Text>
+      <Text dimColor>{tx('comando.prova.rodape', { colunas, px: PX_CELULA, linha: pxL })}</Text>
     </Box>
   )
 }
@@ -650,16 +654,9 @@ const LIVRO = 'livro'
 /** A Vigília manda no máximo 6 mensagens por vez que é acesa; depois apaga sozinha. */
 export const VIGILIA_MAX = 6
 /** A mensagem curtinha da Vigília (reacende o cache). */
-export const MSG_VIGILIA = '🌙 Vigília da Lua: só mantendo o cache aceso. Não faça nada; responda apenas "ok".'
+export const MSG_VIGILIA = tx('mensagens.vigilia')
 /** O pedido do Estandarte: o resumo da missão para continuar numa sessão nova. */
-export const PEDIDO_RESUMO =
-  '🚩 Estandarte da Lua: escreva agora o resumo da missão para continuar numa sessão nova. ' +
-  'Crie ou atualize o arquivo PROXIMA_SESSAO.md na raiz do projeto, em português, limpo e objetivo, com: ' +
-  'no topo, o texto pronto para colar na sessão nova; onde está cada coisa (arquivos, pastas, comandos para rodar, validar e testar); ' +
-  'o que está pronto e aprovado (para não refazer); as decisões tomadas e as restrições ou pegadinhas descobertas; ' +
-  'o próximo passo em detalhe, como um plano numerado; e as pendências e perguntas abertas. ' +
-  'Se o projeto tiver um CLAUDE.md, ponha nele uma linha apontando para o PROXIMA_SESSAO.md. ' +
-  'Ao terminar, diga em poucas linhas o que ficou salvo.'
+export const PEDIDO_RESUMO = tx('mensagens.estandarte')
 
 /** Quanto antes de o luar acabar a Vigília manda a mensagem: 5 min (cache de 1 h) ou 1 min (cache de 5 min). */
 const antecedencia = (ttlMs: number) => (ttlMs >= 1_800_000 ? 300_000 : 60_000)
@@ -725,7 +722,7 @@ async function avisarApagou($: $): Promise<void> {
   const agora = await $.clock.now()
   await update($, botoes, (b): Botoes => ({ ...b, vigilia: { ...b.vigilia, pisca: agora } }))
   void tocar($, 'apagou')
-  $.ui.toast(`🏮 A Vigília apagou sozinha depois de ${VIGILIA_MAX} mensagens. Acenda de novo se quiser manter o cache quente.`)
+  $.ui.toast(tx('avisos.vigilia.apagou_sozinha', { max: VIGILIA_MAX }))
 }
 
 async function alternarVigilia($: $): Promise<void> {
@@ -733,28 +730,26 @@ async function alternarVigilia($: $): Promise<void> {
   const antes = (await read($, botoes)).vigilia.ligada
   await update($, botoes, (b): Botoes => ({ ...b, vigilia: antes ? { ligada: false, envios: 0 } : { ligada: true, envios: 0, pisca: agora } }))
   if (antes) {
-    $.ui.toast('🏮 Vigília apagada.')
+    $.ui.toast(tx('avisos.vigilia.apagada'))
   } else {
     void tocar($, 'vigilia')
-    $.ui.toast(
-      `🔥 Vigília acesa. Perto de o luar acabar, a Lua manda uma mensagem curtinha para manter o cache quente (até ${VIGILIA_MAX} vezes, só enquanto você não escreve). Cada uma gasta um pouco do limite do plano. Clique de novo para apagar.`,
-    )
+    $.ui.toast(tx('avisos.vigilia.acesa', { max: VIGILIA_MAX }))
   }
   await agendarVigilia($)
 }
 
 async function arrumarMochila($: $): Promise<void> {
   if (await read($, turno)) {
-    $.ui.toast('🎒 Espere o Claude terminar a tarefa para arrumar a mochila.')
+    $.ui.toast(tx('avisos.mochila.espere'))
     await update($, botoes, (b): Botoes => ({ ...b, mochila: 'nada' }))
     return
   }
   await update($, botoes, (b): Botoes => ({ ...b, mochila: 'arrumando' }))
   try {
     const r = await $.session.compact({})
-    $.ui.toast(r.skip === undefined ? '🎒 Mochila arrumada: a conversa foi resumida e sobrou espaço.' : `🎒 A mochila não foi arrumada: ${String(r.skip)}`)
+    $.ui.toast(r.skip === undefined ? tx('avisos.mochila.arrumada') : tx('avisos.mochila.nao_arrumada', { motivo: String(r.skip) }))
   } catch (err) {
-    $.ui.toast(`🎒 Não deu para arrumar a mochila agora: ${err instanceof Error ? err.message : String(err)}`)
+    $.ui.toast(tx('avisos.mochila.falhou', { erro: err instanceof Error ? err.message : String(err) }))
   } finally {
     await update($, botoes, (b): Botoes => ({ ...b, mochila: 'nada' }))
   }
@@ -762,7 +757,7 @@ async function arrumarMochila($: $): Promise<void> {
 
 async function erguerEstandarte($: $): Promise<void> {
   if (await read($, turno)) {
-    $.ui.toast('🚩 Espere o Claude terminar a tarefa para erguer o estandarte.')
+    $.ui.toast(tx('avisos.estandarte.espere'))
     return
   }
   if ((await read($, botoes)).estandarte === 'escrevendo') {
@@ -773,7 +768,7 @@ async function erguerEstandarte($: $): Promise<void> {
     await $.prompt.submit({ text: PEDIDO_RESUMO })
   } catch (err) {
     await update($, botoes, (b): Botoes => ({ ...b, estandarte: 'nada' }))
-    $.ui.toast(`🚩 Não deu para pedir o resumo: ${err instanceof Error ? err.message : String(err)}`)
+    $.ui.toast(tx('avisos.estandarte.falhou', { erro: err instanceof Error ? err.message : String(err) }))
   }
 }
 
@@ -784,10 +779,10 @@ async function alternarLivro($: $): Promise<void> {
     await update($, botoes, (b): Botoes => ({ ...b, livro: false }))
     return
   }
-  const r = await $.ui.open({ id: LIVRO, title: 'O Livro da Lua' })
+  const r = await $.ui.open({ id: LIVRO, title: tx('livro.titulo_painel') })
   await update($, botoes, (b): Botoes => ({ ...b, livro: true }))
   if (!r.isPlaced) {
-    $.ui.toast(`📖 O Livro ainda não abriu: ${r.reason}`)
+    $.ui.toast(tx('avisos.livro.nao_abriu', { motivo: r.reason }))
   }
 }
 
@@ -862,10 +857,10 @@ function botoesDoHud($: $, els: Elementos, a: Ajustes, colunas: number, W: numbe
 function botoesEmLinha($: $, els: Elementos, bt: Botoes) {
   const { Box, Button, Svg } = els
   const rotulo: Record<NomeBotao, string> = {
-    vigilia: bt.vigilia.ligada ? `Vigília acesa (${bt.vigilia.envios}/${VIGILIA_MAX})` : 'Vigília',
-    mochila: 'Mochila',
-    estandarte: bt.estandarte === 'escrevendo' ? 'Escrevendo…' : 'Estandarte',
-    livro: 'Livro',
+    vigilia: bt.vigilia.ligada ? tx('chips.vigilia_acesa', { envios: bt.vigilia.envios, max: VIGILIA_MAX }) : tx('chips.vigilia'),
+    mochila: tx('chips.mochila'),
+    estandarte: bt.estandarte === 'escrevendo' ? tx('chips.escrevendo') : tx('chips.estandarte'),
+    livro: tx('chips.livro'),
   }
   const ativo: Record<NomeBotao, boolean> = { vigilia: bt.vigilia.ligada, mochila: bt.mochila !== 'nada', estandarte: bt.estandarte !== 'nada', livro: bt.livro }
   return (
@@ -901,10 +896,10 @@ function botoesEmLinha($: $, els: Elementos, bt: Botoes) {
 function botoesChips($: $, els: Elementos, bt: Botoes) {
   const { Box, Button } = els
   const rotulo: Record<NomeBotao, string> = {
-    vigilia: bt.vigilia.ligada ? `Vigília acesa (${bt.vigilia.envios}/${VIGILIA_MAX})` : 'Vigília',
-    mochila: 'Mochila',
-    estandarte: bt.estandarte === 'escrevendo' ? 'Escrevendo…' : 'Estandarte',
-    livro: bt.livro ? 'Livro aberto' : 'Livro',
+    vigilia: bt.vigilia.ligada ? tx('chips.vigilia_acesa', { envios: bt.vigilia.envios, max: VIGILIA_MAX }) : tx('chips.vigilia'),
+    mochila: tx('chips.mochila'),
+    estandarte: bt.estandarte === 'escrevendo' ? tx('chips.escrevendo') : tx('chips.estandarte'),
+    livro: bt.livro ? tx('chips.livro_aberto') : tx('chips.livro'),
   }
   // tudo encostado à esquerda (pedido do usuário): a linha não estica os chips
   return (
@@ -946,7 +941,7 @@ function acoesDaFaixa($: $, els: Elementos, bt: Botoes, confirmando: boolean, ca
   if (confirmando) {
     linhas.push(
       <Box key="l_confirma" flexDirection="row" gap={1} alignItems="center">
-        <Text>A conversa atual sai da tela (volta com /resume).</Text>
+        <Text>{tx('faixa.nova_conversa.explica')}</Text>
         <Button
           key="sim"
           variant="primary"
@@ -955,10 +950,10 @@ function acoesDaFaixa($: $, els: Elementos, bt: Botoes, confirmando: boolean, ca
             await $.command.run({ command: 'clear' })
           }}
         >
-          Começar
+          {tx('faixa.nova_conversa.sim')}
         </Button>
         <Button key="nao" onPress={() => update($, confirma, () => false)}>
-          Ficar nesta
+          {tx('faixa.nova_conversa.nao')}
         </Button>
       </Box>,
     )
@@ -966,40 +961,40 @@ function acoesDaFaixa($: $, els: Elementos, bt: Botoes, confirmando: boolean, ca
     linhas.push(
       <Box key="l_luanova" flexDirection="row" gap={1} alignItems="center">
         <Button key="nova" variant="primary" onPress={() => update($, confirma, () => true)}>
-          🌙 Nova conversa
+          {tx('faixa.nova_conversa.botao')}
         </Button>
-        <Text dimColor>ou continue aqui: só a próxima mensagem custa mais.</Text>
+        <Text dimColor>{tx('faixa.lua_nova.continuar')}</Text>
       </Box>,
     )
   }
   if (bt.mochila === 'confirma') {
     linhas.push(
       <Box key="l_mochila" flexDirection="row" gap={1} alignItems="center">
-        <Text>Arrumar a mochila resume a conversa e libera espaço (como o /compact).</Text>
+        <Text>{tx('faixa.mochila.explica')}</Text>
         <Button key="mochila_sim" variant="primary" onPress={() => arrumarMochila($)}>
-          Arrumar a mochila
+          {tx('faixa.mochila.sim')}
         </Button>
         <Button key="mochila_nao" onPress={() => update($, botoes, (b): Botoes => ({ ...b, mochila: 'nada' }))}>
-          Agora não
+          {tx('faixa.mochila.nao')}
         </Button>
       </Box>,
     )
   } else if (bt.mochila === 'arrumando') {
     linhas.push(
       <Text key="l_mochila" dimColor>
-        🎒 Arrumando a mochila…
+        {tx('faixa.mochila.arrumando')}
       </Text>,
     )
   }
   if (bt.estandarte === 'pronto' && !confirmando) {
     linhas.push(
       <Box key="l_estandarte" flexDirection="row" gap={1} alignItems="center">
-        <Text>🚩 Resumo da missão pronto (PROXIMA_SESSAO.md).</Text>
+        <Text>{tx('faixa.estandarte.pronto')}</Text>
         <Button key="est_nova" variant="primary" onPress={() => update($, confirma, () => true)}>
-          🌙 Nova conversa
+          {tx('faixa.nova_conversa.botao')}
         </Button>
         <Button key="est_ok" onPress={() => update($, botoes, (b): Botoes => ({ ...b, estandarte: 'nada' }))}>
-          Fechar
+          {tx('faixa.estandarte.fechar')}
         </Button>
       </Box>,
     )
@@ -1044,12 +1039,12 @@ function livroEmTexto(els: Elementos, jogo: Jogo) {
   const trofeus = jogo.trofeus ?? []
   return (
     <Box flexDirection="column" gap={1}>
-      <Text bold>Ficha da Lua</Text>
+      <Text bold>{tx('livro.ficha.titulo')}</Text>
       <Box flexDirection="column">
-        <Text>{`Nível ${nv.nivel} · ${jogo.xp} XP (faltam ${nv.precisa - nv.dentro} para o ${nv.nivel + 1})`}</Text>
-        <Text>{`Páginas das Crônicas: ${paginasNoCiclo(jogo.paginas)}/10 (${jogo.paginas} no total)`}</Text>
-        <Text>{`Lutas vencidas: ${jogo.lutas} · chefão em ${A_CADA - (jogo.lutas % A_CADA)} lutas`}</Text>
-        <Text>{`Troféus: ${trofeus.length}`}</Text>
+        <Text>{tx('livro.texto.nivel', { nivel: nv.nivel, xp: jogo.xp, faltam: nv.precisa - nv.dentro, proximo: nv.nivel + 1 })}</Text>
+        <Text>{tx('livro.texto.paginas', { ciclo: paginasNoCiclo(jogo.paginas), total: jogo.paginas })}</Text>
+        <Text>{tx('livro.texto.lutas', { lutas: jogo.lutas, n: A_CADA - (jogo.lutas % A_CADA) })}</Text>
+        <Text>{tx('livro.texto.trofeus', { n: trofeus.length })}</Text>
       </Box>
       {trofeus.length > 0 ? (
         <Box flexDirection="column">
@@ -1087,7 +1082,7 @@ export const register: Register = on => {
     }
     await $.command.register({
       name: 'cronicas',
-      description: 'As Crônicas de Lua: jornada, ajustes da faixa e testes (chefão, elite, lua nova)',
+      description: tx('comando.descricao'),
       argumentHint: 'abertura [on|off] | escala 2 | largura 690 | regua | quadro | imagem | teste | lua-nova | vigilia | chefao [lista N] [nome] | golpe | elite',
     })
     return next(e)
@@ -1100,21 +1095,21 @@ export const register: Register = on => {
     if (chave === 'superficies' || chave === 'superfícies') {
       // diagnóstico da Fase 5: onde esta sessão está desenhando agora
       const lista = await $.session.surfaces()
-      const nomes: Record<string, string> = { terminal: 'terminal', desktop: 'app desktop', vscode: 'VS Code', mobile: 'celular' }
-      return { text: lista.length === 0 ? 'Nenhuma superfície desenha esta sessão agora.' : `Esta sessão desenha em: ${lista.map(x => nomes[x] ?? x).join(', ')}.` }
+      const nomes: Record<string, string> = { terminal: tx('superficies.terminal'), desktop: NOME_SUP.desktop, vscode: NOME_SUP.vscode, mobile: NOME_SUP.mobile }
+      return { text: lista.length === 0 ? tx('comando.superficies.nenhuma') : tx('comando.superficies.lista', { lista: lista.map(x => nomes[x] ?? x).join(', ') }) }
     }
     if (chave === 'abertura' || chave === 'intro') {
       const op = (valor ?? '').toLowerCase()
       if (['off', 'desligar', 'desliga', 'nao', 'não'].includes(op)) {
         await $.store.set('ajustes', { ...a, abertura: false })
-        return { text: 'Abertura desligada: ela não aparece mais na primeira sessão do dia. /cronicas abertura on liga de novo; /cronicas abertura mostra agora.' }
+        return { text: tx('comando.abertura.desligada') }
       }
       if (['on', 'ligar', 'liga', 'sim'].includes(op)) {
         await $.store.set('ajustes', { ...a, abertura: true })
-        return { text: 'Abertura ligada: ela aparece na primeira sessão de cada dia. /cronicas abertura mostra agora.' }
+        return { text: tx('comando.abertura.ligada') }
       }
       await abrirAbertura($)
-      return { text: `Abertura na faixa (uns ${Math.round(FIM_ABERTURA / 1000)} s; um clique na cena pula). ${a.abertura === false ? 'Ela está desligada na primeira sessão do dia: /cronicas abertura on liga.' : '/cronicas abertura off desliga.'}` }
+      return { text: tx('comando.abertura.mostra', { s: Math.round(FIM_ABERTURA / 1000) }) + ' ' + tx(a.abertura === false ? 'comando.abertura.mostra_desligada' : 'comando.abertura.mostra_ligada') }
     }
     if (chave === 'escala' && (n === 1 || n === 2 || n === 3)) {
       a.escala = n
@@ -1125,7 +1120,7 @@ export const register: Register = on => {
       // Sem superfície no comando, vale a que desenhou a faixa por último.
       const sup = supDoTexto(String(e.args ?? '').trim().split(/\s+/)[2]) ?? ultimaSup
       if (colunasPor[sup] <= 0) {
-        return { text: `Ainda não sei quantas colunas a faixa tem no ${NOME_SUP[sup]}: espere ela aparecer e tente de novo.` }
+        return { text: tx('comando.largura.sem_colunas', { sup: NOME_SUP[sup] }) }
       }
       // desktop: uns px a mais (desenho mais largo que a faixa é cortado à
       // direita, sem distorcer). VS Code e celular esticam ou encolhem a imagem
@@ -1140,7 +1135,7 @@ export const register: Register = on => {
       a.regua = false
       await $.store.set('ajustes', a)
       await update($, tique, t => t + 1)
-      return { text: `Largura calibrada no ${NOME_SUP[sup]}: ${n} px em ${colunasPor[sup]} colunas = ${px} px por coluna. A cena agora acompanha a largura da faixa (régua desligada).` }
+      return { text: tx('comando.largura.calibrada', { sup: NOME_SUP[sup], n, colunas: colunasPor[sup], px }) }
     } else if (chave === 'quadro' || chave === 'imagem') {
       a.quadro = chave === 'quadro'
       a.teste = false
@@ -1152,8 +1147,8 @@ export const register: Register = on => {
       await update($, tique, t => t + 1)
       return {
         text: a.prova
-          ? 'Prova técnica ligada. (1) As áreas de mouse ganham borda: passe o mouse nas barras e no selo de nível (a borda acende e o balão aparece). (2) Os 4 ícones de botão aparecem na cena, com uma área clicável invisível por cima: clique em cada um (aparece um aviso) e passe o mouse (aparece o balão do botão). /cronicas prova de novo desliga.'
-          : 'Prova técnica desligada.',
+          ? tx('comando.prova.ligada')
+          : tx('comando.prova.desligada'),
       }
     } else if (chave === 'linha' && n >= 8 && n <= 40) {
       // altura de uma linha da faixa em px (medida com a régua vertical da prova)
@@ -1164,8 +1159,8 @@ export const register: Register = on => {
       await update($, tique, t => t + 1)
       return {
         text: a.regua
-          ? 'Régua ligada embaixo da cena. Diga qual é o último número que aparece inteiro na borda direita. /cronicas regua de novo desliga.'
-          : 'Régua desligada.',
+          ? tx('comando.regua.ligada')
+          : tx('comando.regua.desligada'),
       }
     } else if (chave === 'chefao' || chave === 'chefão') {
       // para ver o chefão sem lista de tarefas: 3 de vida, /cronicas golpe tira 1.
@@ -1186,24 +1181,24 @@ export const register: Register = on => {
       const pedido = palavras.join(' ')
       const escolhido = chefaoPeloNome(pedido)
       if (pedido !== '' && escolhido === undefined) {
-        return { text: `Não conheço o chefão "${pedido}". Use um destes: ${JORNADA.map(n => NOME_CHEFAO[n] ?? n).join(', ')}.` }
+        return { text: tx('comando.chefao.desconhecido', { pedido, lista: JORNADA.map(n => NOME_CHEFAO[n] ?? n).join(', ') }) }
       }
       const veio = await chamarChefao($, comLista ? 'lista' : 'lutas', tarefas, escolhido)
       await revisar($)
       const ch = await read($, chefao)
       if (!veio || ch === null) {
-        return { text: 'Já há um chefão em cena.' }
+        return { text: tx('comando.chefao.ja_em_cena') }
       }
       const nome = NOME_CHEFAO[ch.nome] ?? ch.nome
       return {
         text: comLista
-          ? `${nome} entrou em cena com uma lista de ${tarefas?.total ?? 0} tarefas (página ${ch.pagina}/10). Cada ferramenta do Claude bate no escudo e tira pouco; /cronicas golpe conclui uma tarefa (a última é o golpe crítico).`
-          : `${nome} entrou em cena (página ${ch.pagina}/10). Use /cronicas golpe para tirar vida.`,
+          ? tx('comando.chefao.com_lista', { nome, total: tarefas?.total ?? 0, pagina: ch.pagina })
+          : tx('comando.chefao.entrou', { nome, pagina: ch.pagina }),
       }
     } else if (chave === 'golpe') {
       const ch = await read($, chefao)
       if (!dePe(ch)) {
-        return { text: 'Não há chefão em cena. /cronicas chefao chama um.' }
+        return { text: tx('comando.golpe.sem_chefao') }
       }
       if (ch.origem === 'lista') {
         // conclui uma tarefa da lista: a vida desce até o fim do bloco
@@ -1219,10 +1214,10 @@ export const register: Register = on => {
       return {
         text:
           depois?.caiu !== undefined
-            ? `${NOME_CHEFAO[ch.nome] ?? ch.nome} caiu! Página ${ch.pagina}/10 recuperada.`
+            ? tx('comando.golpe.caiu', { nome: NOME_CHEFAO[ch.nome] ?? ch.nome, pagina: ch.pagina })
             : ch.origem === 'lista'
-              ? `Tarefa concluída! Faltam ${v.resta} de ${v.total}.`
-              : `Golpe! Vida ${v.resta}/${v.total}.`,
+              ? tx('comando.golpe.tarefa', { resta: v.resta, total: v.total })
+              : tx('comando.golpe.golpe', { resta: v.resta, total: v.total }),
       }
     } else if (chave === 'elite') {
       // para ver o elite sem esperar um erro de verdade: a próxima ferramenta chama o Golem
@@ -1236,8 +1231,7 @@ export const register: Register = on => {
         web: 'Error: Request failed with status code 404',
       }
       await update($, elite, el => ({ ...el, proximo: nomeDoErro(exemplo[tipo]), proximoTipo: tipo }))
-      const nomes: Record<TipoTrofeu, string> = { comando: 'taça com chama (comando)', edicao: 'engrenagem (edição)', leitura: 'lua crescente (leitura)', web: 'orbe (web)' }
-      return { text: `A próxima luta comum será o elite (Golem de Obsidiana) trazendo o troféu ${nomes[tipo]}. Rode de novo depois para ver o próximo tipo.` }
+      return { text: tx('comando.elite.proximo', { elite: NOME_CHEFAO[ELITE] ?? ELITE, trofeu: tx(`comando.elite.trofeu.${tipo}`) }) }
     } else if (chave === 'vigilia' || chave === 'vigília') {
       // para ver a Vigília sem esperar: o luar fica a 10 s da hora em que ela manda a mensagem
       const agora = await $.clock.now()
@@ -1249,30 +1243,34 @@ export const register: Register = on => {
       const acesa = (await read($, botoes)).vigilia.ligada
       return {
         text: acesa
-          ? 'Luar simulado perto do fim: a Vigília manda a mensagem curtinha em 10 s.'
-          : 'Luar simulado perto do fim. A Vigília está apagada: clique na lanterna para acender (a mensagem sai logo depois).',
+          ? tx('comando.vigilia.acesa')
+          : tx('comando.vigilia.apagada'),
       }
     } else if (chave === 'lua-nova') {
       // só para ver o aviso: a próxima resposta acende o luar de novo
       const agora = await $.clock.now()
       await update($, hud, h => ({ ...h, luz: { at: agora - (h.luz?.ttlMs ?? 3_600_000) - 1000, ttlMs: h.luz?.ttlMs ?? 3_600_000 } }))
-      return { text: 'Lua nova simulada: o aviso aparece na faixa até a próxima resposta.' }
+      return { text: tx('comando.lua_nova') }
     } else {
       const atual = await read($, hud)
       const nv = nivelDe(atual.jogo.xp)
       return {
-        text: `As Crônicas de Lua: escala ${a.escala}x, ${a.pxColuna} px por coluna, modo ${a.quadro ? 'quadro' : 'imagem'}. Nível ${nv.nivel}, ${atual.jogo.xp} XP, ${paginasNoCiclo(atual.jogo.paginas)}/10 páginas.\nUse /cronicas escala 1|2|3, /cronicas regua e /cronicas largura <px> (calibra a largura), /cronicas quadro|imagem, /cronicas teste (compara os dois) /cronicas lua-nova (simula o cache frio), /cronicas vigilia (o luar perto do fim, para ver a Vigília) ou /cronicas chefao [nome] e /cronicas golpe (testa o chefão) ou /cronicas elite (a próxima luta é o elite).${(atual.jogo.trofeus ?? []).length > 0 ? `\nTroféus: ${(atual.jogo.trofeus ?? []).slice(0, 5).join(' · ')}` : ''}`,
+        text:
+          tx('comando.ajuda.estado', { escala: a.escala, px: a.pxColuna, modo: tx(a.quadro ? 'comando.modo.quadro' : 'comando.modo.imagem'), nivel: nv.nivel, xp: atual.jogo.xp, paginas: paginasNoCiclo(atual.jogo.paginas) }) +
+          '\n' +
+          tx('comando.ajuda.uso') +
+          ((atual.jogo.trofeus ?? []).length > 0 ? '\n' + tx('comando.ajuda.trofeus', { lista: (atual.jogo.trofeus ?? []).slice(0, 5).join(' · ') }) : ''),
       }
     }
     await $.store.set('ajustes', a)
     await update($, tique, t => t + 1)
     if (chave === 'linha') {
-      return { text: `Altura da linha: ${n} px. As áreas de mouse foram recalculadas.` }
+      return { text: tx('comando.linha', { n }) }
     }
     return {
       text: a.teste
-        ? 'Teste ligado: a faixa aparece duas vezes, A (quadro interativo) e B (imagem). /cronicas teste de novo desliga.'
-        : `Faixa ajustada: escala ${a.escala}x, ${a.pxColuna} px por coluna, modo ${a.quadro ? 'quadro (balões no hover)' : 'imagem'}.`,
+        ? tx('comando.teste')
+        : tx('comando.ajustada', { escala: a.escala, px: a.pxColuna, modo: tx(a.quadro ? 'comando.modo.quadro_baloes' : 'comando.modo.imagem') }),
     }
   })
 
@@ -1304,7 +1302,7 @@ export const register: Register = on => {
     if (e.props.placement === 'widget') {
       // painel minimizado: só uma linha que se lê de relance
       const { Text } = els
-      return <Text>{`📖 Nível ${nivelDe(jogo.xp).nivel} · páginas ${paginasNoCiclo(jogo.paginas)}/10 · ${(jogo.trofeus ?? []).length} troféus`}</Text>
+      return <Text>{tx('livro.widget', { nivel: nivelDe(jogo.xp).nivel, paginas: paginasNoCiclo(jogo.paginas), trofeus: (jogo.trofeus ?? []).length })}</Text>
     }
     const [aba, a] = await Promise.all([read($, livroAba), lerAjustes($)])
     return livroNoPainel($, els, jogo, aba, e.props.bodyColumns, a, e.surface)
@@ -1507,16 +1505,27 @@ export const register: Register = on => {
     // direita (preserveAspectRatio slice) em vez de encolher o desenho
     const nv = nivelDe(estado.jogo.xp)
     const cansada = luar(estado, agora).desmaiada
-    const alt = `As Crônicas de Lua: a Lua ${cansada ? 'está cansada (lua nova, cache frio)' : dePe(ch) ? `enfrenta o chefão ${NOME_CHEFAO[ch.nome] ?? ch.nome} (${vidaEmTarefas(ch).resta}/${vidaEmTarefas(ch).total} de vida)` : luta !== undefined ? 'luta com um monstro' : c.andando ? 'anda pela floresta' : 'descansa'}; nível ${nv.nivel}.`
+    const alt = tx('cena_alt.frase', {
+      acao: cansada
+        ? tx('cena_alt.cansada')
+        : dePe(ch)
+          ? tx('cena_alt.chefao', { nome: NOME_CHEFAO[ch.nome] ?? ch.nome, resta: vidaEmTarefas(ch).resta, total: vidaEmTarefas(ch).total })
+          : luta !== undefined
+            ? tx('cena_alt.luta')
+            : c.andando
+              ? tx('cena_alt.anda')
+              : tx('cena_alt.descansa'),
+      nivel: nv.nivel,
+    })
     const cena = remota ? (
       // sem altura fixa: o editor estica ou encolhe a imagem inteira até a largura
       // da faixa (não corta os botões); com a largura calibrada, fica perto de 1:1
       <Svg source={svg} alt={alt} />
     ) : a.teste ? (
       <Box flexDirection="column" gap={1}>
-        <Text key="ta">A: quadro interativo (balões no hover)</Text>
+        <Text key="ta">{tx('comando.teste_a')}</Text>
         <Svg key="sa" source={svg} isInteractive height={altura} alt={alt} />
-        <Text key="tb">B: imagem (sem balões)</Text>
+        <Text key="tb">{tx('comando.teste_b')}</Text>
         <Svg key="sb" source={svg} height={altura} alt={alt} />
       </Box>
     ) : a.quadro ? (
@@ -1545,7 +1554,7 @@ export const register: Register = on => {
       return (
         <Box flexDirection="column" gap={1}>
           {cena}
-          <Svg key="regua" source={regua(e.props.bodyColumns, pxColuna)} height={44} alt="Régua de calibrar a largura da faixa" />
+          <Svg key="regua" source={regua(e.props.bodyColumns, pxColuna)} height={44} alt={tx('regua_alt')} />
         </Box>
       )
     }

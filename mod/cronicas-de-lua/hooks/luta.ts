@@ -7,8 +7,9 @@
 // redesenho no meio da luta continua do mesmo ponto. Ritmo de previa_luta.py
 // (quadros de 70 ms).
 import { META } from './arte'
-import { ANDAR, type Doc, PARADA, type Q, art, mod, r, sorteio } from './base'
+import { ANDAR, type Doc, PARADA, type Q, art, esc, mod, r, sorteio } from './base'
 import type { Caminho, Golpe, Luta, TipoTrofeu } from '../types'
+import { t } from './t'
 
 /** Um quadro do roteiro (como em previa_luta.py). */
 export const F = 70
@@ -124,9 +125,9 @@ export function nomeDoErro(texto: string | undefined): string {
     .split(/\r?\n/)
     .map(l => l.replace(/^\s*(error|erro|fatal)\s*:\s*/i, '').trim())
     .filter(l => l !== '' && !/^exit code \d+$/i.test(l))
-  let nome = (linhas[0] ?? 'ERRO MISTERIOSO').replace(LETRAS, ' ').replace(/\s+/g, ' ').trim().toUpperCase()
+  let nome = (linhas[0] ?? t('luta.erro_misterioso')).replace(LETRAS, ' ').replace(/\s+/g, ' ').trim().toUpperCase()
   if (nome === '') {
-    nome = 'ERRO MISTERIOSO'
+    nome = t('luta.erro_misterioso')
   }
   return nome.length > TROFEU_MAX ? `${nome.slice(0, TROFEU_MAX - 1).trimEnd()}…` : nome
 }
@@ -593,7 +594,7 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
         const num = numero(d, `-${valor}`, 'xp', 3)
         const cx = r(Math.min(Math.max(mx + mi.w / 2, num.w / 2 + 4), W - num.w / 2 - 4))
         const ny = Math.max(ay - 16, 44)
-        const txt = `<text class="t m" x="${cx}" y="${ny - 6}" style="font-size:16px;fill:#ff3b4e">CRÍTICO!</text>`
+        const txt = `<text class="t m" x="${cx}" y="${ny - 6}" style="font-size:16px;fill:#ff3b4e">${esc(t('luta.critico'))}</text>`
         efeitos += d.janela(i + 2 * F, i + 22 * F, agora, d.pista(subindo(i + 2 * F, 20, 1), agora, txt + `<g transform="translate(${r(cx - num.w / 2)},${ny})">${num.svg}</g>`))
       }
     } else if (i + 14 * F > agora && cabe(a.a)) {
@@ -671,7 +672,7 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
       }
       efeitos += d.janela(t1, t2 + DESFAZ, agora, d.pista(pts, agora, corpoT))
       // "+TROFÉU" sobre ele e estrelinhas piscando em volta
-      const txt = `<text class="t m" x="${r(mx + mi.w / 2)}" y="${gy - 8}" style="fill:#ffe27a">+TROFÉU</text>`
+      const txt = `<text class="t m" x="${r(mx + mi.w / 2)}" y="${gy - 8}" style="fill:#ffe27a">${esc(t('luta.trofeu'))}</text>`
       efeitos += d.janela(t1 + 2 * F, t2, agora, d.pista(subindo(t1 + 2 * F, 4, 1), agora, txt))
       const cantos: [number, number][] = [[-10, 6], [tw + 3, 14], [-6, th - 22], [tw - 1, th - 30]]
       cantos.forEach(([ex, ey], j) => {

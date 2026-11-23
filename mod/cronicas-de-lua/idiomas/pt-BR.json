@@ -1,0 +1,368 @@
+{
+  "_sobre": "Textos do jogo em português do Brasil (idioma padrão). {x} é trocado pelo valor na hora; chaves .um/.outros são plurais. Depois de editar, rode: python3 idiomas.py",
+  "chefoes": {
+    "vespera": "Vespera",
+    "dama_penumbra": "Dama Penumbra",
+    "golem_obsidiana": "Golem de Obsidiana",
+    "leviata": "Leviatã",
+    "ignis": "Ignis",
+    "relojoeiro": "Relojoeiro",
+    "sir_solis": "Sir Solis",
+    "rei_espelho": "Rei Espelho",
+    "nebula": "Nébula",
+    "malakor": "Malakor"
+  },
+  "chefao": {
+    "pagina": "+PÁGINA {pagina}/10",
+    "novo_jogo": "NOVO JOGO+"
+  },
+  "luta": {
+    "_critico": "aparece em vermelho, grande, sobre o monstro; Silkscreen 16 px",
+    "critico": "CRÍTICO!",
+    "trofeu": "+TROFÉU",
+    "_erro_misterioso": "nome do troféu quando o erro não diz nada; cabe em 24 letras",
+    "erro_misterioso": "ERRO MISTERIOSO"
+  },
+  "terminal": {
+    "_sobre": "faixa em texto (terminal sem imagens); os espaços nas pontas contam",
+    "nivel": "🌙 Nv {nivel}",
+    "lua_nova": "lua nova",
+    "minutos": "{n} min",
+    "luz": "LUZ ",
+    "mana": "MANA ",
+    "mochila": "MOCHILA ",
+    "mochila_cheia": " (cheia!)",
+    "desmaio": "🌑 Lua nova: a Lua desmaiou (o cache esfriou). A próxima mensagem sai mais cara.",
+    "vida_tarefas": " {resta}/{total} tarefas",
+    "chefao_caiu": "🏆 {nome} caiu! +PÁGINA {pagina}/10",
+    "fugiu": "💥 {alvo} contra-atacou e fugiu",
+    "defendeu": "🛡 {alvo} defendeu com o escudo ",
+    "critico": "💥 CRÍTICO! ",
+    "golpe_em": "golpe em {alvo}",
+    "derrotado": "{alvo} derrotado",
+    "xp": " +{xp} XP",
+    "trofeu": " +TROFÉU",
+    "canaliza": "🔮 a Lua canaliza contra {alvo}…",
+    "enfrenta": "⚔ a Lua enfrenta {alvo}",
+    "enfrenta_elite": "⚔ a Lua enfrenta {alvo} (elite)",
+    "anda": "🌲 a Lua anda pela floresta",
+    "descansa": "💤 a Lua descansa",
+    "chefao_em": {
+      "um": "  ·  chefão em {n} luta",
+      "outros": "  ·  chefão em {n} lutas"
+    }
+  },
+  "barras": {
+    "_sobre": "nome e valor das barras saem em CAIXA ALTA (Silkscreen 12 px); se nome + valor não couberem na barra, usa o .curto",
+    "luz": {
+      "nome": "Luz da Lua",
+      "curto": "Luz",
+      "minutos": "{n} min",
+      "lua_nova": "lua nova",
+      "titulo_lua_nova": "Luz da Lua · lua nova",
+      "_explica": "balões do hover: textos curtos, \\n quebra a linha",
+      "sem_luz": "Cache da conversa.\nAcende na primeira resposta.",
+      "explica": "Cache da conversa.\nDura {min} min após cada resposta.",
+      "lua_nova_explica": "Cache frio.\nA próxima mensagem sai mais cara."
+    },
+    "mana": {
+      "nome": "Mana Estelar",
+      "curto": "Mana",
+      "sem_dado": "Limite do plano.\nAparece após a 1ª resposta.",
+      "explica": "Limite do plano: {livre}% livre.",
+      "renova": "\nRenova às {hora} (5 h).",
+      "sete_dias": "\n7 dias: {livre}% livre."
+    },
+    "mochila": {
+      "nome": "Mochila",
+      "nome_cheia": "Mochila!",
+      "curto": "Mochila",
+      "explica": "Quanto da conversa já foi usado\n(o contexto).",
+      "cheia_explica": "Conversa quase cheia ({pct}%).\nHora de arrumar (compactar)."
+    },
+    "xp": {
+      "nome": "XP",
+      "curto": "XP",
+      "titulo": "XP · nível {nivel}",
+      "explica": "Faltam {faltam} XP para o nível {proximo}.\nPáginas {paginas}/10.",
+      "chefao_em": "Chefão em {n} lutas.",
+      "chefao_lista": "O chefão cai quando as tarefas acabarem: {feitas} de {total}.",
+      "chefao_vida": {
+        "um": "O chefão cai em {n} vitória.",
+        "outros": "O chefão cai em {n} vitórias."
+      }
+    },
+    "selo": {
+      "titulo": "Nível {nivel}",
+      "explica": "{xp} XP no total.\nPáginas {paginas}/10 · {lutas} lutas."
+    }
+  },
+  "botoes": {
+    "_sobre": "nome e explicação do balão de cada botão; cabem numa linha (\\n quebra)",
+    "vigilia": {
+      "nome": "Vigília",
+      "acesa": "Vigília · acesa",
+      "explica": "Mantém o cache aceso.\nGasta um pouco do limite.",
+      "acesa_explica": "Cache quente: {envios}/{max} mensagens.\nClique para apagar."
+    },
+    "mochila": {
+      "nome": "Mochila",
+      "cheia": "Mochila cheia",
+      "explica": "Arruma a conversa\n(compacta o contexto).",
+      "cheia_explica": "Clique para arrumar\n(compactar a conversa)."
+    },
+    "estandarte": {
+      "nome": "Estandarte",
+      "explica": "Resumo da missão\npara a próxima sessão.",
+      "escrevendo": "O Claude está escrevendo\no resumo da missão.",
+      "pronto": "Resumo da missão pronto."
+    },
+    "livro": {
+      "nome": "Livro",
+      "explica": "Ficha, páginas,\nbestiário e troféus.",
+      "aberto_explica": "Clique para fechar."
+    }
+  },
+  "lua_nova": {
+    "_sobre": "aviso grande no meio da cena quando o cache esfria (Pixelify Sans)",
+    "frase": "A Lua batalhou muito e se cansou.",
+    "linha2": "A próxima mensagem sai mais cara (cache frio)."
+  },
+  "livro": {
+    "_sobre": "títulos das páginas saem em CAIXA ALTA; .alt é o texto para leitor de tela",
+    "alt": "O Livro da Lua. {alt}",
+    "abas": {
+      "ficha": "Ficha",
+      "bestiario": "Bestiário",
+      "trofeus": "Troféus",
+      "grimorio": "Grimório"
+    },
+    "ficha": {
+      "titulo": "Ficha da Lua",
+      "subtitulo": "Maga da lua, guardiã das Crônicas.",
+      "nivel": "Nível",
+      "nivel_valor": "{nivel} · {xp} XP",
+      "proximo_nivel": "Próximo nível",
+      "proximo_nivel_valor": "faltam {faltam} XP",
+      "lutas": "Lutas vencidas",
+      "chefoes": "Chefões derrotados",
+      "trofeus": "Troféus",
+      "proximo_chefao": "Próximo chefão",
+      "proximo_chefao_valor": "{nome}, em {n} lutas ou na próxima lista de tarefas",
+      "paginas": "Páginas das Crônicas: {ciclo}/10",
+      "paginas_novo_jogo": "Páginas das Crônicas: {ciclo}/10 (Novo Jogo+)",
+      "alt": "Ficha da Lua: nível {nivel}, {xp} XP, {lutas} lutas vencidas, {chefoes} chefões derrotados, {trofeus} troféus, páginas {ciclo}/10."
+    },
+    "bestiario": {
+      "titulo": "Bestiário",
+      "todos": "Todos os 10 chefões derrotados. A jornada recomeça no Novo Jogo+.",
+      "vistos": "{vistos} de 10 chefões derrotados. Os outros esperam nas sombras.",
+      "pagina": "Página {n}",
+      "alt": "Bestiário: {vistos} de 10 chefões derrotados.",
+      "alt_nomes": "Bestiário: {vistos} de 10 chefões derrotados ({nomes})."
+    },
+    "trofeus": {
+      "titulo": "Troféus",
+      "vazio": "Vença um elite (um erro que o Claude consertou) para ganhar o primeiro.",
+      "subtitulo": "Erros que o Claude consertou. Passe o mouse para ler o nome.",
+      "nome": {
+        "comando": "Taça do comando",
+        "edicao": "Engrenagem da edição",
+        "leitura": "Lua da leitura",
+        "web": "Orbe da web"
+      },
+      "explica": "{nome}\nErro consertado.",
+      "estante_vazia": "A estante está vazia.",
+      "estante_cheia": "{n} troféus: os {vagas} mais novos estão na estante.",
+      "estante": {
+        "um": "{n} troféu na estante.",
+        "outros": "{n} troféus na estante."
+      },
+      "alt": "Troféus: {lista}.",
+      "nenhum": "nenhum ainda"
+    },
+    "grimorio": {
+      "titulo": "Grimório",
+      "subtitulo": "As ferramentas do Claude são os feitiços da Lua.",
+      "ler": {
+        "nome": "Olhar de Lúmen",
+        "desc": "Ler e procurar arquivos. Desperta a Vespera."
+      },
+      "editar": {
+        "nome": "Runa da Reescrita",
+        "desc": "Editar e escrever código. Chama o Relojoeiro e Sir Solis."
+      },
+      "terminal": {
+        "nome": "Chama do Comando",
+        "desc": "Comandos no terminal. Acorda o Ignis."
+      },
+      "web": {
+        "nome": "Maré Estelar",
+        "desc": "Pesquisar e ler a web. Traz o Leviatã e a Nébula."
+      },
+      "integracao": {
+        "nome": "Pacto do Espelho",
+        "desc": "Integrações externas (MCP). Abre o Rei Espelho."
+      },
+      "subagente": {
+        "nome": "Eco da Penumbra",
+        "desc": "Chamar ajudantes (subagentes). Clones da Dama Penumbra."
+      },
+      "total": "{total} feitiços lançados ao todo.",
+      "alt": "Grimório: {lista}.",
+      "alt_item": "{nome} {n} vezes"
+    },
+    "titulo_painel": "O Livro da Lua",
+    "widget": "📖 Nível {nivel} · páginas {paginas}/10 · {trofeus} troféus",
+    "texto": {
+      "_sobre": "o Livro em texto (terminal)",
+      "nivel": "Nível {nivel} · {xp} XP (faltam {faltam} para o {proximo})",
+      "paginas": "Páginas das Crônicas: {ciclo}/10 ({total} no total)",
+      "lutas": "Lutas vencidas: {lutas} · chefão em {n} lutas",
+      "trofeus": "Troféus: {n}"
+    }
+  },
+  "superficies": {
+    "terminal": "terminal",
+    "desktop": "app desktop",
+    "vscode": "VS Code",
+    "mobile": "celular"
+  },
+  "mensagens": {
+    "_sobre": "mensagens que o mod manda ao Claude em nome do usuário",
+    "vigilia": "🌙 Vigília da Lua: só mantendo o cache aceso. Não faça nada; responda apenas \"ok\".",
+    "estandarte": "🚩 Estandarte da Lua: escreva agora o resumo da missão para continuar numa sessão nova. Crie ou atualize o arquivo PROXIMA_SESSAO.md na raiz do projeto, em português, limpo e objetivo, com: no topo, o texto pronto para colar na sessão nova; onde está cada coisa (arquivos, pastas, comandos para rodar, validar e testar); o que está pronto e aprovado (para não refazer); as decisões tomadas e as restrições ou pegadinhas descobertas; o próximo passo em detalhe, como um plano numerado; e as pendências e perguntas abertas. Se o projeto tiver um CLAUDE.md, ponha nele uma linha apontando para o PROXIMA_SESSAO.md. Ao terminar, diga em poucas linhas o que ficou salvo."
+  },
+  "avisos": {
+    "_sobre": "avisos rápidos (toast) dos botões",
+    "vigilia": {
+      "apagou_sozinha": "🏮 A Vigília apagou sozinha depois de {max} mensagens. Acenda de novo se quiser manter o cache quente.",
+      "apagada": "🏮 Vigília apagada.",
+      "acesa": "🔥 Vigília acesa. Perto de o luar acabar, a Lua manda uma mensagem curtinha para manter o cache quente (até {max} vezes, só enquanto você não escreve). Cada uma gasta um pouco do limite do plano. Clique de novo para apagar."
+    },
+    "mochila": {
+      "espere": "🎒 Espere o Claude terminar a tarefa para arrumar a mochila.",
+      "arrumada": "🎒 Mochila arrumada: a conversa foi resumida e sobrou espaço.",
+      "nao_arrumada": "🎒 A mochila não foi arrumada: {motivo}",
+      "falhou": "🎒 Não deu para arrumar a mochila agora: {erro}"
+    },
+    "estandarte": {
+      "espere": "🚩 Espere o Claude terminar a tarefa para erguer o estandarte.",
+      "falhou": "🚩 Não deu para pedir o resumo: {erro}"
+    },
+    "livro": {
+      "nao_abriu": "📖 O Livro ainda não abriu: {motivo}"
+    }
+  },
+  "chips": {
+    "_sobre": "botões do VS Code (chips do editor, só texto)",
+    "vigilia": "Vigília",
+    "vigilia_acesa": "Vigília acesa ({envios}/{max})",
+    "mochila": "Mochila",
+    "estandarte": "Estandarte",
+    "escrevendo": "Escrevendo…",
+    "livro": "Livro",
+    "livro_aberto": "Livro aberto"
+  },
+  "faixa": {
+    "_sobre": "linhas de ação embaixo da cena (texto + botões do app)",
+    "nova_conversa": {
+      "explica": "A conversa atual sai da tela (volta com /resume).",
+      "sim": "Começar",
+      "nao": "Ficar nesta",
+      "botao": "🌙 Nova conversa"
+    },
+    "lua_nova": {
+      "continuar": "ou continue aqui: só a próxima mensagem custa mais."
+    },
+    "mochila": {
+      "explica": "Arrumar a mochila resume a conversa e libera espaço (como o /compact).",
+      "sim": "Arrumar a mochila",
+      "nao": "Agora não",
+      "arrumando": "🎒 Arrumando a mochila…"
+    },
+    "estandarte": {
+      "pronto": "🚩 Resumo da missão pronto (PROXIMA_SESSAO.md).",
+      "fechar": "Fechar"
+    }
+  },
+  "cena_alt": {
+    "_sobre": "texto da cena para leitor de tela",
+    "frase": "As Crônicas de Lua: a Lua {acao}; nível {nivel}.",
+    "cansada": "está cansada (lua nova, cache frio)",
+    "chefao": "enfrenta o chefão {nome} ({resta}/{total} de vida)",
+    "luta": "luta com um monstro",
+    "anda": "anda pela floresta",
+    "descansa": "descansa"
+  },
+  "regua_alt": "Régua de calibrar a largura da faixa",
+  "comando": {
+    "_sobre": "respostas do /cronicas (os nomes dos subcomandos ficam no código)",
+    "descricao": "As Crônicas de Lua: jornada, ajustes da faixa e testes (chefão, elite, lua nova)",
+    "superficies": {
+      "nenhuma": "Nenhuma superfície desenha esta sessão agora.",
+      "lista": "Esta sessão desenha em: {lista}."
+    },
+    "abertura": {
+      "desligada": "Abertura desligada: ela não aparece mais na primeira sessão do dia. /cronicas abertura on liga de novo; /cronicas abertura mostra agora.",
+      "ligada": "Abertura ligada: ela aparece na primeira sessão de cada dia. /cronicas abertura mostra agora.",
+      "mostra": "Abertura na faixa (uns {s} s; um clique na cena pula).",
+      "mostra_desligada": "Ela está desligada na primeira sessão do dia: /cronicas abertura on liga.",
+      "mostra_ligada": "/cronicas abertura off desliga."
+    },
+    "largura": {
+      "sem_colunas": "Ainda não sei quantas colunas a faixa tem no {sup}: espere ela aparecer e tente de novo.",
+      "calibrada": "Largura calibrada no {sup}: {n} px em {colunas} colunas = {px} px por coluna. A cena agora acompanha a largura da faixa (régua desligada)."
+    },
+    "prova": {
+      "ligada": "Prova técnica ligada. (1) As áreas de mouse ganham borda: passe o mouse nas barras e no selo de nível (a borda acende e o balão aparece). (2) Os 4 ícones de botão aparecem na cena, com uma área clicável invisível por cima: clique em cada um (aparece um aviso) e passe o mouse (aparece o balão do botão). /cronicas prova de novo desliga.",
+      "desligada": "Prova técnica desligada.",
+      "rodape": "Prova técnica: {colunas} colunas, {px} px por coluna, {linha} px por linha. /cronicas prova desliga."
+    },
+    "regua": {
+      "ligada": "Régua ligada embaixo da cena. Diga qual é o último número que aparece inteiro na borda direita. /cronicas regua de novo desliga.",
+      "desligada": "Régua desligada."
+    },
+    "chefao": {
+      "desconhecido": "Não conheço o chefão \"{pedido}\". Use um destes: {lista}.",
+      "ja_em_cena": "Já há um chefão em cena.",
+      "com_lista": "{nome} entrou em cena com uma lista de {total} tarefas (página {pagina}/10). Cada ferramenta do Claude bate no escudo e tira pouco; /cronicas golpe conclui uma tarefa (a última é o golpe crítico).",
+      "entrou": "{nome} entrou em cena (página {pagina}/10). Use /cronicas golpe para tirar vida."
+    },
+    "golpe": {
+      "sem_chefao": "Não há chefão em cena. /cronicas chefao chama um.",
+      "caiu": "{nome} caiu! Página {pagina}/10 recuperada.",
+      "tarefa": "Tarefa concluída! Faltam {resta} de {total}.",
+      "golpe": "Golpe! Vida {resta}/{total}."
+    },
+    "elite": {
+      "proximo": "A próxima luta comum será o elite ({elite}) trazendo o troféu {trofeu}. Rode de novo depois para ver o próximo tipo.",
+      "trofeu": {
+        "comando": "taça com chama (comando)",
+        "edicao": "engrenagem (edição)",
+        "leitura": "lua crescente (leitura)",
+        "web": "orbe (web)"
+      }
+    },
+    "vigilia": {
+      "acesa": "Luar simulado perto do fim: a Vigília manda a mensagem curtinha em 10 s.",
+      "apagada": "Luar simulado perto do fim. A Vigília está apagada: clique na lanterna para acender (a mensagem sai logo depois)."
+    },
+    "lua_nova": "Lua nova simulada: o aviso aparece na faixa até a próxima resposta.",
+    "modo": {
+      "quadro": "quadro",
+      "quadro_baloes": "quadro (balões no hover)",
+      "imagem": "imagem"
+    },
+    "ajuda": {
+      "estado": "As Crônicas de Lua: escala {escala}x, {px} px por coluna, modo {modo}. Nível {nivel}, {xp} XP, {paginas}/10 páginas.",
+      "uso": "Use /cronicas escala 1|2|3, /cronicas regua e /cronicas largura <px> (calibra a largura), /cronicas quadro|imagem, /cronicas teste (compara os dois) /cronicas lua-nova (simula o cache frio), /cronicas vigilia (o luar perto do fim, para ver a Vigília) ou /cronicas chefao [nome] e /cronicas golpe (testa o chefão) ou /cronicas elite (a próxima luta é o elite).",
+      "trofeus": "Troféus: {lista}"
+    },
+    "linha": "Altura da linha: {n} px. As áreas de mouse foram recalculadas.",
+    "teste": "Teste ligado: a faixa aparece duas vezes, A (quadro interativo) e B (imagem). /cronicas teste de novo desliga.",
+    "teste_a": "A: quadro interativo (balões no hover)",
+    "teste_b": "B: imagem (sem balões)",
+    "ajustada": "Faixa ajustada: escala {escala}x, {px} px por coluna, modo {modo}."
+  }
+}

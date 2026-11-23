@@ -4,6 +4,7 @@ import type { Chefao, Hud, Luta } from '../types'
 import { luar, nivelDe } from './cena'
 import { A_CADA, NOME_CHEFAO, paginasNoCiclo, vidaEmTarefas } from './chefao'
 import { roteiro } from './luta'
+import { t, tp } from './t'
 
 /** Um pedaço de uma linha: o texto e, se tiver, a cor. */
 export type Pedaco = { t: string; cor?: string; dim?: boolean; negrito?: boolean }
@@ -49,15 +50,15 @@ export function linhaHud(hud: Hud, agora: number, colunas: number): Pedaco[] {
   const nv = nivelDe(hud.jogo.xp)
   const l = luar(hud, agora)
   const largo = colunas >= 84
-  const p: Pedaco[] = [{ t: `🌙 Nv ${nv.nivel}`, negrito: true }, { t: ` ${nv.dentro}/${nv.precisa} XP`, cor: CORES_TEXTO.xp }, { t: '  ·  ', dim: true }]
-  const luzTxt = !l.temLuz ? '—' : l.desmaiada ? 'lua nova' : `${Math.max(1, Math.round(l.restanteMs / 60000))} min`
-  p.push({ t: largo ? 'LUZ ' : '☀ ', dim: true })
+  const p: Pedaco[] = [{ t: t('terminal.nivel', { nivel: nv.nivel }), negrito: true }, { t: ` ${nv.dentro}/${nv.precisa} XP`, cor: CORES_TEXTO.xp }, { t: '  ·  ', dim: true }]
+  const luzTxt = !l.temLuz ? '—' : l.desmaiada ? t('terminal.lua_nova') : t('terminal.minutos', { n: Math.max(1, Math.round(l.restanteMs / 60000)) })
+  p.push({ t: largo ? t('terminal.luz') : '☀ ', dim: true })
   if (largo && l.temLuz) {
     p.push({ t: `${barraTexto(l.frac)} `, cor: CORES_TEXTO.luz })
   }
   p.push({ t: luzTxt, cor: CORES_TEXTO.luz }, { t: '  ·  ', dim: true })
   const cinco = hud.mana.cinco
-  p.push({ t: largo ? 'MANA ' : '✦ ', dim: true })
+  p.push({ t: largo ? t('terminal.mana') : '✦ ', dim: true })
   if (cinco === undefined) {
     p.push({ t: '—', cor: CORES_TEXTO.mana })
   } else {
@@ -67,14 +68,14 @@ export function linhaHud(hud: Hud, agora: number, colunas: number): Pedaco[] {
     }
     p.push({ t: `${Math.round(resta)}%`, cor: CORES_TEXTO.mana })
   }
-  p.push({ t: '  ·  ', dim: true }, { t: largo ? 'MOCHILA ' : '🎒 ', dim: true })
+  p.push({ t: '  ·  ', dim: true }, { t: largo ? t('terminal.mochila') : '🎒 ', dim: true })
   if (hud.mochila === null) {
     p.push({ t: '—', cor: CORES_TEXTO.mochila })
   } else {
     if (largo) {
       p.push({ t: `${barraTexto(hud.mochila / 100)} `, cor: CORES_TEXTO.mochila })
     }
-    p.push({ t: `${Math.round(hud.mochila)}%${hud.mochila > 80 ? ' (cheia!)' : ''}`, cor: CORES_TEXTO.mochila })
+    p.push({ t: `${Math.round(hud.mochila)}%${hud.mochila > 80 ? t('terminal.mochila_cheia') : ''}`, cor: CORES_TEXTO.mochila })
   }
   return p
 }
@@ -82,7 +83,7 @@ export function linhaHud(hud: Hud, agora: number, colunas: number): Pedaco[] {
 /** O que a Lua está fazendo agora, numa linha. */
 export function linhaAcao(hud: Hud, agora: number, andando: boolean, luta: Luta | undefined, ch: Chefao | null): Pedaco[] {
   if (luar(hud, agora).desmaiada) {
-    return [{ t: '🌑 Lua nova: a Lua desmaiou (o cache esfriou). A próxima mensagem sai mais cara.', cor: CORES_TEXTO.luz }]
+    return [{ t: t('terminal.desmaio'), cor: CORES_TEXTO.luz }]
   }
   const p: Pedaco[] = []
   const dePe = ch !== null && ch.caiu === undefined
@@ -90,9 +91,9 @@ export function linhaAcao(hud: Hud, agora: number, andando: boolean, luta: Luta 
     const v = vidaEmTarefas(ch)
     if (dePe) {
       p.push({ t: `👑 ${nome(ch.nome).toUpperCase()} `, cor: CORES_TEXTO.chefao, negrito: true }, { t: barraTexto(v.total === 0 ? 0 : ch.vida / ch.vidaMax, Math.min(10, Math.max(3, v.total))), cor: CORES_TEXTO.chefao })
-      p.push({ t: ch.origem === 'lista' ? ` ${v.resta}/${v.total} tarefas` : ` ${v.resta}/${v.total}`, dim: true })
+      p.push({ t: ch.origem === 'lista' ? t('terminal.vida_tarefas', { resta: v.resta, total: v.total }) : ` ${v.resta}/${v.total}`, dim: true })
     } else {
-      p.push({ t: `🏆 ${nome(ch.nome)} caiu! +PÁGINA ${paginasNoCiclo(hud.jogo.paginas)}/10`, cor: CORES_TEXTO.xp, negrito: true })
+      p.push({ t: t('terminal.chefao_caiu', { nome: nome(ch.nome), pagina: paginasNoCiclo(hud.jogo.paginas) }), cor: CORES_TEXTO.xp, negrito: true })
       return p
     }
   }
@@ -103,20 +104,20 @@ export function linhaAcao(hud: Hud, agora: number, andando: boolean, luta: Luta 
       p.push({ t: '  ·  ', dim: true })
     }
     if (rt.desfecho?.tipo === 'fuga') {
-      p.push({ t: `💥 ${alvo} contra-atacou e fugiu` })
+      p.push({ t: t('terminal.fugiu', { alvo }) })
     } else if (rt.defendida) {
-      p.push({ t: `🛡 ${alvo} defendeu com o escudo `, dim: false }, { t: '❓💧', cor: CORES_TEXTO.duvida })
+      p.push({ t: t('terminal.defendeu', { alvo }), dim: false }, { t: '❓💧', cor: CORES_TEXTO.duvida })
     } else if (rt.desfecho?.tipo === 'vitoria') {
       const critico = luta.final === true
-      p.push(critico ? { t: '💥 CRÍTICO! ', cor: CORES_TEXTO.critico, negrito: true } : { t: '⭐ ' }, { t: luta.fixo === true ? `golpe em ${alvo}` : `${alvo} derrotado`, negrito: true }, { t: ` +${rt.xp} XP`, cor: CORES_TEXTO.xp })
+      p.push(critico ? { t: t('terminal.critico'), cor: CORES_TEXTO.critico, negrito: true } : { t: '⭐ ' }, { t: luta.fixo === true ? t('terminal.golpe_em', { alvo }) : t('terminal.derrotado', { alvo }), negrito: true }, { t: t('terminal.xp', { xp: rt.xp }), cor: CORES_TEXTO.xp })
       if (luta.trofeu !== undefined) {
-        p.push({ t: ' +TROFÉU', cor: CORES_TEXTO.xp, negrito: true })
+        p.push({ t: t('terminal.trofeu'), cor: CORES_TEXTO.xp, negrito: true })
       }
     } else if (rt.canalAberto && agora >= rt.livre) {
-      p.push({ t: `🔮 a Lua canaliza contra ${alvo}…` })
+      p.push({ t: t('terminal.canaliza', { alvo }) })
     } else {
       const g = luta.golpes.filter(x => x.ok).length
-      p.push({ t: `⚔ a Lua enfrenta ${alvo}${luta.trofeu !== undefined ? ' (elite)' : ''}` }, ...(g > 0 ? [{ t: ` ×${g}`, dim: true }] : []))
+      p.push({ t: t(luta.trofeu !== undefined ? 'terminal.enfrenta_elite' : 'terminal.enfrenta', { alvo }) }, ...(g > 0 ? [{ t: ` ×${g}`, dim: true }] : []))
     }
     return p
   }
@@ -124,5 +125,5 @@ export function linhaAcao(hud: Hud, agora: number, andando: boolean, luta: Luta 
     return p
   }
   const faltam = A_CADA - (hud.jogo.lutas % A_CADA)
-  return [andando ? { t: '🌲 a Lua anda pela floresta' } : { t: '💤 a Lua descansa' }, { t: `  ·  chefão em ${faltam} ${faltam === 1 ? 'luta' : 'lutas'}`, dim: true }]
+  return [andando ? { t: t('terminal.anda') } : { t: t('terminal.descansa') }, { t: tp('terminal.chefao_em', faltam), dim: true }]
 }

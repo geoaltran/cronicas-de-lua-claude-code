@@ -11,12 +11,13 @@ import type { AbaDoLivro, Jogo, TipoTrofeu } from '../types'
 import { type Alvo, CSS_FONTE_LONGA, CSS_TEXTO, nivelDe, selo } from './cena'
 import { JORNADA, NOME_CHEFAO, chefaoEm, paginasNoCiclo, proximoChefao } from './chefao'
 import { monstroInfo } from './luta'
+import { t as tx, tp } from './t'
 
 export const ABAS: readonly { id: AbaDoLivro; nome: string }[] = [
-  { id: 'ficha', nome: 'Ficha' },
-  { id: 'bestiario', nome: 'Bestiário' },
-  { id: 'trofeus', nome: 'Troféus' },
-  { id: 'grimorio', nome: 'Grimório' },
+  { id: 'ficha', get nome() { return tx('livro.abas.ficha') } },
+  { id: 'bestiario', get nome() { return tx('livro.abas.bestiario') } },
+  { id: 'trofeus', get nome() { return tx('livro.abas.trofeus') } },
+  { id: 'grimorio', get nome() { return tx('livro.abas.grimorio') } },
 ]
 
 export type PaginaDoLivro = { svg: string; largura: number; altura: number; alvos: Alvo[]; alt: string }
@@ -119,7 +120,7 @@ function alturaDoSelo(nivel: number, escalaEstrela: number): number {
 
 function ficha(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: string } {
   const n = nivelDe(j.xp)
-  const cab = cabecalho(W, 'Ficha da Lua', 'Maga da lua, guardiã das Crônicas.')
+  const cab = cabecalho(W, tx('livro.ficha.titulo'), tx('livro.ficha.subtitulo'))
   let s = cab.svg
   // A Lua em 2x à esquerda e o selo à direita dela, em 2x quando cabe (senão
   // com a estrela no tamanho cheio): pedido do usuário. Os dados ficam à
@@ -142,24 +143,24 @@ function ficha(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: str
     s += `<g transform="translate(${sx},${r(meio + alturaDoSelo(n.nivel, 1) / 2)})">${sl1.svg}</g>`
   }
   const sb = oy + LUA_PES * 2
-  const tx = aoLado ? dir + 6 + larguraSelo + 16 : 16
+  const colX = aoLado ? dir + 6 + larguraSelo + 16 : 16
   let ty = aoLado ? cab.y + 12 : sb + 18
   const prox = proximoChefao(j.paginas)
   const trofeus = (j.trofeus ?? []).length
   const linhas: [string, string][] = [
-    ['Nível', `${n.nivel} · ${j.xp} XP`],
-    ['Próximo nível', `faltam ${n.precisa - n.dentro} XP`],
-    ['Lutas vencidas', String(j.lutas)],
-    ['Chefões derrotados', String(j.paginas)],
-    ['Troféus', String(trofeus)],
-    ['Próximo chefão', `${NOME_CHEFAO[prox.nome] ?? prox.nome}, em ${chefaoEm(j.lutas)} lutas ou na próxima lista de tarefas`],
+    [tx('livro.ficha.nivel'), tx('livro.ficha.nivel_valor', { nivel: n.nivel, xp: j.xp })],
+    [tx('livro.ficha.proximo_nivel'), tx('livro.ficha.proximo_nivel_valor', { faltam: n.precisa - n.dentro })],
+    [tx('livro.ficha.lutas'), String(j.lutas)],
+    [tx('livro.ficha.chefoes'), String(j.paginas)],
+    [tx('livro.ficha.trofeus'), String(trofeus)],
+    [tx('livro.ficha.proximo_chefao'), tx('livro.ficha.proximo_chefao_valor', { nome: NOME_CHEFAO[prox.nome] ?? prox.nome, n: chefaoEm(j.lutas) })],
   ]
-  const larg = W - tx - 14
+  const larg = W - colX - 14
   for (const [k, v] of linhas) {
-    s += texto(tx, ty, k, '', '#cdbdf0')
+    s += texto(colX, ty, k, '', '#cdbdf0')
     ty += 12
     for (const l of quebrar(v, larg)) {
-      s += texto(tx, ty, l)
+      s += texto(colX, ty, l)
       ty += 12
     }
     ty += 5
@@ -168,13 +169,13 @@ function ficha(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: str
   const py = Math.max(ty, sb + 14) + 6
   const ciclo = paginasNoCiclo(j.paginas)
   let pl = py
-  for (const l of quebrar(`Páginas das Crônicas: ${ciclo}/10${j.paginas >= 10 ? ' (Novo Jogo+)' : ''}`, W - 32)) {
+  for (const l of quebrar(tx(j.paginas >= 10 ? 'livro.ficha.paginas_novo_jogo' : 'livro.ficha.paginas', { ciclo }), W - 32)) {
     s += texto(16, pl, l, '', '#cdbdf0')
     pl += 12
   }
   s += paginas(16, pl - 6, ciclo)
   const H = pl + 20
-  return { corpo: s, H, alt: `Ficha da Lua: nível ${n.nivel}, ${j.xp} XP, ${j.lutas} lutas vencidas, ${j.paginas} chefões derrotados, ${trofeus} troféus, páginas ${ciclo}/10.` }
+  return { corpo: s, H, alt: tx('livro.ficha.alt', { nivel: n.nivel, xp: j.xp, lutas: j.lutas, chefoes: j.paginas, trofeus, ciclo }) }
 }
 
 // ---------------------------------------------------------------- Bestiário
@@ -189,7 +190,7 @@ export function derrotado(paginasTotal: number, i: number): boolean {
 
 function bestiario(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: string } {
   const vistos = JORNADA.filter((_, i) => derrotado(j.paginas, i)).length
-  const cab = cabecalho(W, 'Bestiário', vistos === 10 ? 'Todos os 10 chefões derrotados. A jornada recomeça no Novo Jogo+.' : `${vistos} de 10 chefões derrotados. Os outros esperam nas sombras.`)
+  const cab = cabecalho(W, tx('livro.bestiario.titulo'), vistos === 10 ? tx('livro.bestiario.todos') : tx('livro.bestiario.vistos', { vistos }))
   let s = cab.svg
   const cols = Math.max(1, Math.min(5, Math.floor((W - 12) / CELULA_W)))
   const x0 = Math.floor((W - cols * CELULA_W) / 2)
@@ -205,7 +206,7 @@ function bestiario(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt:
     // chão de cada um
     s += ret(cx - 40, top + CELULA_SPRITE, 80, 1, LINHA)
     s += viu ? texto(cx, top + CELULA_SPRITE + 13, NOME_CHEFAO[nome] ?? nome, ' m', OURO) : texto(cx, top + CELULA_SPRITE + 13, '???', ' m', '#8f80b8')
-    s += texto(cx, top + CELULA_SPRITE + 25, `Página ${i + 1}`, ' m', '#8f80b8')
+    s += texto(cx, top + CELULA_SPRITE + 25, tx('livro.bestiario.pagina', { n: i + 1 }), ' m', '#8f80b8')
     if (!viu) {
       s += titulo(cx, top + CELULA_SPRITE / 2 + 18, '?', 16, ' m')
     }
@@ -213,16 +214,14 @@ function bestiario(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt:
   const linhas = Math.ceil(JORNADA.length / cols)
   const H = cab.y + linhas * (CELULA_SPRITE + 34) + 6
   const nomes = JORNADA.filter((_, i) => derrotado(j.paginas, i)).map(n => NOME_CHEFAO[n] ?? n)
-  return { corpo: s, H, alt: `Bestiário: ${vistos} de 10 chefões derrotados${nomes.length > 0 ? ` (${nomes.join(', ')})` : ''}.` }
+  return { corpo: s, H, alt: tx(nomes.length > 0 ? 'livro.bestiario.alt_nomes' : 'livro.bestiario.alt', { vistos, nomes: nomes.join(', ') }) }
 }
 
 // ---------------------------------------------------------------- Troféus
 
-export const NOME_TROFEU: Record<TipoTrofeu, string> = {
-  comando: 'Taça do comando',
-  edicao: 'Engrenagem da edição',
-  leitura: 'Lua da leitura',
-  web: 'Orbe da web',
+export const NOME_TROFEU = {} as Record<TipoTrofeu, string>
+for (const k of ['comando', 'edicao', 'leitura', 'web'] as const) {
+  Object.defineProperty(NOME_TROFEU, k, { get: () => tx(`livro.trofeus.nome.${k}`), enumerable: true })
 }
 
 /** Quantos troféus cabem na estante (3 prateleiras de 5). */
@@ -230,7 +229,7 @@ export const VAGAS = 15
 
 function trofeus(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: string; alvos: Alvo[] } {
   const lista = j.trofeus ?? []
-  const cab = cabecalho(W, 'Troféus', lista.length === 0 ? 'Vença um elite (um erro que o Claude consertou) para ganhar o primeiro.' : 'Erros que o Claude consertou. Passe o mouse para ler o nome.')
+  const cab = cabecalho(W, tx('livro.trofeus.titulo'), lista.length === 0 ? tx('livro.trofeus.vazio') : tx('livro.trofeus.subtitulo'))
   let s = cab.svg
   const est = META.trofeus as unknown as { estante: { vagas: readonly (readonly (readonly [number, number])[])[] } }
   const vagas = est.estante.vagas.flat()
@@ -245,15 +244,15 @@ function trofeus(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: s
     const x = ex + vx - Math.floor(a.w / 2)
     const y = ey + vy - a.h
     s += `<use href="${d.img(`trofeu_${tipo}`)}" x="${x}" y="${y}"/>`
-    alvos.push({ id: `trofeu_${k}`, x, y, w: a.w, h: a.h, titulo: NOME_TROFEU[tipo], explica: `${nome}\nErro consertado.` })
+    alvos.push({ id: `trofeu_${k}`, x, y, w: a.w, h: a.h, titulo: NOME_TROFEU[tipo], explica: tx('livro.trofeus.explica', { nome }) })
   })
   let y = ey + 148 + 16
-  const resumo = lista.length === 0 ? 'A estante está vazia.' : lista.length > VAGAS ? `${lista.length} troféus: os ${VAGAS} mais novos estão na estante.` : `${lista.length} ${lista.length === 1 ? 'troféu' : 'troféus'} na estante.`
+  const resumo = lista.length === 0 ? tx('livro.trofeus.estante_vazia') : lista.length > VAGAS ? tx('livro.trofeus.estante_cheia', { n: lista.length, vagas: VAGAS }) : tp('livro.trofeus.estante', lista.length)
   for (const l of quebrar(resumo, W - 24)) {
     s += texto(W / 2, y, l, ' m', '#cdbdf0')
     y += 12
   }
-  return { corpo: s, H: y + 6, alt: `Troféus: ${lista.length === 0 ? 'nenhum ainda' : lista.slice(0, VAGAS).join(' · ')}.`, alvos }
+  return { corpo: s, H: y + 6, alt: tx('livro.trofeus.alt', { lista: lista.length === 0 ? tx('livro.trofeus.nenhum') : lista.slice(0, VAGAS).join(' · ') }), alvos }
 }
 
 // ---------------------------------------------------------------- Grimório
@@ -262,16 +261,26 @@ type Feitico = { papel: string; nome: string; desc: string; icone: string }
 
 /** As ferramentas do Claude, por papel de monstro, como feitiços da Lua. */
 export const FEITICOS: readonly Feitico[] = [
-  { papel: 'ler', nome: 'Olhar de Lúmen', desc: 'Ler e procurar arquivos. Desperta a Vespera.', icone: 'trofeu_leitura' },
-  { papel: 'editar', nome: 'Runa da Reescrita', desc: 'Editar e escrever código. Chama o Relojoeiro e Sir Solis.', icone: 'trofeu_edicao' },
-  { papel: 'terminal', nome: 'Chama do Comando', desc: 'Comandos no terminal. Acorda o Ignis.', icone: 'trofeu_comando' },
-  { papel: 'web', nome: 'Maré Estelar', desc: 'Pesquisar e ler a web. Traz o Leviatã e a Nébula.', icone: 'trofeu_web' },
-  { papel: 'integracao', nome: 'Pacto do Espelho', desc: 'Integrações externas (MCP). Abre o Rei Espelho.', icone: 'projetil' },
-  { papel: 'subagente', nome: 'Eco da Penumbra', desc: 'Chamar ajudantes (subagentes). Clones da Dama Penumbra.', icone: 'canalizar' },
+  feitico('ler', 'trofeu_leitura'),
+  feitico('editar', 'trofeu_edicao'),
+  feitico('terminal', 'trofeu_comando'),
+  feitico('web', 'trofeu_web'),
+  feitico('integracao', 'projetil'),
+  feitico('subagente', 'canalizar'),
 ]
 
+/** Um feitiço com nome e descrição no idioma em uso (livro.grimorio.<papel>). */
+function feitico(papel: Feitico['papel'], icone: Feitico['icone']): Feitico {
+  return {
+    papel,
+    icone,
+    get nome() { return tx(`livro.grimorio.${papel}.nome`) },
+    get desc() { return tx(`livro.grimorio.${papel}.desc`) },
+  }
+}
+
 function grimorio(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: string } {
-  const cab = cabecalho(W, 'Grimório', 'As ferramentas do Claude são os feitiços da Lua.')
+  const cab = cabecalho(W, tx('livro.grimorio.titulo'), tx('livro.grimorio.subtitulo'))
   let s = cab.svg
   let y = cab.y
   const usos = j.feiticos ?? {}
@@ -301,8 +310,8 @@ function grimorio(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: 
     y = Math.max(y + 38, ly + 4)
   }
   const total = Object.values(usos).reduce((t, v) => t + v, 0)
-  s += texto(W / 2, y + 6, `${total} feitiços lançados ao todo.`, ' m', '#cdbdf0')
-  return { corpo: s, H: y + 18, alt: `Grimório: ${FEITICOS.map(f => `${f.nome} ${usos[f.papel] ?? 0} vezes`).join(', ')}.` }
+  s += texto(W / 2, y + 6, tx('livro.grimorio.total', { total }), ' m', '#cdbdf0')
+  return { corpo: s, H: y + 18, alt: tx('livro.grimorio.alt', { lista: FEITICOS.map(f => tx('livro.grimorio.alt_item', { nome: f.nome, n: usos[f.papel] ?? 0 })).join(', ') }) }
 }
 
 // ---------------------------------------------------------------- tudo junto
@@ -336,5 +345,5 @@ export function paginaDoLivro(aba: AbaDoLivro, j: Jogo, W0: number, escala: numb
     p.corpo +
     assinatura +
     `</svg>`
-  return { svg, largura: W * escala, altura: H * escala, alvos: p.alvos ?? [], alt: `O Livro da Lua. ${p.alt}` }
+  return { svg, largura: W * escala, altura: H * escala, alvos: p.alvos ?? [], alt: tx('livro.alt', { alt: p.alt }) }
 }

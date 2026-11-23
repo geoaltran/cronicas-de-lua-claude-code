@@ -7,6 +7,7 @@ import { FONTE, FONTE_LONGA, MARCA, META } from './arte'
 import { ANDAR, Doc, P, PARADA, type Q, art, esc, mod, r, sorteio } from './base'
 import type { Caminho, Chefao, Hud, Luta } from '../types'
 import { desenharLuta } from './luta'
+import { t as tx, tp } from './t'
 import { barraNoLugar, chefaoEm, chefaoEmCena, fimDoChefao, paginaRecuperada, paginasNoCiclo, tingir } from './chefao'
 
 /** px por segundo que o chão rola enquanto a Lua anda (5 px por quadro de 110 ms). */
@@ -390,7 +391,7 @@ type Barra = {
 const PONTA = 20 // cada ponta ornamentada do trilho; o miolo entre elas é uniforme
 
 /** Nome curto de cada barra, para quando o nome inteiro e o valor não cabem juntos. */
-const NOME_CURTO: Record<Barra['tipo'], string> = { luz: 'Luz', mana: 'Mana', mochila: 'Mochila', xp: 'XP' }
+const nomeCurto = (tipo: Barra['tipo']): string => tx(`barras.${tipo}.curto`)
 
 /** O trilho dourado com `largura` px: as duas pontas como são, o miolo repetido. */
 function trilho(d: Doc, largura: number): string {
@@ -426,7 +427,7 @@ function barra(d: Doc, x: number, y: number, larguraBarra: number, b: Barra, ago
   // (o "lua nova" do fim da contagem não conta: nessa hora a faixa é redesenhada)
   const maiorValor = Math.max(...[b.valor, ...(b.valores ?? []).filter(t => Number.isFinite(t[1])).map(t => t[2])].map(v => larguraTexto(v)))
   const cabe = larguraTexto(b.nome) + 10 + maiorValor <= larguraBarra - 4
-  const nome = texto(2, 8, (cabe ? b.nome : NOME_CURTO[b.tipo]).toUpperCase(), 'n b')
+  const nome = texto(2, 8, (cabe ? b.nome : nomeCurto(b.tipo)).toUpperCase(), 'n b')
   const valor = (s: string) => texto(larguraBarra - 2, 8, s.toUpperCase(), 'e b')
   const textos = nome + (b.valores !== undefined ? textoNoTempo(b.valores, t => valor(t[2])) : valor(b.valor))
   let classe = ''
@@ -497,18 +498,18 @@ export function rotuloBotao(b: NomeBotao, e?: EstadoBotoes): [string, string] {
   switch (b) {
     case 'vigilia':
       return e?.vigilia === true
-        ? ['Vigília · acesa', `Cache quente: ${e.envios}/${e.maxEnvios} mensagens.\nClique para apagar.`]
-        : ['Vigília', 'Mantém o cache aceso.\nGasta um pouco do limite.']
+        ? [tx('botoes.vigilia.acesa'), tx('botoes.vigilia.acesa_explica', { envios: e.envios, max: e.maxEnvios })]
+        : [tx('botoes.vigilia.nome'), tx('botoes.vigilia.explica')]
     case 'mochila':
-      return e?.mochila === true ? ['Mochila cheia', 'Clique para arrumar\n(compactar a conversa).'] : ['Mochila', 'Arruma a conversa\n(compacta o contexto).']
+      return e?.mochila === true ? [tx('botoes.mochila.cheia'), tx('botoes.mochila.cheia_explica')] : [tx('botoes.mochila.nome'), tx('botoes.mochila.explica')]
     case 'estandarte':
       return e?.estandarte === 'escrevendo'
-        ? ['Estandarte', 'O Claude está escrevendo\no resumo da missão.']
+        ? [tx('botoes.estandarte.nome'), tx('botoes.estandarte.escrevendo')]
         : e?.estandarte === 'pronto'
-          ? ['Estandarte', 'Resumo da missão pronto.']
-          : ['Estandarte', 'Resumo da missão\npara a próxima sessão.']
+          ? [tx('botoes.estandarte.nome'), tx('botoes.estandarte.pronto')]
+          : [tx('botoes.estandarte.nome'), tx('botoes.estandarte.explica')]
     case 'livro':
-      return e?.livro === true ? ['Livro', 'Clique para fechar.'] : ['Livro', 'Ficha, páginas,\nbestiário e troféus.']
+      return e?.livro === true ? [tx('botoes.livro.nome'), tx('botoes.livro.aberto_explica')] : [tx('botoes.livro.nome'), tx('botoes.livro.explica')]
   }
 }
 
@@ -704,23 +705,23 @@ function hud(d: Doc, v: Vista, y0: number): { svg: string; botoesNaCena: boolean
   const valores: Trecho[] = []
   let luz: Barra
   if (!l.temLuz) {
-    luz = { tipo: 'luz', frac: 0, nome: 'Luz da Lua', valor: '—', titulo: 'Luz da Lua', explica: 'Cache da conversa.\nAcende na primeira resposta.' }
+    luz = { tipo: 'luz', frac: 0, nome: tx('barras.luz.nome'), valor: '—', titulo: tx('barras.luz.nome'), explica: tx('barras.luz.sem_luz') }
   } else if (l.desmaiada) {
-    luz = { tipo: 'luz', frac: 0, nome: 'Luz da Lua', valor: 'lua nova', titulo: 'Luz da Lua · lua nova', explica: 'Cache frio.\nA próxima mensagem sai mais cara.' }
+    luz = { tipo: 'luz', frac: 0, nome: tx('barras.luz.nome'), valor: tx('barras.luz.lua_nova'), titulo: tx('barras.luz.titulo_lua_nova'), explica: tx('barras.luz.lua_nova_explica') }
   } else {
     const restS = l.restanteMs / 1000
     const mins = Math.ceil(restS / 60)
     for (let m = mins; m >= 1; m--) {
-      valores.push([Math.max(0, restS - m * 60), restS - (m - 1) * 60, `${m} min`])
+      valores.push([Math.max(0, restS - m * 60), restS - (m - 1) * 60, tx('barras.luz.minutos', { n: m })])
     }
-    valores.push([restS, Infinity, 'lua nova'])
+    valores.push([restS, Infinity, tx('barras.luz.lua_nova')])
     luz = {
       tipo: 'luz',
       frac: l.frac,
-      nome: 'Luz da Lua',
+      nome: tx('barras.luz.nome'),
       valor: '',
-      titulo: 'Luz da Lua',
-      explica: `Cache da conversa.\nDura ${Math.round((h.luz?.ttlMs ?? 0) / 60000)} min após cada resposta.`,
+      titulo: tx('barras.luz.nome'),
+      explica: tx('barras.luz.explica', { min: Math.round((h.luz?.ttlMs ?? 0) / 60000) }),
       esvaziaMs: l.restanteMs,
       valores,
     }
@@ -730,15 +731,15 @@ function hud(d: Doc, v: Vista, y0: number): { svg: string; botoesNaCena: boolean
   const mana: Barra = {
     tipo: 'mana',
     frac: m.cinco === undefined ? 1 : (100 - m.cinco) / 100,
-    nome: 'Mana Estelar',
+    nome: tx('barras.mana.nome'),
     valor: m.cinco === undefined ? '—' : `${Math.round(100 - m.cinco)}%`,
-    titulo: 'Mana Estelar',
+    titulo: tx('barras.mana.nome'),
     explica:
       m.cinco === undefined
-        ? 'Limite do plano.\nAparece após a 1ª resposta.'
-        : `Limite do plano: ${Math.round(100 - m.cinco)}% livre.` +
-          (m.cincoRenova ? `\nRenova às ${hora(m.cincoRenova)} (5 h).` : '') +
-          (m.sete !== undefined ? `\n7 dias: ${Math.round(100 - m.sete)}% livre.` : ''),
+        ? tx('barras.mana.sem_dado')
+        : tx('barras.mana.explica', { livre: Math.round(100 - m.cinco) }) +
+          (m.cincoRenova ? tx('barras.mana.renova', { hora: hora(m.cincoRenova) }) : '') +
+          (m.sete !== undefined ? tx('barras.mana.sete_dias', { livre: Math.round(100 - m.sete) }) : ''),
   }
 
   const moch = h.mochila
@@ -746,22 +747,22 @@ function hud(d: Doc, v: Vista, y0: number): { svg: string; botoesNaCena: boolean
   const mochila: Barra = {
     tipo: 'mochila',
     frac: (moch ?? 0) / 100,
-    nome: cheia ? 'Mochila!' : 'Mochila', // a barra treme e o balão diz para arrumar
+    nome: cheia ? tx('barras.mochila.nome_cheia') : tx('barras.mochila.nome'), // a barra treme e o balão diz para arrumar
     valor: moch === null ? '0%' : `${Math.round(moch)}%`,
-    titulo: 'Mochila',
+    titulo: tx('barras.mochila.nome'),
     explica: cheia
-      ? `Conversa quase cheia (${Math.round(moch)}%).\nHora de arrumar (compactar).`
-      : 'Quanto da conversa já foi usado\n(o contexto).',
+      ? tx('barras.mochila.cheia_explica', { pct: Math.round(moch) })
+      : tx('barras.mochila.explica'),
     treme: cheia,
   }
 
   const xp: Barra = {
     tipo: 'xp',
     frac: n.dentro / n.precisa,
-    nome: 'XP',
+    nome: tx('barras.xp.nome'),
     valor: `${n.dentro}/${n.precisa}`,
-    titulo: `XP · nível ${n.nivel}`,
-    explica: `Faltam ${n.precisa - n.dentro} XP para o nível ${n.nivel + 1}.\nPáginas ${paginasNoCiclo(h.jogo.paginas)}/10.\n${sobreChefao(v.chefao, h.jogo.lutas)}`,
+    titulo: tx('barras.xp.titulo', { nivel: n.nivel }),
+    explica: tx('barras.xp.explica', { faltam: n.precisa - n.dentro, proximo: n.nivel + 1, paginas: paginasNoCiclo(h.jogo.paginas) }) + `\n${sobreChefao(v.chefao, h.jogo.lutas)}`,
   }
 
   const sl = selo(d, 0, 0, n.nivel, v.estrela ?? 0.5)
@@ -782,8 +783,8 @@ function hud(d: Doc, v: Vista, y0: number): { svg: string; botoesNaCena: boolean
     y: y0,
     w: sl.largura,
     h: ALTURA_HUD - 4,
-    titulo: `Nível ${n.nivel}`,
-    explica: `${h.jogo.xp} XP no total.\nPáginas ${paginasNoCiclo(h.jogo.paginas)}/10 · ${h.jogo.lutas} lutas.`,
+    titulo: tx('barras.selo.titulo', { nivel: n.nivel }),
+    explica: tx('barras.selo.explica', { xp: h.jogo.xp, paginas: paginasNoCiclo(h.jogo.paginas), lutas: h.jogo.lutas }),
   })
   const yb = a.botoes === 'hud' ? y0 + Math.floor((ALTURA_HUD - 32) / 2) : 4
   if (a.botoes === 'hud') {
@@ -862,11 +863,11 @@ export function balaoSolto(nome: string, desc: string, escala: number, larguraCe
 // ---------------------------------------------------------------- lua nova
 
 /** Aviso grande, em duas linhas, num painel no alto da cena quando o cache esfria. */
-export const FRASE_LUA_NOVA = 'A Lua batalhou muito e se cansou.'
+export const fraseLuaNova = (): string => tx('lua_nova.frase')
 
 /** Aviso grande, em duas linhas, num painel sobre a cena quando o cache esfria. */
 function avisoLuaNova(W: number, H: number, frase: string, noMeio: boolean): string {
-  const l2 = 'A próxima mensagem sai mais cara (cache frio).'
+  const l2 = tx('lua_nova.linha2')
   const emoji = 15 // largura do 🌙 a 15 px
   const vao = 8 // espaço entre a lua e a frase
   const w1 = Math.ceil(frase.length * 8.4) // Pixelify Sans a 15 px
@@ -894,13 +895,13 @@ function avisoLuaNova(W: number, H: number, frase: string, noMeio: boolean): str
 /** A última frase do balão do XP: quando vem o próximo chefão, ou quando cai o que está em cena. */
 function sobreChefao(c: Chefao | undefined, lutas: number): string {
   if (c === undefined || c.caiu !== undefined) {
-    return `Chefão em ${chefaoEm(lutas)} lutas.`
+    return tx('barras.xp.chefao_em', { n: chefaoEm(lutas) })
   }
   if (c.origem === 'lista') {
     const t = c.tarefas
-    return `O chefão cai quando as tarefas acabarem: ${Math.min(t.feitas, t.total)} de ${t.total}.`
+    return tx('barras.xp.chefao_lista', { feitas: Math.min(t.feitas, t.total), total: t.total })
   }
-  return `O chefão cai em ${c.vida} ${c.vida === 1 ? 'vitória' : 'vitórias'}.`
+  return tp('barras.xp.chefao_vida', c.vida)
 }
 
 /** Abertura, fase 1: a marca no meio do céu, aparecendo e sumindo; a noite fecha no fim. */
@@ -958,7 +959,7 @@ export function montar(v: Vista): { svg: string; largura: number; altura: number
   }
   if (l.desmaiada) {
     corpo.push(`<rect width="${v.W}" height="${H}" fill="#140f2e" opacity="0.38"/>`)
-    corpo.push(avisoLuaNova(v.W, H, v.fraseLuaNova ?? FRASE_LUA_NOVA, v.avisoNoMeio ?? true))
+    corpo.push(avisoLuaNova(v.W, H, v.fraseLuaNova ?? fraseLuaNova(), v.avisoNoMeio ?? true))
   }
   const hd = hud(d, v, H)
   if (hd.botoesNaCena) {
