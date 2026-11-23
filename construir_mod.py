@@ -212,6 +212,12 @@ def fonte_longa(mod: Path) -> str:
     return _woff2(instancer.instantiateVariableFont(TTFont(A / "fontes" / "PixelifySans[wght].ttf"), {"wght": 500}))
 
 
+def marca():
+    """A marca animada da abertura (assets/marca/animacao/, via marca_svg.py)."""
+    import marca_svg  # aqui dentro: marca_svg importa este arquivo
+    return marca_svg.fragmento(inicio_reflexo=1.1)
+
+
 def main():
     mod = Path(sys.argv[1]) if len(sys.argv) > 1 else MOD_PADRAO
     meta = {
@@ -235,6 +241,8 @@ def main():
         f"export const FONTE = {json.dumps(fonte(mod))}",
         f"export const FONTE_LONGA = {json.dumps(fonte_longa(mod))}",
         f"export const META = {json.dumps(meta, ensure_ascii=False)} as const",
+        "// Marca animada (marca_svg.py): miolo em px nativos + CSS; usada na tela de abertura.",
+        f"export const MARCA = {json.dumps(marca())} as const",
         "export const ARTE: Record<string, Arte> = {",
     ]
     for k, v in ARTE.items():

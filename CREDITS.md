@@ -1,7 +1,7 @@
 # Credits · Créditos
 
 ## Art and characters · Arte e personagens
-**George Altran ([@geoaltran](https://github.com/geoaltran))**: illustration, pixel art, characters, scenery, UI, effects, trophies and art direction.
+**George Altran ([@geoaltran](https://github.com/geoaltran))**: illustration, pixel art, characters, scenery, UI, effects, trophies, the "As Crônicas de Lua" logo and art direction.
 Licensed under **CC BY-NC 4.0**: free to share and adapt **with credit** ("Art by George Altran (@geoaltran)"), **no commercial use** without permission (commercial license on request). See [`LICENSE-ART`](LICENSE-ART).
 
 Lua, Vespera, Dama Penumbra, Golem de Obsidiana, Leviatã, Ignis, Relojoeiro, Sir Solis, Rei Espelho, Nébula and Malakor are original characters by George Altran.

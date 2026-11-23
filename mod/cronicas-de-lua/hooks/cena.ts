@@ -3,7 +3,7 @@
 // roda no próprio SVG; o mod só redesenha quando o estado muda. Cada
 // animação usa um atraso negativo calculado do relógio, então um redesenho
 // continua exatamente de onde a cena estava (sem pulo).
-import { FONTE, FONTE_LONGA, META } from './arte'
+import { FONTE, FONTE_LONGA, MARCA, META } from './arte'
 import { ANDAR, Doc, P, PARADA, type Q, art, esc, mod, r, sorteio } from './base'
 import type { Caminho, Chefao, Hud, Luta } from '../types'
 import { desenharLuta } from './luta'
@@ -58,9 +58,54 @@ export type Vista = {
   horizonte?: number
   /** O SVG não coube: sem partículas e sem a tira de andar na luta. */
   economia?: boolean
+  /** Sem a assinatura do autor (último recurso quando o SVG passa do limite do app). */
+  semAssinatura?: boolean
   /** Um texto longo pode aparecer (balões visíveis ou aviso de lua nova): embute a Pixelify Sans. */
   textoLongo?: boolean
+  /** Hora (ms) em que a tela de abertura começou; some sozinha em ABERTURA.fim. */
+  abertura?: number
 }
+
+/**
+ * Tela de abertura, dentro da faixa (mesma altura). Dois redesenhos, porque a
+ * marca e a floresta juntas passariam do limite de caracteres do app:
+ *   fase 1 (0 até fase2): céu noturno + a marca animada, que aparece, fica e some;
+ *   fase 2 (fase2 até fim): a floresta clareia e a Lua chega andando pela esquerda.
+ * Os tempos são do relógio: um redesenho no meio continua do ponto certo.
+ */
+export const ABERTURA = {
+  /** a marca aparece (ms). */
+  entra: 600,
+  /** a marca começa a sumir e a noite fecha. */
+  sai: 3400,
+  /** fim da fase 1: redesenho com a floresta. */
+  fase2: 4000,
+  /** a floresta clareia em (ms, contados da fase 2). */
+  clareia: 900,
+  /** a Lua começa a andar (ms, contados da fase 2). */
+  anda: 300,
+  /** quanto ela anda até o lugar dela (px de arte). */
+  distancia: 120,
+} as const
+/** Fim da abertura (ms): a Lua chegou ao lugar dela. */
+export const FIM_ABERTURA = ABERTURA.fase2 + ABERTURA.anda + Math.ceil((ABERTURA.distancia / (5 / 0.11)) * 1000) + 200
+
+export type FaseAbertura = { fase: 1 | 2; t: number }
+
+/** Em que fase da abertura a cena está (t: ms desde o começo da fase), ou nada. */
+export function faseAbertura(v: Pick<Vista, 'abertura' | 'agora'>): FaseAbertura | undefined {
+  if (v.abertura === undefined) {
+    return undefined
+  }
+  const e = v.agora - v.abertura
+  if (e < 0 || e >= FIM_ABERTURA) {
+    return undefined
+  }
+  return e < ABERTURA.fase2 ? { fase: 1, t: e } : { fase: 2, t: e - ABERTURA.fase2 }
+}
+
+const NOITE = '#0b0a20'
+const seg = (ms: number) => `${r(ms) / 1000}s`
 
 export const ALTURA_HUD = 48
 
@@ -122,7 +167,7 @@ function particula(d: Doc, nome: string, x: number, y: number, fasesMs: number, 
   return d.tira(`p_${nome}`, x, y, q, q, seq, agora + fasesMs)
 }
 
-function cenario(d: Doc, v: Vista, dist: number): string {
+function cenario(d: Doc, v: Vista, dist: number, soCeu = false): string {
   const { W, modo, agora } = v
   const { topo, fundoTopo } = JANELA[modo]
   const x0 = Math.floor(480 - W / 2)
@@ -178,6 +223,10 @@ function cenario(d: Doc, v: Vista, dist: number): string {
     }
   })
   partes.push(d.rolo(ilhas, dist * il.velocidade, andando ? VEL * il.velocidade : 0, para))
+  if (soCeu) {
+    // abertura, fase 1: só o céu (as árvores ficam para o redesenho seguinte)
+    return partes.join('')
+  }
 
   // 4. meio (árvores) com vaga-lumes e folhas caindo junto
   const md = cen[3] as { velocidade: number }
@@ -257,7 +306,20 @@ function lua(d: Doc, v: Vista, desmaiada: boolean, naLuta?: { corpo: string; tri
   const y = pes - PES_Q
   const { nivel } = nivelDe(v.hud.jogo.xp)
   let corpo: string
-  if (desmaiada) {
+  const ab = faseAbertura(v)
+  if (ab?.fase === 2) {
+    // abertura: ela entra andando pela esquerda (o chão não rola) e para no lugar
+    const anda = Math.ceil((ABERTURA.distancia / VEL) * 1000)
+    const total = ABERTURA.anda + anda
+    const tempo = `dur="${seg(total)}" begin="${seg(-ab.t)}" fill="freeze"`
+    const k = (ABERTURA.anda / total).toFixed(3)
+    corpo =
+      `<g><animate attributeName="opacity" values="1;0" keyTimes="0;1" calcMode="discrete" ${tempo}/>` +
+      `<g transform="translate(${-ABERTURA.distancia} 0)"><animateTransform attributeName="transform" type="translate" values="${-ABERTURA.distancia} 0;${-ABERTURA.distancia} 0;0 0" keyTimes="0;${k};1" ${tempo}/>` +
+      `${d.tira('lua_andar', 0, 0, QW, 100, ANDAR, ab.t)}</g></g>` +
+      `<g opacity="0"><animate attributeName="opacity" values="0;1" keyTimes="0;1" calcMode="discrete" ${tempo}/>` +
+      `${d.tira('lua_parada', 0, 0, QW, 100, PARADA, v.agora)}</g>`
+  } else if (desmaiada) {
     corpo = d.tira('lua_dano', 0, 0, QW, 100, [[1, 1]], 0)
   } else if (naLuta !== undefined) {
     corpo = d.pista(naLuta.trilha, v.agora, naLuta.corpo)
@@ -841,27 +903,52 @@ function sobreChefao(c: Chefao | undefined, lutas: number): string {
   return `O chefão cai em ${c.vida} ${c.vida === 1 ? 'vitória' : 'vitórias'}.`
 }
 
+/** Abertura, fase 1: a marca no meio do céu, aparecendo e sumindo; a noite fecha no fim. */
+function marcaNoCeu(W: number, H: number, t: number): string {
+  const x = Math.round((W - MARCA.w) / 2)
+  const y = Math.round((H - MARCA.h) / 2)
+  const f = ABERTURA.fase2
+  const kt = (ms: number) => (ms / f).toFixed(3)
+  const tempo = `dur="${seg(f)}" begin="${seg(-t)}" fill="freeze"`
+  return (
+    // o céu escurece um pouco para a marca saltar; no fim, a noite fecha de vez
+    `<rect width="${W}" height="${H}" fill="${NOITE}" opacity="0.65"><animate attributeName="opacity" values="0.65;0.65;1" keyTimes="0;${kt(ABERTURA.sai)};1" ${tempo}/></rect>` +
+    `<g opacity="0"><animate attributeName="opacity" values="0;1;1;0;0" keyTimes="0;${kt(ABERTURA.entra)};${kt(ABERTURA.sai)};${kt(f - 250)};1" ${tempo}/>` +
+    `<g transform="translate(${x} ${y})">${MARCA.svg}</g></g>`
+  )
+}
+
 export function montar(v: Vista): { svg: string; largura: number; altura: number; alvos: Alvo[] } {
   const d = new Doc()
   const H = alturaCena(v.modo)
   const dist = distancia(v.caminho, v.agora)
   const l = luar(v.hud, v.agora)
+  const ab = faseAbertura(v)
   const corpo: string[] = []
   corpo.push(`<svg x="0" y="0" width="${v.W}" height="${H}" overflow="hidden">`)
-  corpo.push(cenario(d, v, dist))
+  corpo.push(cenario(d, v, dist, ab?.fase === 1))
+  if (ab?.fase === 1) {
+    corpo.push(marcaNoCeu(v.W, H, ab.t))
+  }
   const pes = 209 - JANELA[v.modo].topo
   const ch = v.chefao !== undefined && fimDoChefao(v.chefao) > v.agora ? v.chefao : undefined
   const palco = { W: v.W, H, pes, agora: v.agora }
   if (ch !== undefined && (v.tom ?? 'todo') === 'todo') {
     corpo.push(tingir(ch, v.W, H, 0.16))
   }
-  const lt = v.luta !== undefined && !l.desmaiada ? desenharLuta(d, v.luta, { W: v.W, pes: 209 - JANELA[v.modo].topo, agora: v.agora, caminho: v.caminho, ...(v.horizonte === undefined ? {} : { horizonte: v.horizonte }), ...(v.economia === undefined ? {} : { economia: v.economia }) }) : undefined
+  const lt = ab === undefined && v.luta !== undefined && !l.desmaiada ? desenharLuta(d, v.luta, { W: v.W, pes: 209 - JANELA[v.modo].topo, agora: v.agora, caminho: v.caminho, ...(v.horizonte === undefined ? {} : { horizonte: v.horizonte }), ...(v.economia === undefined ? {} : { economia: v.economia }) }) : undefined
   if (lt !== undefined) {
     corpo.push(lt.monstro)
   } else if (ch !== undefined && !l.desmaiada) {
     corpo.push(chefaoEmCena(d, ch, palco))
   }
-  corpo.push(lua(d, v, l.desmaiada, lt === undefined ? undefined : { corpo: lt.luaCorpo, trilha: lt.luaTrilha }))
+  if (ab?.fase !== 1) {
+    corpo.push(lua(d, v, l.desmaiada, lt === undefined ? undefined : { corpo: lt.luaCorpo, trilha: lt.luaTrilha }))
+  }
+  if (ab?.fase === 2) {
+    // a noite da fase 1 abre e mostra a floresta
+    corpo.push(`<rect width="${v.W}" height="${H}" fill="${NOITE}" opacity="0"><animate attributeName="opacity" values="1;0" dur="${seg(ABERTURA.clareia)}" begin="${seg(-ab.t)}" fill="freeze"/></rect>`)
+  }
   if (lt !== undefined) {
     corpo.push(lt.efeitos)
   }
@@ -884,14 +971,16 @@ export function montar(v: Vista): { svg: string; largura: number; altura: number
   }
   // assinatura do autor (pedido do usuário): discreta no canto de cima à
   // esquerda, fora do tremor; vai junto em todo print da faixa
-  corpo.push(`<use href="${d.img('assinatura')}" x="4" y="4" opacity="0.72"/>`)
+  if (v.semAssinatura !== true) {
+    corpo.push(`<use href="${d.img('assinatura')}" x="4" y="4" opacity="0.72"/>`)
+  }
   corpo.push('</svg>')
   corpo.push(hd.svg)
   const Ht = H + ALTURA_HUD
   const s = v.escala
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${v.W * s}" height="${Ht * s}" viewBox="0 0 ${v.W} ${Ht}" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges">` +
-    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${CSS_TEXTO}${v.textoLongo === true || l.desmaiada ? CSS_FONTE_LONGA : ''}${CSS_BOTOES}${d.css.join('')}</style>` +
+    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${ab?.fase === 1 ? MARCA.css : ''}${CSS_TEXTO}${v.textoLongo === true || l.desmaiada ? CSS_FONTE_LONGA : ''}${CSS_BOTOES}${d.css.join('')}</style>` +
     `<defs>${d.defs.join('')}</defs>` +
     corpo.join('') +
     `</svg>`

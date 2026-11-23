@@ -73,8 +73,13 @@ Object.assign(casos, {
   'HÍBRIDO · CRÍTICO enorme: a lista acabou cedo (Nébula, 5 tarefas de uma vez)': { chefao: hib('nebula', 9, 5, { vida: 0, golpe: { at: acerto, antes: 50 }, caiu: t0 + 300 + 1260 + 1500, tarefas: { total: 5, feitas: 5 } }), luta: luta('integracao', 'nebula', [{ at: t0 + 300, ok: true, dano: 9, critico: 459 }], { fixo: true, final: true }) },
   'HÍBRIDO · chefão das 12 lutas: último golpe também é crítico (Golem)': { chefao: chefe('golem_obsidiana', 3, { origem: 'lutas', t0: agora - 9000, vida: 0, golpe: { at: acerto, antes: 1 }, caiu: t0 + 300 + 1260 + 1500 }), luta: luta('editar', 'golem_obsidiana', [{ at: t0 + 300, ok: true, dano: 13 }], { fixo: true, final: true }) },
 })
+// tela de abertura (9ª sessão): fase 1 (marca no céu) e fase 2 (floresta e a Lua chegando)
+Object.assign(casos, {
+  'ABERTURA · fase 1: a marca no céu noturno (aparece, fica e some)': { W: 760, botoes: true, caminho: parada, hud, abertura: agora, textoLongo: false },
+  'ABERTURA · fase 2: a floresta clareia e a Lua chega andando': { W: 760, botoes: true, caminho: parada, hud, abertura: agora - 4000, textoLongo: false },
+})
 if (process.argv.includes('--novos')) {
-  for (const k of Object.keys(casos)) if (!/^HÍBRIDO/.test(k)) delete casos[k]
+  for (const k of Object.keys(casos)) if (!/^ABERTURA/.test(k)) delete casos[k]
 }
 // tom da cena: os 10 chefões, antes (tudo de leve) e depois (só o fundo, mais forte)
 const JORNADA = [['vespera', 'Vespera'], ['dama_penumbra', 'Dama Penumbra'], ['golem_obsidiana', 'Golem'], ['leviata', 'Leviatã'], ['ignis', 'Ignis'], ['relojoeiro', 'Relojoeiro'], ['sir_solis', 'Sir Solis'], ['rei_espelho', 'Rei Espelho'], ['nebula', 'Nébula'], ['malakor', 'Malakor']]

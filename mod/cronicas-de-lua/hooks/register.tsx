@@ -4,7 +4,7 @@ import type { EngineInterface, Register, RenderChildren, SessionContextUsage, Se
 import type { AbaDoLivro, Botoes, Caminho, Chefao, Elite, Golpe, Hud, Jogo, Luta, Lutas, TipoTrofeu } from '../types'
 import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
 import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
-import { BOTOES, LARGURA_MAX, LARGURA_MIN, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
+import { ABERTURA, BOTOES, FIM_ABERTURA, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
 import { ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu } from './luta'
 import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, vidaEmTarefas } from './chefao'
@@ -32,6 +32,7 @@ const elite = atom({ plugin: 'cronicas-de-lua', key: 'elite' } as const, ELITE0,
 const BOTOES0: Botoes = { vigilia: { ligada: false, envios: 0 }, mochila: 'nada', estandarte: 'nada', livro: false }
 const botoes = atom({ plugin: 'cronicas-de-lua', key: 'botoes' } as const, BOTOES0, { shape: 'botoes-1' })
 const livroAba = atom({ plugin: 'cronicas-de-lua', key: 'livroAba' } as const, 'ficha' as AbaDoLivro)
+const abertura = atom({ plugin: 'cronicas-de-lua', key: 'abertura' } as const, null as number | null)
 /** Quantos erros de ações diferentes o elite lembra (os mais velhos saem). */
 const ERROS_MAX = 20
 /** Quantos troféus ficam guardados. */
@@ -56,6 +57,8 @@ type Ajustes = {
   pxLinha?: number
   /** px por coluna no VS Code e no celular (cada um calibra a sua régua). */
   pxColunaPor?: Partial<Record<Remota, number>>
+  /** false: sem a tela de abertura (/cronicas abertura off). */
+  abertura?: boolean
 }
 
 /** As superfícies que desenham a cena em Svg. Fora do desktop: sem hover, botões numa linha. */
@@ -133,6 +136,103 @@ async function marcarFimDoLuar($: $, restanteMs: number): Promise<void> {
   alarme = $.clock.after(Math.max(0, restanteMs) + 400, () => {
     void update($, tique, n => n + 1)
   })
+}
+
+// ---------------------------------------------------------------- abertura
+
+// A tela de abertura (marca + a Lua chegando) aparece na primeira sessão do
+// dia e na primeira sessão depois que o app reinicia; /cronicas abertura
+// mostra de novo; um clique na cena pula.
+let alarmesAbertura: Timer[] = []
+
+/** O dia local (AAAA-MM-DD) de uma hora em ms. */
+function diaDe(ms: number): string {
+  const d = new Date(ms)
+  const dois = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${dois(d.getMonth() + 1)}-${dois(d.getDate())}`
+}
+
+/**
+ * Quando o app que abriu esta sessão começou (o texto do `ps`), ou nada se não
+ * der para saber. A API do mod não diz; o processo mais alto acima desta sessão
+ * (abaixo do sistema) é o app: Claude, VS Code ou o terminal. Se esse começo
+ * mudou desde a última abertura, o app reiniciou.
+ */
+async function inicioDoApp($: $): Promise<string | undefined> {
+  try {
+    const { exitCode, stdout } = await $.process.run(['/bin/sh', '-c', 'echo $PPID; ps -A -o pid=,ppid=,lstart='], { timeoutMs: 5000 })
+    if (exitCode !== 0) {
+      return undefined
+    }
+    const [primeira, ...resto] = stdout.trim().split('\n')
+    const pai = new Map<number, { ppid: number; inicio: string }>()
+    for (const l of resto) {
+      const m = /^\s*(\d+)\s+(\d+)\s+(.+?)\s*$/.exec(l)
+      if (m !== null) {
+        pai.set(Number(m[1]), { ppid: Number(m[2]), inicio: m[3] ?? '' })
+      }
+    }
+    let pid = Number(primeira)
+    let topo: string | undefined
+    for (let i = 0; i < 40; i++) {
+      const p = pai.get(pid)
+      if (p === undefined || p.ppid <= 1) {
+        topo = p?.inicio ?? topo
+        break
+      }
+      topo = p.inicio
+      pid = p.ppid
+    }
+    return topo
+  } catch {
+    return undefined
+  }
+}
+
+async function abrirAbertura($: $, app?: string): Promise<void> {
+  const agora = await $.clock.now()
+  for (const t of alarmesAbertura) {
+    t.cancel()
+  }
+  await update($, abertura, () => agora)
+  alarmesAbertura = [
+    // fase 2 (a floresta e a Lua) é um redesenho novo
+    $.clock.after(ABERTURA.fase2 + 20, () => {
+      void update($, tique, n => n + 1)
+    }),
+    $.clock.after(FIM_ABERTURA + 20, () => {
+      void update($, abertura, () => null)
+    }),
+  ]
+  await $.store.set('aberturaDia', diaDe(agora))
+  if (app !== undefined) {
+    await $.store.set('aberturaApp', app)
+  }
+}
+
+async function pularAbertura($: $): Promise<void> {
+  for (const t of alarmesAbertura) {
+    t.cancel()
+  }
+  alarmesAbertura = []
+  await update($, abertura, () => null)
+}
+
+/**
+ * Durante a abertura, a cena inteira vira um botão invisível (uma linha de
+ * botões por linha da faixa, cada um esticado na largura): um clique pula.
+ */
+function areaDePular($: $, els: Elementos, a: Ajustes, colunas: number) {
+  const { Box, Button } = els
+  const linhas = Math.ceil((alturaCena('compacto') * a.escala) / (a.pxLinha ?? 20))
+  const estilo = { color: INVISIVEL, backgroundColor: INVISIVEL }
+  return (
+    <Box key="pular" position="absolute" top={0} left={0} width={colunas} height={linhas} flexDirection="column">
+      {Array.from({ length: linhas }, (_, i) => (
+        <Button key={`pula_${i}`} plain label={ROTULO_INVISIVEL} hover={estilo} onPress={() => pularAbertura($)} />
+      ))}
+    </Box>
+  )
 }
 
 // ---------------------------------------------------------------- lutas
@@ -974,10 +1074,21 @@ export const register: Register = on => {
     }))
     await revisar($)
     await agendarVigilia($)
+    // abertura: na primeira sessão do dia ou depois que o app reiniciou (com
+    // alguém olhando), se não foi desligada
+    const aj = await lerAjustes($)
+    if (e.isInteractive && aj.abertura !== false) {
+      const hojeJa = (await $.store.get('aberturaDia')) === diaDe(await $.clock.now())
+      const app = await inicioDoApp($)
+      const reiniciou = app !== undefined && (await $.store.get('aberturaApp')) !== app
+      if (!hojeJa || reiniciou) {
+        await abrirAbertura($, app)
+      }
+    }
     await $.command.register({
       name: 'cronicas',
       description: 'As Crônicas de Lua: jornada, ajustes da faixa e testes (chefão, elite, lua nova)',
-      argumentHint: 'escala 2 | largura 690 | regua | quadro | imagem | teste | lua-nova | vigilia | chefao [lista N] [nome] | golpe | elite',
+      argumentHint: 'abertura [on|off] | escala 2 | largura 690 | regua | quadro | imagem | teste | lua-nova | vigilia | chefao [lista N] [nome] | golpe | elite',
     })
     return next(e)
   })
@@ -991,6 +1102,19 @@ export const register: Register = on => {
       const lista = await $.session.surfaces()
       const nomes: Record<string, string> = { terminal: 'terminal', desktop: 'app desktop', vscode: 'VS Code', mobile: 'celular' }
       return { text: lista.length === 0 ? 'Nenhuma superfície desenha esta sessão agora.' : `Esta sessão desenha em: ${lista.map(x => nomes[x] ?? x).join(', ')}.` }
+    }
+    if (chave === 'abertura' || chave === 'intro') {
+      const op = (valor ?? '').toLowerCase()
+      if (['off', 'desligar', 'desliga', 'nao', 'não'].includes(op)) {
+        await $.store.set('ajustes', { ...a, abertura: false })
+        return { text: 'Abertura desligada: ela não aparece mais na primeira sessão do dia. /cronicas abertura on liga de novo; /cronicas abertura mostra agora.' }
+      }
+      if (['on', 'ligar', 'liga', 'sim'].includes(op)) {
+        await $.store.set('ajustes', { ...a, abertura: true })
+        return { text: 'Abertura ligada: ela aparece na primeira sessão de cada dia. /cronicas abertura mostra agora.' }
+      }
+      await abrirAbertura($)
+      return { text: `Abertura na faixa (uns ${Math.round(FIM_ABERTURA / 1000)} s; um clique na cena pula). ${a.abertura === false ? 'Ela está desligada na primeira sessão do dia: /cronicas abertura on liga.' : '/cronicas abertura off desliga.'}` }
     }
     if (chave === 'escala' && (n === 1 || n === 2 || n === 3)) {
       a.escala = n
@@ -1336,6 +1460,7 @@ export const register: Register = on => {
       read($, botoes),
     ])
     const ch = await read($, chefao)
+    const ab = await read($, abertura)
     colunasPor[sup] = e.props.bodyColumns
     ultimaSup = sup
     const pxColuna = pxColunaDe(a, sup)
@@ -1356,15 +1481,28 @@ export const register: Register = on => {
       estandarte: bt.estandarte === 'nada' ? 'enrolado' : bt.estandarte,
       livro: bt.livro,
     }
-    const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }) } as const
+    const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }), ...(ab !== null && luta === undefined && ch === null ? { abertura: ab } : {}) } as const
     // celular: menos animação (sem partículas nem a tira de andar na luta)
     const montada = montar(sup === 'mobile' ? { ...vista, economia: true } : vista)
     let { svg } = montada
     const { altura, alvos } = montada
     if (svg.length > LIMITE_SVG) {
-      // não coube: sem partículas e sem a tira de andar na luta
-      svg = montar({ ...vista, economia: true }).svg
+      // não coube: sem partículas e sem a tira de andar na luta; se ainda não
+      // couber, sem a assinatura; por fim, a cena sem a luta (o app recusa
+      // um Svg acima de 131.072 caracteres e a faixa sumiria)
+      const tentativas = [{ economia: true }, { economia: true, semAssinatura: true }] as const
+      for (const t of tentativas) {
+        svg = montar({ ...vista, ...t }).svg
+        if (svg.length <= LIMITE_SVG) {
+          break
+        }
+      }
+      if (svg.length > LIMITE_SVG) {
+        const { luta: _fora, ...semLuta } = vista as typeof vista & { luta?: unknown }
+        svg = montar({ ...semLuta, economia: true, semAssinatura: true }).svg
+      }
     }
+
     // altura fixa: se a cena passar da largura da faixa, o app corta a sobra à
     // direita (preserveAspectRatio slice) em vez de encolher o desenho
     const nv = nivelDe(estado.jogo.xp)
@@ -1388,6 +1526,7 @@ export const register: Register = on => {
         <Svg source={svg} height={altura} alt={alt} />
         {areasDeHover($.ui.resolve(e) as Elementos, a, e.props.bodyColumns, W, alvos, false)}
         {botoesDoHud($, $.ui.resolve(e) as Elementos, a, e.props.bodyColumns, W, alvos)}
+        {faseAbertura(vista) === undefined ? null : areaDePular($, $.ui.resolve(e) as Elementos, a, e.props.bodyColumns)}
       </Box>
     )
     if (a.prova === true && !remota) {

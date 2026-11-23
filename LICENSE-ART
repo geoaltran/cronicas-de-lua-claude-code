@@ -9,11 +9,13 @@ Summary:         https://creativecommons.org/licenses/by-nc/4.0/
 
 WHAT THIS LICENSE COVERS ("the Art")
   - everything under assets/ (Lua, the bosses and monsters, the scenery,
-    the UI, the effects, the trophies, the particles, the signature), except
+    the UI, the effects, the trophies, the particles, the signature, the
+    "As Crônicas de Lua" logo and its animation), except
     the fonts in assets/fontes/, which keep their own license (SIL OFL 1.1);
   - the art embedded in the mod (mod/cronicas-de-lua/hooks/arte.ts) and the
     sounds in mod/cronicas-de-lua/sons/;
-  - the preview images and animations (previa_*.png, previa_*.gif);
+  - the preview images and animations (previa_*.png, previa_*.gif,
+    previa_*.svg);
   - the characters themselves: Lua, Vespera, Dama Penumbra, Golem de
     Obsidiana, Leviatã, Ignis, Relojoeiro, Sir Solis, Rei Espelho, Nébula and
     Malakor, their names and designs.

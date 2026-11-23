@@ -1,4 +1,6 @@
-[English](README.md) · **Português** · *Español, Français, Deutsch, 中文, 日本語, 한국어: em breve*
+[English](README.md) · **Português** · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
+
+<p align="center"><img src="previa_marca.svg" alt="Marca animada de As Crônicas de Lua" width="824"></p>
 
 # 🌙 As Crônicas de Lua
 

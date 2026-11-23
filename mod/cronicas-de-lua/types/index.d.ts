@@ -153,6 +153,8 @@ declare module 'claude-code' {
       botoes: Shaped<Botoes>
       /** A aba aberta no Livro. */
       livroAba: AbaDoLivro
+      /** Hora (ms) em que a tela de abertura começou; null fora dela. */
+      abertura: number | null
     }
   }
 }

@@ -9,6 +9,8 @@ Os comandos servem pra três coisas: **ver como está a jornada**, **ajustar a f
 | Comando | O que faz |
 |---|---|
 | `/cronicas` | Mostra o resumo: nível da Lua, XP, páginas recuperadas (x/10), os últimos 5 troféus e os ajustes da faixa (escala, largura, modo). Também lista os outros comandos. |
+| `/cronicas abertura` | Mostra agora a **tela de abertura** na faixa (uns 7 s): a marca "As Crônicas de Lua" animada no céu (a lua balança na corrente, as estrelas piscam, um reflexo passa no metal), a noite fecha, a floresta clareia e a Lua chega andando. **Um clique na cena pula.** Ela aparece sozinha na **primeira sessão do dia** e na **primeira sessão depois que você reinicia o app**. Também funciona como `/cronicas intro`. |
+| `/cronicas abertura off` · `on` | Desliga (ou liga de novo) a abertura automática (primeira sessão do dia e depois de reiniciar o app). `/cronicas abertura` continua mostrando quando você pedir. Também aceita `desligar`/`ligar`. |
 
 ## 🖼️ Ajustar a faixa
 
@@ -76,4 +78,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | `/cronicas language <código>` | Troca o idioma de todo o jogo e guarda a escolha. Idiomas previstos: `pt-BR` (português), `en` (inglês), `es` (espanhol), `fr` (francês), `de` (alemão), `zh` (mandarim), `ja` (japonês), `ko` (coreano). |
 
 ---
-*Última atualização: 22/11/2026 (Fase 5: a faixa no VS Code e no celular, com botões numa linha embaixo da cena; `/cronicas largura` calibra cada lugar separado).*
+*Última atualização: 23/11/2026 (tela de abertura com a marca animada: `/cronicas abertura`, `on` e `off`).*

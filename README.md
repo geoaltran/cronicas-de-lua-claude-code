@@ -1,4 +1,6 @@
-**English** · [Português](README.pt-BR.md) · *Español, Français, Deutsch, 中文, 日本語, 한국어: coming soon*
+**English** · [Português](README.pt-BR.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
+
+<p align="center"><img src="previa_marca.svg" alt="The Chronicles of Lua logo, animated" width="824"></p>
 
 # 🌙 The Chronicles of Lua · *As Crônicas de Lua*
 
