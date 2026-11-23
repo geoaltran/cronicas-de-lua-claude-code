@@ -24,6 +24,8 @@ Antworte mit `y`, um den Marketplace hinzuzufügen, und wähle dann einen Geltun
 
 Benötigt ein aktuelles Claude Code mit Mod-Unterstützung (gebaut und getestet mit 2.1.330).
 
+Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um zu merken, wann die App neu gestartet wurde, fürs Intro) und unter macOS `defaults read -g AppleLanguages` (die Systemsprache).
+
 ## Wo es läuft
 | Oberfläche | Was du bekommst |
 |---|---|
@@ -56,12 +58,12 @@ Benötigt ein aktuelles Claude Code mit Mod-Unterstützung (gebaut und getestet 
 | Das Tool klappt | Trefferpause, das Monster blitzt auf, weicht zurück und zerplatzt in Sterne; Schadenszahl |
 | Ein langsames Tool | Lua kanalisiert mit einem magischen Kreis zu ihren Füßen |
 | Das Tool schlägt fehl | Das Monster schlägt zurück; Lua blinkt rot (nur optisch) |
-| Ein später behobener Fehler | Elite (Obsidian-Golem); wenn er fällt, bleibt eine Trophäe fürs Regal |
+| Ein später behobener Fehler | Elite (Obsidiangolem); wenn er fällt, bleibt eine Trophäe fürs Regal |
 | Eine Aufgabenliste wird erstellt, oder alle 12 Kämpfe | **Boss**: Leben in Blöcken, einer pro Aufgabe. Normale Treffer prallen an seinem **Schild** ab (Lua kratzt sich am Kopf ❓💧); eine erledigte Aufgabe räumt einen Block ab; die letzte ist ein **KRITISCHER** Treffer. Der Boss fällt mit einer wiedergefundenen Seite (x/10) und einem Levelaufstieg |
 
 ![Ein Bosskampf](previa_chefao.gif)
 
-Monster nach Tool: Dateien lesen → Vespera · Code bearbeiten → Relojoeiro / Sir Solis · Terminal → Ignis · Web → Leviatã / Nébula · Integrationen (MCP) → Rei Espelho · Subagenten → Klone von Dama Penumbra. Die Bosse kommen der Reihe nach, jeder mit einer Seite der Chroniken, bis zu Malakor, danach Neues Spiel+.
+Monster nach Tool: Dateien lesen → Vespera · Code bearbeiten → Uhrmacher / Sir Solis · Terminal → Ignis · Web → Leviathan / Nébula · Integrationen (MCP) → Spiegelkönig · Subagenten → Klone der Dame Penumbra. Die Bosse kommen der Reihe nach, jeder mit einer Seite der Chroniken, bis zu Malakor, danach Neues Spiel+.
 
 ## Befehle
 `/cronicas` zeigt Luas Übersicht. Die nützlichsten: `/cronicas ruler` und `/cronicas width <px>` (Breite kalibrieren), `/cronicas boss` und `/cronicas hit` (einen Bosskampf ausprobieren), `/cronicas surfaces` (wo die Sitzung gerade gezeichnet wird), `/cronicas language` (die Spielsprache wählen). Das Spiel spricht Englisch, Portugiesisch, Spanisch, Französisch und Deutsch (es folgt der Systemsprache; `/cronicas language` wechselt sie); Chinesisch, Japanisch und Koreanisch sind unterwegs.

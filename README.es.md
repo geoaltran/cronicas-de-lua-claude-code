@@ -24,6 +24,8 @@ Responde `y` para añadir el marketplace y elige un alcance. La franja aparece e
 
 Requiere un Claude Code reciente con soporte para mods (creado y probado en la 2.1.330).
 
+El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuándo se reinició la app, por la introducción) y, en macOS, `defaults read -g AppleLanguages` (el idioma del sistema).
+
 ## Dónde funciona
 | Superficie | Qué obtienes |
 |---|---|
@@ -56,12 +58,12 @@ Requiere un Claude Code reciente con soporte para mods (creado y probado en la 2
 | La herramienta sale bien | Pausa de impacto, el monstruo parpadea, retrocede y estalla en estrellas; número de daño |
 | Una herramienta lenta | Lua canaliza con un círculo mágico a sus pies |
 | La herramienta falla | El monstruo contraataca; Lua parpadea en rojo (solo visual) |
-| Un error corregido después | Élite (Golem de Obsidiana); al caer deja un trofeo para la estantería |
+| Un error corregido después | Élite (Gólem de Obsidiana); al caer deja un trofeo para la estantería |
 | Se crea una lista de tareas, o cada 12 combates | **Jefe**: vida en bloques, uno por tarea. Los golpes normales rebotan en su **escudo** (Lua se rasca la cabeza ❓💧); una tarea terminada tumba un bloque; la última es un golpe **CRÍTICO**. El jefe cae con una página recuperada (x/10) y una subida de nivel |
 
 ![Un combate contra un jefe](previa_chefao.gif)
 
-Monstruos por herramienta: leer archivos → Vespera · editar código → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · integraciones (MCP) → Rei Espelho · subagentes → clones de Dama Penumbra. Los jefes llegan en orden, una página de las Crónicas cada uno, hasta Malakor, y luego Nueva Partida+.
+Monstruos por herramienta: leer archivos → Vespera · editar código → Relojero / Sir Solis · terminal → Ignis · web → Leviatán / Nébula · integraciones (MCP) → Rey Espejo · subagentes → clones de Dama Penumbra. Los jefes llegan en orden, una página de las Crónicas cada uno, hasta Malakor, y luego Nueva Partida+.
 
 ## Comandos
 `/cronicas` muestra el resumen de Lua. Los más útiles: `/cronicas ruler` y `/cronicas width <px>` (calibrar el ancho), `/cronicas boss` y `/cronicas hit` (probar un combate contra un jefe), `/cronicas surfaces` (dónde se está dibujando la sesión), `/cronicas language` (elegir el idioma del juego). El juego habla inglés, portugués, español, francés y alemán (sigue el idioma del sistema; `/cronicas language` lo cambia); pronto llegarán el chino, el japonés y el coreano.

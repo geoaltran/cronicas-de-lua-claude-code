@@ -24,6 +24,8 @@ Réponds `y` pour ajouter la marketplace, puis choisis une portée. La bande app
 
 Nécessite une version récente de Claude Code compatible avec les mods (créé et testé sur la 2.1.330).
 
+Le mod lance seulement deux commandes en lecture seule sur votre machine : `ps` (pour savoir quand l'app a redémarré, à cause de l'intro) et, sur macOS, `defaults read -g AppleLanguages` (la langue du système).
+
 ## Où ça tourne
 | Surface | Ce que tu obtiens |
 |---|---|
@@ -61,7 +63,7 @@ Nécessite une version récente de Claude Code compatible avec les mods (créé 
 
 ![Un combat de boss](previa_chefao.gif)
 
-Monstres par outil : lire des fichiers → Vespera · modifier du code → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · intégrations (MCP) → Rei Espelho · sous-agents → clones de Dama Penumbra. Les boss arrivent dans l'ordre, une page des Chroniques chacun, jusqu'à Malakor, puis Nouvelle Partie+.
+Monstres par outil : lire des fichiers → Vespera · modifier du code → Horloger / Sir Solis · terminal → Ignis · web → Léviathan / Nébula · intégrations (MCP) → Roi Miroir · sous-agents → clones de la Dame Pénombre. Les boss arrivent dans l'ordre, une page des Chroniques chacun, jusqu'à Malakor, puis Nouvelle partie+.
 
 ## Commandes
 `/cronicas` affiche le résumé de Lua. Les plus utiles : `/cronicas ruler` et `/cronicas width <px>` (calibrer la largeur), `/cronicas boss` et `/cronicas hit` (tester un combat de boss), `/cronicas surfaces` (où la session est dessinée), `/cronicas language` (choisir la langue du jeu). Le jeu parle anglais, portugais, espagnol, français et allemand (il suit la langue du système ; `/cronicas language` la change) ; le chinois, le japonais et le coréen arrivent bientôt.

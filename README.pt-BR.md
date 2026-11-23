@@ -24,6 +24,8 @@ Responda `y` para adicionar o marketplace e escolha onde instalar. A faixa apare
 
 Precisa de um Claude Code recente, com suporte a mods (feito e testado na 2.1.330).
 
+O mod roda só dois comandos de leitura na sua máquina: `ps` (para saber quando o app reiniciou, por causa da abertura) e, no macOS, `defaults read -g AppleLanguages` (o idioma do sistema).
+
 ## Onde funciona
 | Lugar | O que aparece |
 |---|---|

@@ -24,6 +24,8 @@ Answer `y` to add the marketplace, then pick a scope. The band appears above the
 
 Requires a recent Claude Code with mod support (built and tested on 2.1.330).
 
+The mod runs two read-only commands on your machine, nothing else: `ps` (to notice when the app restarted, for the intro) and, on macOS, `defaults read -g AppleLanguages` (your system language).
+
 ## Where it runs
 | Surface | What you get |
 |---|---|
