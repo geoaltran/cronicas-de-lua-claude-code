@@ -23,13 +23,15 @@ export const PRIMEIRO_ATAQUE = ENTRA + EXCL
 const ATAQUE = 18 * F
 const VOO_DE = 6 * F
 const VOO_ATE = 14 * F
+/** Ferramenta que volta depois disso fez a Lua canalizar: vale mais XP. */
+export const DEMORADA_MS = PRIMEIRO_ATAQUE + VOO_ATE
 /** Depois de 2 quadros de "congelado" (pausa de impacto), o golpe. */
 const IMPACTO = 16 * F
 const CONTRA = 14 * F
 /** Uma ferramenta nova até 1,5 s depois da última entra na mesma luta. */
 export const JUNTA_MS = 1500
-/** XP a mais por vencer um elite. */
-export const ELITE_XP = 10
+/** XP a mais por vencer um elite (erro consertado). */
+export const ELITE_XP = 15
 export const DESFAZ = 22 * F
 const ATE_VITORIA = 12 * F
 const VITORIA = 22 * F
@@ -53,6 +55,17 @@ const WEB = ['WebSearch', 'WebFetch']
 const SUBAGENTE = ['Agent', 'Task', 'SendMessage']
 
 /** Que papel de monstro uma ferramenta chama (o resto: o mais próximo, ler). */
+/**
+ * XP de uma ferramenta que deu certo, pelo tamanho da vitória: comum 2,
+ * demorada (a Lua canalizou) 4, subagente 6.
+ */
+export function xpDaFerramenta(papel: string, demorou: boolean): number {
+  if (papel === 'subagente') {
+    return 6
+  }
+  return demorou ? 4 : 2
+}
+
 export function papelDe(tool: string): string {
   if (tool.startsWith('mcp__')) {
     return 'integracao'
@@ -230,7 +243,9 @@ export function roteiro(l: Luta): Roteiro {
     }
   }
   const canalAberto = l.ativas > 0
-  const xp = golpes.filter(g => g.ok).length * 2 + (l.trofeu !== undefined ? ELITE_XP : 0)
+  // o "+XP" da vitória mostra o valor de verdade (golpe que fez a Lua canalizar vale mais)
+  const xp = ataques.reduce((s, at) => s + (at.golpe?.ok === true ? xpDaFerramenta(l.papel, at.canal !== null) : 0), 0) +
+    (l.trofeu !== undefined ? ELITE_XP : 0)
   let desfecho: Desfecho | null = null
   let fim: number | null = null
   const ult = golpes[golpes.length - 1]

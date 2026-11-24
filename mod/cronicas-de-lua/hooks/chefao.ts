@@ -307,3 +307,15 @@ export function paginaRecuperada(d: Doc, c: Chefao, p: PalcoChefao): string {
   const sobe: [number, string][] = Array.from({ length: 8 }, (_, k) => [de + k * 2 * F, `translateY(${-k}px)`])
   return d.janela(de, c.caiu + QUEDA_MS, p.agora, d.pista(sobe, p.agora, txt))
 }
+
+/**
+ * XP por derrubar um chefão, pela força dele (decisão do usuário, 24/11/2026:
+ * subir o nível inteiro era fácil demais): 20 + 10 por página da jornada + 5
+ * por tarefa da lista + 10 do golpe crítico; no Novo Jogo+ (depois de
+ * Malakor) vale 1,5 vez. Teto: 60% do que o nível atual pede.
+ */
+export function xpDoChefao(c: Chefao, precisaNoNivel: number, paginasAntes: number): number {
+  const base = 20 + 10 * c.pagina + 5 * (c.tarefas?.total ?? 0) + 10
+  const mult = paginasAntes >= 10 ? 1.5 : 1
+  return Math.round(Math.min(base * mult, 0.6 * precisaNoNivel))
+}

@@ -24,7 +24,7 @@ A faixa tem sempre a mesma altura, então os gigantes (como a Nébula, o Golem e
 
 ### 👑 Os chefões
 
-Aparecem **a cada 12 lutas** ou quando eu passo **uma lista grande de tarefas**. O chefão "luta" a lista inteira: perde vida a cada tarefa concluída e só cai quando a última termina, com som de vitória, **uma página recuperada** 📜 e nível subindo.
+Aparecem **a cada 12 lutas** ou quando eu passo **uma lista grande de tarefas**. O chefão "luta" a lista inteira: perde vida a cada tarefa concluída e só cai quando a última termina, com som de vitória, **uma página recuperada** 📜 e um bom tanto de XP, que cresce com a força do chefão (quanto mais adiante na jornada e maior a lista, mais XP).
 
 A ordem da jornada:
 1. 🕷️ **Vespera, a Tecelã de Pesadelos:** aranha-espectral que prende viajantes em teias de sonhos ruins.
@@ -55,7 +55,7 @@ Quando um chefão aparece, a cena toda ganha **o tom dele**, e uma **barra de vi
 - 🌕 **Luz da Lua (vida):** se a "memória rápida" da conversa (o cache) ainda está quente. A lua do céu vai **minguando** conforme o tempo passa. Se eu largo a conversa parada muito tempo, vira **lua nova**, a Lua desmaia, e a próxima mensagem sai mais cara.
 - 🔷 **Mana Estelar:** quanto ainda tenho do **meu limite de uso** do plano (janela de 5 horas; a de 7 dias aparece ao passar o mouse).
 - 🎒 **Mochila:** o quanto a **conversa já encheu**. Cheia demais, hora de arrumar a mochila.
-- ⭐ **Nível (XP):** sobe conforme eu uso. O selo vai do 1 ao 9999, e a cada 2 níveis a varinha e a roupa da Lua melhoram.
+- ⭐ **Nível (XP):** sobe conforme eu uso, e vitória maior vale mais: ferramenta comum +2, ferramenta demorada +4, subagente +6, tarefa da lista concluída +5, erro consertado (elite) +15 e chefão pela força dele (no máximo 60% de um nível; no Novo Jogo+ vale 1,5 vez). O selo vai do 1 ao 9999, e a cada 2 níveis a varinha e a roupa da Lua melhoram.
 - 📜 **Páginas das Crônicas:** quantos chefões já derrotei (x/10).
 
 ## 🎛️ Os botões

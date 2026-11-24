@@ -7,8 +7,8 @@ import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icone
 import { ABERTURA, BOTOES, FIM_ABERTURA, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
 import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, tp, usarIdioma } from './t'
-import { ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu } from './luta'
-import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, vidaEmTarefas } from './chefao'
+import { DEMORADA_MS, ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu, xpDaFerramenta } from './luta'
+import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, vidaEmTarefas, xpDoChefao } from './chefao'
 
 const PLUGIN = 'cronicas-de-lua'
 /** O app desenha SVG de até 131.072 caracteres; uma margem para não arriscar. */
@@ -338,7 +338,7 @@ async function ferirChefao($: $, vida: (c: Chefao) => number, n?: number, at?: n
   let jogo: Jogo = JOGO0
   await update($, hud, h => {
     const nv = nivelDe(h.jogo.xp)
-    jogo = { ...h.jogo, paginas: h.jogo.paginas + 1, xp: h.jogo.xp + (nv.precisa - nv.dentro) }
+    jogo = { ...h.jogo, paginas: h.jogo.paginas + 1, xp: h.jogo.xp + xpDoChefao(a, nv.precisa, h.jogo.paginas) }
     return { ...h, jogo }
   })
   await salvarJogo($, jogo)
@@ -456,6 +456,11 @@ async function lista($: $, tool: string, input: unknown, n: number, at?: number)
       await chamarChefao($, 'lista', t)
     }
     return null
+  }
+  // cada tarefa concluída vale 5 de XP
+  const concluidas = t.feitas - doChefao.feitas
+  if (concluidas > 0) {
+    await ganharXp($, 5 * concluidas)
   }
   // tarefas novas na lista: o chefão ganha um bloco de vida por tarefa (sem golpe)
   await update($, chefao, c => (dePe(c) ? crescer(c, t) : c))
@@ -1527,7 +1532,7 @@ export const register: Register = on => {
       }
       await revisar($)
       if (ok) {
-        await ganharXp($, 2, e.tool)
+        await ganharXp($, xpDaFerramenta(papelDe(e.tool), fim - agora >= DEMORADA_MS), e.tool)
       }
     }
   }).catch(($, e, next) => next(e))
