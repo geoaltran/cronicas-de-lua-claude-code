@@ -110,20 +110,50 @@ function manaDe(limites: readonly SessionRateLimit[]): Hud['mana'] {
 
 const mochilaDe = (c: SessionContextUsage): number | null => (c.percent === undefined ? null : c.percent)
 
-async function salvarJogo($: $, jogo: Jogo): Promise<void> {
-  await $.store.set('jogo', jogo)
+/** O progresso guardado (o mesmo para todas as sessões abertas). */
+async function jogoGuardado($: $): Promise<Jogo> {
+  const salvo = (await $.store.get('jogo')) as Partial<Jogo> | undefined
+  return { ...JOGO0, ...(salvo ?? {}) }
+}
+
+// Uma mudança de progresso por vez nesta sessão (os ganchos correm juntos).
+let filaJogo: Promise<unknown> = Promise.resolve()
+
+/**
+ * Muda o progresso (XP, páginas, lutas, troféus, grimório). O progresso é
+ * compartilhado entre as sessões: cada mudança parte do que está guardado
+ * agora no $.store (outra sessão pode ter ganhado XP desde a última leitura),
+ * não da cópia desta sessão, e a cópia da sessão (hud.jogo) segue o resultado.
+ * Antes (1.0.1) cada sessão gravava a sua cópia inteira por cima da outra.
+ */
+function mudarJogo($: $, fn: (j: Jogo) => Jogo): Promise<Jogo> {
+  const vez = filaJogo.then(async () => {
+    const novo = fn(await jogoGuardado($))
+    await $.store.set('jogo', novo)
+    await update($, hud, h => ({ ...h, jogo: novo }))
+    return novo
+  })
+  filaJogo = vez.catch(() => undefined)
+  return vez
+}
+
+/** Traz para esta sessão o progresso que outras sessões gravaram. */
+async function sincronizarJogo($: $): Promise<void> {
+  await filaJogo
+  const j = await jogoGuardado($)
+  const atual = (await read($, hud)).jogo
+  if (JSON.stringify(j) !== JSON.stringify(atual)) {
+    await update($, hud, h => ({ ...h, jogo: j }))
+  }
 }
 
 /** XP para a Lua; com `tool`, conta também o feitiço no Grimório do Livro. */
 async function ganharXp($: $, quanto: number, tool?: string): Promise<void> {
-  let novo: Jogo = JOGO0
-  await update($, hud, h => {
-    const papel = tool === undefined ? undefined : papelDe(tool)
-    const feiticos = papel === undefined ? h.jogo.feiticos : { ...(h.jogo.feiticos ?? {}), [papel]: (h.jogo.feiticos?.[papel] ?? 0) + 1 }
-    novo = { ...h.jogo, xp: h.jogo.xp + quanto, ...(feiticos === undefined ? {} : { feiticos }) }
-    return { ...h, jogo: novo }
+  const papel = tool === undefined ? undefined : papelDe(tool)
+  await mudarJogo($, j => {
+    const feiticos = papel === undefined ? j.feiticos : { ...(j.feiticos ?? {}), [papel]: (j.feiticos?.[papel] ?? 0) + 1 }
+    return { ...j, xp: j.xp + quanto, ...(feiticos === undefined ? {} : { feiticos }) }
   })
-  await salvarJogo($, novo)
 }
 
 /** Colunas do último desenho da faixa em cada superfície (para calibrar a largura com /cronicas largura). */
@@ -335,13 +365,7 @@ async function ferirChefao($: $, vida: (c: Chefao) => number, n?: number, at?: n
   if (n !== undefined) {
     await update($, lutas, s => ({ ...s, lista: s.lista.map(l => (l.n === n && l.fixo === true ? { ...l, final: true } : l)) }))
   }
-  let jogo: Jogo = JOGO0
-  await update($, hud, h => {
-    const nv = nivelDe(h.jogo.xp)
-    jogo = { ...h.jogo, paginas: h.jogo.paginas + 1, xp: h.jogo.xp + xpDoChefao(a, nv.precisa, h.jogo.paginas) }
-    return { ...h, jogo }
-  })
-  await salvarJogo($, jogo)
+  await mudarJogo($, j => ({ ...j, paginas: j.paginas + 1, xp: j.xp + xpDoChefao(a, nivelDe(j.xp).precisa, j.paginas) }))
   return ferida
 }
 
@@ -364,28 +388,20 @@ async function revisar($: $, turnoAcabou = false): Promise<void> {
   const ganhas = depois.lista.filter(l => l.fecha !== undefined && antes.lista.some(a => a.n === l.n && a.fecha === undefined) && roteiro(l).desfecho?.tipo === 'vitoria')
   const vitorias = ganhas.filter(l => l.fixo !== true).length
   if (vitorias > 0) {
-    let jogo: Jogo = JOGO0
-    await update($, hud, h => {
-      jogo = { ...h.jogo, lutas: h.jogo.lutas + vitorias }
-      return { ...h, jogo }
-    })
-    await salvarJogo($, jogo)
+    const jogo = await mudarJogo($, j => ({ ...j, lutas: j.lutas + vitorias }))
     if (Math.floor(jogo.lutas / A_CADA) > Math.floor((jogo.lutas - vitorias) / A_CADA)) {
       await chamarChefao($, 'lutas')
     }
   }
   const elites = ganhas.filter(l => l.trofeu !== undefined)
   if (elites.length > 0) {
-    let jogo: Jogo = JOGO0
-    await update($, hud, h => {
-      const antes = h.jogo.trofeus ?? []
-      const tiposAntes = antes.map((_, i) => h.jogo.trofeusTipos?.[i] ?? 'edicao')
+    await mudarJogo($, j => {
+      const antes = j.trofeus ?? []
+      const tiposAntes = antes.map((_, i) => j.trofeusTipos?.[i] ?? 'edicao')
       const trofeus = [...elites.map(l => l.trofeu as string), ...antes].slice(0, TROFEUS_MAX)
       const trofeusTipos = [...elites.map(l => l.trofeuTipo ?? 'edicao'), ...tiposAntes].slice(0, TROFEUS_MAX)
-      jogo = { ...h.jogo, trofeus, trofeusTipos, xp: h.jogo.xp + ELITE_XP * elites.length }
-      return { ...h, jogo }
+      return { ...j, trofeus, trofeusTipos, xp: j.xp + ELITE_XP * elites.length }
     })
-    await salvarJogo($, jogo)
   }
   for (const l of ganhas.filter(g => g.fixo === true)) {
     const ch = await read($, chefao)
@@ -433,11 +449,64 @@ async function revisar($: $, turnoAcabou = false): Promise<void> {
   const prox = Math.min(...futuros.filter(t => t > agora))
   alarmeLuta?.cancel()
   alarmeLuta = undefined
+  proximoMarco = Number.isFinite(prox) ? prox : null
   if (Number.isFinite(prox)) {
     alarmeLuta = $.clock.after(prox - agora + 20, () => {
-      void update($, tique, n => n + 1).then(() => revisar($))
+      void marcoChegou($)
     })
   }
+  if (proximoMarco !== null) {
+    baterPulso($)
+  }
+}
+
+/** O instante do próximo redesenho da luta (null: nada marcado). */
+let proximoMarco: number | null = null
+/** Quanto o redesenho de um marco pode atrasar antes que o pulso o faça. */
+const ATRASO_MAX = 600
+const PULSO_MS = 1000
+let pulso: Timer | undefined
+
+/**
+ * Um marco da luta chegou: redesenha (a cena só leva as poses da Lua até o
+ * próximo marco) e põe a luta em dia. O redesenho vem antes, para a Lua não
+ * ficar parada se o revisar falhar.
+ */
+async function marcoChegou($: $): Promise<void> {
+  await update($, tique, n => n + 1)
+  try {
+    await revisar($)
+  } catch {
+    // o pulso tenta de novo
+  }
+}
+
+/**
+ * Rede de segurança durante lutas e chefões. Cada redesenho da luta leva só
+ * as poses da Lua até o próximo marco; se o alarme do marco se perde (o mod
+ * recarregou ou foi instalado no meio da sessão, o app recusou o alarme, um
+ * revisar falhou), o monstro continua a animação dele e a Lua fica parada
+ * respirando, sem atacar nem seguir viagem (bug relatado em 24/11/2026). O
+ * pulso confere uma vez por segundo e, se o marco passou sem redesenho, faz
+ * o redesenho. Para sozinho quando não há marco marcado.
+ */
+function baterPulso($: $): void {
+  if (pulso !== undefined) {
+    return
+  }
+  pulso = $.clock.every(PULSO_MS, () => {
+    void (async () => {
+      const agora = await $.clock.now()
+      if (proximoMarco === null) {
+        pulso?.cancel()
+        pulso = undefined
+        return
+      }
+      if (proximoMarco !== null && agora > proximoMarco + ATRASO_MAX) {
+        await marcoChegou($)
+      }
+    })().catch(() => undefined)
+  })
 }
 
 /**
@@ -1160,19 +1229,63 @@ export const SUBCOMANDOS: Readonly<Record<string, string>> = {
   'new-moon': 'lua-nova',
 }
 
+/** O mod já se preparou nesta sessão (idioma, progresso, barras). */
+let iniciado = false
+
+/** Prepara a sessão: idioma, progresso guardado, barras, lutas e Vigília. */
+async function iniciar($: $): Promise<void> {
+  iniciado = true
+  await aplicarIdioma($)
+  const jogo = await jogoGuardado($)
+  const uso = await $.session.usage()
+  await update($, hud, h => ({
+    ...h,
+    jogo,
+    mana: uso.rateLimits.length > 0 ? manaDe(uso.rateLimits) : h.mana,
+    mochila: mochilaDe(uso.context) ?? h.mochila,
+  }))
+  await revisar($)
+  await agendarVigilia($)
+}
+
+async function registrarComando($: $): Promise<void> {
+  await $.command.register({
+    name: 'cronicas',
+    description: tx('comando.descricao'),
+    argumentHint: 'language [en|pt-BR|…] | intro [on|off] | scale 2 | ruler | width 690 | image | frame | test | new-moon | vigil | boss [list N] [name] | hit | elite | surfaces',
+  })
+}
+
+/**
+ * Instalado ou atualizado no meio de uma sessão, o mod não recebe o
+ * session.start dela: sem isto ele ficaria no idioma padrão, com o progresso
+ * zerado e sem o /cronicas. O primeiro gancho da sessão faz o começo.
+ */
+async function garantirInicio($: $): Promise<void> {
+  if (iniciado) {
+    return
+  }
+  await iniciar($)
+  try {
+    await registrarComando($)
+  } catch {
+    // fora do session.start o app pode recusar: o /cronicas volta na próxima sessão
+  }
+}
+
+/** Mochila e Mana lidas na hora (o session.measure pode trazer o contexto vazio). */
+async function medirAgora($: $): Promise<void> {
+  const uso = await $.session.usage()
+  await update($, hud, h => ({
+    ...h,
+    mana: uso.rateLimits.length > 0 ? manaDe(uso.rateLimits) : h.mana,
+    mochila: mochilaDe(uso.context) ?? h.mochila,
+  }))
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    await aplicarIdioma($)
-    const salvo = (await $.store.get('jogo')) as Partial<Jogo> | undefined
-    const uso = await $.session.usage()
-    await update($, hud, h => ({
-      ...h,
-      jogo: { ...JOGO0, ...(salvo ?? {}) },
-      mana: uso.rateLimits.length > 0 ? manaDe(uso.rateLimits) : h.mana,
-      mochila: mochilaDe(uso.context) ?? h.mochila,
-    }))
-    await revisar($)
-    await agendarVigilia($)
+    await iniciar($)
     // abertura: na primeira sessão do dia ou depois que o app reiniciou (com
     // alguém olhando), se não foi desligada
     const aj = await lerAjustes($)
@@ -1184,11 +1297,7 @@ export const register: Register = on => {
         await abrirAbertura($, app)
       }
     }
-    await $.command.register({
-      name: 'cronicas',
-      description: tx('comando.descricao'),
-      argumentHint: 'language [en|pt-BR|…] | intro [on|off] | scale 2 | ruler | width 690 | image | frame | test | new-moon | vigil | boss [list N] [name] | hit | elite | surfaces',
-    })
+    await registrarComando($)
     return next(e)
   })
 
@@ -1431,6 +1540,9 @@ export const register: Register = on => {
   // (numa luta, ela só volta a andar quando a luta acaba).
   on('turn.start', async ($, e, next) => {
     if (e.agentId === undefined) {
+      await garantirInicio($)
+      // o progresso é compartilhado: traz o que outra sessão ganhou
+      await sincronizarJogo($)
       const agora = await $.clock.now()
       await update($, turno, () => true)
       const emLuta = lutaDaVez((await read($, lutas)).lista, agora) !== undefined || dePe(await read($, chefao))
@@ -1453,6 +1565,7 @@ export const register: Register = on => {
       // a última ferramenta do turno decide a luta na hora
       await revisar($, true)
       await ganharXp($, 1)
+      await medirAgora($)
       if ((await read($, botoes)).estandarte === 'escrevendo') {
         await update($, botoes, (b): Botoes => ({ ...b, estandarte: 'pronto' }))
       }
@@ -1495,6 +1608,7 @@ export const register: Register = on => {
       }
       return res
     }
+    await garantirInicio($)
     const agora = await $.clock.now()
     let n = 0
     let nova: Luta | null = null

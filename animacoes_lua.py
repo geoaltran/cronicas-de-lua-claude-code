@@ -37,6 +37,11 @@ FOLHAS = {
     # reação quando o escudo do chefão segura o golpe (8ª sessão; escolher uma)
     "triste": {"n": 2, "altura_origem": 1255},
     "duvida": {"n": 2, "altura_origem": 1258},
+    # lua nova (o luar acabou): ela dorme deitada no lugar do desmaio.
+    # Quadro largo; a escala casa a cabeça com a da Lua em pé (pixel de 15,5 px
+    # na folha; o da própria folha, 19,8, deixava a cabeça pequena demais)
+    "dormindo": {"n": 2, "arquivo": "lua_dormindo.jpeg", "deitada": True,
+                 "pixel_origem": 15.5, "qw": 100},
 }
 
 
@@ -76,6 +81,8 @@ def quantizar(cor, alfa, pal):
 
 def processar(nome, cfg, pal):
     rgb = np.asarray(Image.open(BRUTOS / cfg.get("arquivo", f"lua_{nome}.jpg")).convert("RGB"))
+    if cfg.get("deitada"):
+        return processar_deitada(rgb, cfg, pal)
     s = cfg.get("altura_origem", 0) / ALTURA
     mascaras = figuras(rgb)
     assert len(mascaras) == cfg["n"], f"{nome}: achei {len(mascaras)} quadros, esperava {cfg['n']}"
@@ -116,6 +123,59 @@ def processar(nome, cfg, pal):
     return tira, info
 
 
+def processar_deitada(rgb, cfg, pal):
+    """Pose deitada (dormindo): quadro largo, corpo apoiado na linha dos pés.
+    O 2º quadro é encaixado no 1º pelo deslocamento que mais casa os pixels
+    (a respiração não pode fazer a cabeça pular)."""
+    s, qw = cfg["pixel_origem"], cfg["qw"]
+    sprs = []
+    for m in figuras(rgb):
+        sl = pa.recorte(m)
+        grid = pa.detectar_grid(rgb[sl], m[sl], (s, s))
+        cor, alfa = pa.reamostrar(rgb[sl], m[sl], grid)
+        alfa = pa.limpar_halo(cor, alfa)
+        spr = quantizar(cor, alfa, pal)
+        ys, xs = np.nonzero(spr[..., 3])
+        sprs.append(spr[ys.min():ys.max() + 1, xs.min():xs.max() + 1])
+    assert len(sprs) == cfg["n"], f"deitada: achei {len(sprs)} quadros"
+
+    def apoio(spr):
+        # linha onde o corpo encosta no chão: o fundo do terço da direita
+        # (pernas e botas); a varinha, na frente, pode descer um pouco mais
+        a = spr[..., 3] > 0
+        return int(np.nonzero(a[:, a.shape[1] * 2 // 3:].any(1))[0].max())
+
+    base = sprs[0]
+    pos = [(0, 0)]
+    for spr in sprs[1:]:
+        melhor = None
+        for dy in range(-4, 5):
+            for dx in range(-4, 5):
+                h = min(base.shape[0], spr.shape[0]); w = min(base.shape[1], spr.shape[1])
+                a = np.zeros((h + 10, w + 10, 4), np.uint8); b = a.copy()
+                a[5:5 + h, 5:5 + w] = base[:h, :w]
+                y0, x0 = 5 + dy, 5 + dx
+                b[y0:y0 + h, x0:x0 + w] = spr[:h, :w]
+                # compara só a metade da esquerda (cabeça e mochila)
+                meia = (w + 10) // 2
+                d = (np.abs(a[:, :meia].astype(int) - b[:, :meia].astype(int))).sum()
+                if melhor is None or d < melhor[0]:
+                    melhor = (d, dx, dy)
+        pos.append((melhor[1], melhor[2]))
+    tira = np.zeros((QH, qw * len(sprs), 4), np.uint8)
+    info = []
+    # a varinha desce além do apoio; se não couber no quadro, o corpo sobe
+    y_base = min(PES - apoio(base), QH - max(sp.shape[0] + dy for sp, (_, dy) in zip(sprs, pos)))
+    x_base = (qw - base.shape[1]) // 2
+    for i, (spr, (dx, dy)) in enumerate(zip(sprs, pos)):
+        h, w = spr.shape[:2]
+        x, y = i * qw + x_base + dx, y_base + dy
+        dest = tira[y:y + h, x:x + w]
+        tira[y:y + h, x:x + w] = np.where(spr[..., 3:] > 0, spr, dest)
+        info.append({"altura": int(h), "acima_do_chao": 0})
+    return tira, info
+
+
 def ponta_da_varinha(tira, i):
     """Ponta da varinha no quadro i: o pixel opaco mais à direita na metade de cima."""
     q = tira[:, i * QW:(i + 1) * QW, 3] > 0
@@ -142,6 +202,8 @@ def gerar(apenas=None):
         arq = f"lua_{nome}_{cfg['n']}f.png"
         Image.fromarray(tira).save(SAIDA / arq)
         meta["quadros"][nome] = {"arquivo": arq, "n": cfg["n"], "quadros": info}
+        if "qw" in cfg:
+            meta["quadros"][nome]["quadro"] = [cfg["qw"], QH]
         if nome == "ataque":
             meta["quadros"][nome]["ponta_da_varinha"] = [ponta_da_varinha(tira, i) for i in range(cfg["n"])]
             meta["quadros"][nome]["lancamento"] = 2

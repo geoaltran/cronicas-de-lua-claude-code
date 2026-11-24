@@ -52,10 +52,11 @@ Quando um chefão aparece, a cena toda ganha **o tom dele**, e uma **barra de vi
 
 ## 📊 As barras: o que elas mostram de verdade
 
-- 🌕 **Luz da Lua (vida):** se a "memória rápida" da conversa (o cache) ainda está quente. A lua do céu vai **minguando** conforme o tempo passa. Se eu largo a conversa parada muito tempo, vira **lua nova**, a Lua desmaia, e a próxima mensagem sai mais cara.
+- 🌕 **Luz da Lua (vida):** se a "memória rápida" da conversa (o cache) ainda está quente. A lua do céu vai **minguando** conforme o tempo passa. Se eu largo a conversa parada muito tempo, vira **lua nova**, a Lua cai no sono (deitada, com Zs subindo), e a próxima mensagem sai mais cara.
 - 🔷 **Mana Estelar:** quanto ainda tenho do **meu limite de uso** do plano (janela de 5 horas; a de 7 dias aparece ao passar o mouse).
 - 🎒 **Mochila:** o quanto a **conversa já encheu**. Cheia demais, hora de arrumar a mochila.
 - ⭐ **Nível (XP):** sobe conforme eu uso, e vitória maior vale mais: ferramenta comum +2, ferramenta demorada +4, subagente +6, tarefa da lista concluída +5, erro consertado (elite) +15 e chefão pela força dele (no máximo 60% de um nível; no Novo Jogo+ vale 1,5 vez). O selo vai do 1 ao 9999, e a cada 2 níveis a varinha e a roupa da Lua melhoram.
+- 🪟 **Várias conversas abertas:** cada uma tem a **sua** faixa (barras, luta, caminhada e chefão dela). O **progresso é um só**: XP, nível, páginas e troféus de todas as conversas se somam.
 - 📜 **Páginas das Crônicas:** quantos chefões já derrotei (x/10).
 
 ## 🎛️ Os botões

@@ -164,6 +164,24 @@
      "acima_do_chao": 0
     }
    ]
+  },
+  "dormindo": {
+   "arquivo": "lua_dormindo_2f.png",
+   "n": 2,
+   "quadros": [
+    {
+     "altura": 60,
+     "acima_do_chao": 0
+    },
+    {
+     "altura": 60,
+     "acima_do_chao": 0
+    }
+   ],
+   "quadro": [
+    100,
+    100
+   ]
   }
  }
 }

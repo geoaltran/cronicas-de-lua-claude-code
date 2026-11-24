@@ -302,6 +302,53 @@ function luaDoCeu(d: Doc, v: Vista, x0: number, fundoTopo: number): string {
 
 // ---------------------------------------------------------------- Lua
 
+/** Lua dormindo (lua nova): respira devagar, quadro largo (100 px) um pouco
+ * à esquerda do quadro comum. Os Zs saem da cabeça, sobem balançando de pixel
+ * em pixel, dobram de tamanho no meio do caminho e somem. */
+const DORMINDO: readonly Q[] = [[0, 1400], [1, 1400]]
+const DQW = 100
+const DESCE_DORMINDO = 3
+const Z_MS = 3000
+// caminho de cada Z (px inteiros, para não borrar): sobe 21 e balança
+const Z_PASSOS: readonly [number, number][] = [
+  [0, 0], [1, -2], [2, -4], [2, -6], [1, -8], [0, -10], [0, -12], [1, -14], [2, -16], [2, -18], [1, -20], [1, -21],
+]
+// Z de 4x4 células; a sombra escura vai 1 célula para baixo e para a direita
+const Z_CELULAS = ['XXXX', '..X.', '.X..', 'XXXX']
+
+function zPixel(): string {
+  const rects = (cor: string, o: number) =>
+    Z_CELULAS.flatMap((l, y) => [...l].map((c, x) => (c === 'X' ? `<rect x="${x + o}" y="${y + o}" width="1" height="1" fill="${cor}"/>` : ''))).join('')
+  return `<g shape-rendering="crispEdges">${rects('#1b1833', 1)}${rects('#dfe8ff', 0)}</g>`
+}
+
+function dormindo(d: Doc, agora: number): string {
+  // desce DESCE_DORMINDO px: no quadro ela apoia 1-2 px acima dos pés e parecia flutuar
+  return d.tira('lua_dormindo', -10, DESCE_DORMINDO, DQW, 100, DORMINDO, agora)
+}
+
+/** Os Zs vão por cima do escurecimento da lua nova (senão somem no escuro). */
+function zsDormindo(d: Doc, v: Vista): string {
+  const agora = v.agora
+  const n = Z_PASSOS.length
+  const anda = Z_PASSOS.map(([x, y], i) => `${((i / n) * 100).toFixed(2)}%{transform:translate(${x}px,${y}px)}`).join('') + `100%{transform:translate(${Z_PASSOS[n - 1]![0]}px,${Z_PASSOS[n - 1]![1]}px)}`
+  const some = '0%{opacity:0}8%{opacity:1}70%{opacity:1}100%{opacity:0}'
+  // pequeno (1 px por célula) até a metade, depois 2 px por célula; cresce a partir do canto de baixo
+  const cresce = '0%{transform:translate(0,0) scale(1)}45%{transform:translate(0,-4px) scale(2)}100%{transform:translate(0,-4px) scale(2)}'
+  const zs: string[] = []
+  for (let i = 0; i < 3; i++) {
+    const atraso = -mod(agora + (i * Z_MS) / 3, Z_MS)
+    const a = d.anim(anda, Z_MS, 'step-end', atraso, 'infinite')
+    const o = d.anim(some, Z_MS, 'linear', atraso, 'infinite')
+    const c = d.anim(cresce, Z_MS, 'step-end', atraso, 'infinite')
+    zs.push(`<g class="${o}"><g class="${a}"><g class="${c}">${zPixel()}</g></g></g>`)
+  }
+  // a cabeça fica no alto, à esquerda do quadro: os Zs nascem logo acima do rosto
+  // (mesma origem da Lua em lua(): x 40, pés na linha 96 do quadro)
+  const y = 209 - JANELA[v.modo].topo - PES_Q
+  return `<g transform="translate(${40 + 34} ${y + 34 + DESCE_DORMINDO})">${zs.join('')}</g>`
+}
+
 function lua(d: Doc, v: Vista, desmaiada: boolean, naLuta?: { corpo: string; trilha: [number, string][] }): string {
   const pes = 209 - JANELA[v.modo].topo
   const x = 40
@@ -322,7 +369,7 @@ function lua(d: Doc, v: Vista, desmaiada: boolean, naLuta?: { corpo: string; tri
       `<g opacity="0"><animate attributeName="opacity" values="0;1" keyTimes="0;1" calcMode="discrete" ${tempo}/>` +
       `${d.tira('lua_parada', 0, 0, QW, 100, PARADA, v.agora)}</g>`
   } else if (desmaiada) {
-    corpo = d.tira('lua_dano', 0, 0, QW, 100, [[1, 1]], 0)
+    corpo = dormindo(d, v.agora)
   } else if (naLuta !== undefined) {
     corpo = d.pista(naLuta.trilha, v.agora, naLuta.corpo)
   } else if (andandoAgora(v.caminho, v.agora)) {
@@ -983,6 +1030,9 @@ export function montar(v: Vista): { svg: string; largura: number; altura: number
   }
   if (l.desmaiada) {
     corpo.push(`<rect width="${v.W}" height="${H}" fill="#140f2e" opacity="0.38"/>`)
+    if (faseAbertura(v) === undefined) {
+      corpo.push(zsDormindo(d, v))
+    }
     corpo.push(avisoLuaNova(v.W, H, v.fraseLuaNova ?? fraseLuaNova(), v.avisoNoMeio ?? true))
   }
   const hd = hud(d, v, H)
