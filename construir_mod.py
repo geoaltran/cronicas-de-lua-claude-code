@@ -434,11 +434,12 @@ def monstros():
     from tamanho_monstros import para_luta
 
     for nome, c in chefoes.items():
-        # sprite da luta: Golem e Relojoeiro com 110 px, Nébula e Leviatã com 126 (faixa de altura fixa)
+        # sprite da luta: Vespera 95 px; Golem, Relojoeiro, Nébula e Leviatã 126 (faixa de altura fixa)
         guarda(f"m_{nome}", para_luta(nome))
         guarda(f"f_{nome}", abre(A / "chefoes" / nome / c["frente"]))
     teia = A / "chefoes" / "vespera" / "teia"
-    guarda("vespera_sem_teia", abre(teia / "vespera_02_sem_teia.png"))
+    # Vespera v4: o sprite de luta já vem sem teia; as teias giram por cima (teia.json)
+    guarda("vespera_sem_teia", para_luta("vespera"))
     for i in range(4):
         guarda(f"teia_{i}", abre(teia / f"teia_giro_{i}.png"))
     return chefoes

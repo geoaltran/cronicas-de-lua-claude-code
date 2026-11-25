@@ -3,15 +3,12 @@
   "arena": "vespera_02.png",
   "espelhar": true,
   "frente": "vespera_01.png",
-  "w": 110,
-  "h": 92,
+  "w": 150,
+  "h": 123,
   "vistas": [
    "vespera_01.png",
    "vespera_02.png",
-   "vespera_03.png",
-   "vespera_04.png",
-   "vespera_05.png",
-   "vespera_06.png"
+   "vespera_03.png"
   ]
  },
  "dama_penumbra": {
@@ -34,15 +31,12 @@
   "arena": "golem_obsidiana_02.png",
   "espelhar": true,
   "frente": "golem_obsidiana_01.png",
-  "w": 186,
-  "h": 164,
+  "w": 136,
+  "h": 184,
   "vistas": [
    "golem_obsidiana_01.png",
    "golem_obsidiana_02.png",
-   "golem_obsidiana_03.png",
-   "golem_obsidiana_04.png",
-   "golem_obsidiana_05.png",
-   "golem_obsidiana_06.png"
+   "golem_obsidiana_03.png"
   ]
  },
  "leviata": {

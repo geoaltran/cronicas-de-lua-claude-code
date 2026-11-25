@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 
 RAIZ = Path(__file__).parent
 A = RAIZ / "assets"
-AMPLIAR = {"vespera": 2, "ignis": 2, "leviata": 2, "golem_obsidiana": 2}  # malakor v3, relojoeiro v4 e nebula v2: sem ampliação
+AMPLIAR = {"ignis": 2, "leviata": 2}  # malakor v3, relojoeiro v4, nebula v2, golem v5 e vespera v4: sem ampliação
 
 
 def original(nome: str, im: Image.Image) -> Image.Image:
@@ -45,12 +45,13 @@ def no_tamanho(nome: str, fator: int) -> Image.Image:
 # Lutas comuns (pedido do usuário, 22/11/2026): a faixa tem altura fixa e o
 # chão fica a 139 px do topo, então ninguém pode encostar a cabeça lá em cima.
 # Malakor (chefe final, Fase 3): 126 px, opção A aprovada pelo usuário em 22/11/2026.
-ALTURA_LUTA = {"golem_obsidiana": 110, "nebula": 126, "relojoeiro": 126, "leviata": 126, "malakor": 126}
+# Golem v5 (126, punho erguido) e Vespera v4 (95): escolha do usuário, 25/11/2026
+ALTURA_LUTA = {"golem_obsidiana": 126, "vespera": 95, "nebula": 126, "relojoeiro": 126, "leviata": 126, "malakor": 126}
 
 
 # Malakor v3 (25/11/2026): 169 -> 126 px. O "vizinho" descarta 1 de cada 4 linhas
 # e quebra o fio dos anéis; esta redução guarda as linhas finas.
-REDUZIR_CONTRASTE = {"malakor", "relojoeiro", "nebula"}  # v3 e v4: desenhos grandes no pixel da Lua, reduzidos guardando as linhas finas
+REDUZIR_CONTRASTE = {"malakor", "relojoeiro", "nebula", "golem_obsidiana", "vespera"}  # v3 e v4: desenhos grandes no pixel da Lua, reduzidos guardando as linhas finas
 
 
 def reduzir_contraste(im, alvo_h):

@@ -215,3 +215,36 @@ def aplicar(im, vista=None):
     sem_crop = sem_pad.crop(caixa)
     centros_final = [(cx + m - caixa[0], cy + m - caixa[1]) for cx, cy in centros]
     return com, sem_crop, centros_final
+
+
+# Vespera v4 (25/11/2026): vem sem teia e já no pixel da Lua. As teias só existem
+# na luta, desenhadas pelo mod por cima do sprite de luta (95 px, sem espelho):
+# uma no canto de cima, junto do abdômen, e outra pendurada na pata erguida.
+TEIAS_LUTA = [(8, 10), (106, 26)]
+
+
+def luta(pasta):
+    """Grava em `pasta` (assets/chefoes/vespera/teia) os quadros de giro em 1x e o
+    teia.json com os centros no sprite de luta (tamanho_monstros.para_luta)."""
+    import json
+    from pathlib import Path
+    pasta = Path(pasta)
+    pasta.mkdir(parents=True, exist_ok=True)
+    for velho in pasta.glob("*.png"):
+        velho.unlink()
+    for q, im in enumerate(quadros_giro(4)):
+        im.save(pasta / f"teia_giro_{q}.png")
+    _, (tcx, tcy) = desenhar_teia()
+    meta = {"centro_da_teia_no_png": [tcx, tcy], "quadros_giro": 4,
+            "teias_por_vista": {"vespera_02.png": [list(c) for c in TEIAS_LUTA]},
+            "uso": "centros no sprite de luta (m_vespera, antes do espelho): desenhe "
+                   "teia_giro_N.png com o centro_da_teia_no_png em cada centro; alterne N para girar"}
+    (pasta / "teia.json").write_text(json.dumps(meta, indent=1))
+
+
+if __name__ == "__main__":
+    import sys
+    from pathlib import Path
+    if sys.argv[1:] == ["--luta"]:
+        luta(Path(__file__).parent / "assets" / "chefoes" / "vespera" / "teia")
+        print("teia da luta gravada em assets/chefoes/vespera/teia/")

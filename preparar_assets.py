@@ -60,9 +60,13 @@ FOLHAS = {
 
 # Chefões: uma folha de turnaround cada, vistas encontradas automaticamente.
 CHEFOES = {
-    "vespera": "vespera.jpg",
+    # vespera_v4.jpeg (25/11/2026, 3ª rodada): no pixel da Lua, sem teia (as teias
+    # da luta saem de teia_vespera.py --luta)
+    "vespera": "vespera_v4.jpeg",
     "dama_penumbra": "dama_penumbra.jpg",
-    "golem_obsidiana": "golem_obsidiana.jpg",
+    # golem_obsidiana_v5.jpeg (25/11/2026, 3ª rodada): no pixel da Lua (5,73 px no
+    # bruto); o v2..v4 vieram com o pixel 2x
+    "golem_obsidiana": "golem_obsidiana_v5.jpeg",
     "leviata": "leviata.jpg",
     "ignis": "ignis.jpg",
     "relojoeiro": "relojoeiro_v4.jpeg",  # v4 (25/11/2026): no tamanho de pixel da Lua, sem ampliar
@@ -77,10 +81,8 @@ AMPLIAR = {
     # mesmo porte da Lua (tamanho nativo): sir_solis (rival), rei_espelho (cópia
     # da Lua), dama_penumbra (feiticeira humana)
     # relojoeiro: 1 (o v4 já vem no porte final; o v3 era 41 -> 123 px com "vizinho")
-    "vespera": 2,          # 46 -> 92 px: aranha-espectral
     "ignis": 2,            # 56 -> 112 px: ave gigante
     "leviata": 2,          # 69 -> 138 px: serpente gigante
-    "golem_obsidiana": 2,  # 82 -> 164 px: colosso
     # nebula: 1 (o v2 já vem no porte final; o v1 era 92 -> 184 com Scale2x)
     # malakor: 1 (o v3 já vem com ~169 px; o original era 90 -> 180 com Scale2x)
 }
@@ -89,7 +91,11 @@ AMPLIAR = {
 # ficaram deformados, e o desenho dele fica melhor com os pixels exatos.
 METODO_AMPLIAR = {}  # (o Relojoeiro v3 usava "vizinho"; o v4 não amplia)
 # Folhas de fundo escuro liso (#2b2233, pedidas assim nos prompts v2/v3)
-FUNDO_ESCURO = {"malakor", "relojoeiro", "nebula"}
+FUNDO_ESCURO = {"malakor", "relojoeiro", "nebula", "golem_obsidiana", "vespera"}
+# A folha do Golem v2 veio com uma lua e nuvens no fundo, acima da linha 320
+# (o Golem começa na 355): tudo acima desta linha é fundo
+# (com o Golem v2 de volta: {"golem_obsidiana": 340}, e ele em FUNDO_ESCURO)
+IGNORAR_ACIMA: dict = {}
 for _nome, _arquivo in CHEFOES.items():
     FOLHAS[f"chefao_{_nome}"] = {
         "arquivo": f"chefoes/{_arquivo}", "auto": True, "pasta": f"chefoes/{_nome}",
@@ -99,8 +105,10 @@ for _nome, _arquivo in CHEFOES.items():
         "fundo_escuro": _nome in FUNDO_ESCURO,
         # vãos fechados da cor do fundo também são fundo (anéis do Malakor); no
         # Relojoeiro a calça escura tem quase a cor do fundo e sumia
-        "vaos": True if _nome == "malakor" else "cor" if _nome in ("relojoeiro", "nebula") else False,
-        "teia_redesenhada": _nome == "vespera",
+        "vaos": True if _nome == "malakor" else "cor" if _nome in ("relojoeiro", "nebula", "golem_obsidiana", "vespera") else False,
+        "ignorar_acima": IGNORAR_ACIMA.get(_nome, 0),
+        # a Vespera v1 trazia teias ruidosas para trocar; a v4 vem sem teia
+        "teia_redesenhada": _nome == "vespera" and _arquivo == "vespera.jpg",
         "ampliar": AMPLIAR.get(_nome, 1),
         "metodo_ampliar": METODO_AMPLIAR.get(_nome, "pixelart"),
     }
@@ -289,6 +297,8 @@ def processar_auto(folha):
     anéis) da vista mais próxima."""
     rgb = np.asarray(Image.open(BRUTOS / folha["arquivo"]).convert("RGB"))
     fundo = mascara_fundo_escuro(rgb, folha.get("vaos", True)) if folha.get("fundo_escuro") else mascara_fundo(rgb)
+    if folha.get("ignorar_acima"):
+        fundo[: folha["ignorar_acima"]] = True
     if folha.get("buracos_brancos"):
         # branco preso dentro da figura (ex.: entre os anéis do Malakor e o corpo)
         # também é fundo. Só liga por folha: em outros chefões o branco preso é
