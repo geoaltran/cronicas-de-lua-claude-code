@@ -1,4 +1,5 @@
 import { expect, mock, test } from 'claude-code/testing'
+import { LIMITE_APP, altDaCena, fonteDaCena, medida } from './cena'
 
 const FAIXA = {
   plugin: 'cronicas-de-lua',
@@ -25,10 +26,9 @@ test('no desktop a faixa desenha a cena em SVG, com a Lua parada', async ($, on)
   await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
 
   const ui = await $.ui.mount({ ...FAIXA, surface: 'desktop' })
-  const svg = await ui.find({ type: 'Svg' })
-  expect(svg).toBeDefined()
-  const fonte = String((svg as { props?: { source?: string } })?.props?.source ?? '')
-  expect(fonte.length).toBeLessThan(131072)
+  const fonte = await fonteDaCena(ui)
+  expect(fonte).toContain('<svg')
+  expect(medida(fonte)).toBeLessThan(LIMITE_APP)
   expect(fonte).toContain('72%')
   expect(fonte).toContain('35%')
   expect(fonte).toContain('Nível 7')
@@ -56,8 +56,7 @@ test('na lua nova a faixa mostra o aviso e pede confirmação antes do /clear', 
   await $.command.run({ command: 'cronicas', args: 'lua-nova', origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } })
 
   const ui = await $.ui.mount({ ...FAIXA, surface: 'desktop' })
-  const svg = await ui.find({ type: 'Svg' })
-  expect(String((svg as { props?: { source?: string } })?.props?.source ?? '')).toContain('se cansou')
+  expect(await fonteDaCena(ui)).toContain('se cansou')
   await ui.press({ key: 'nova' })
   expect(rodados).toEqual([])
   await ui.press({ key: 'sim' })

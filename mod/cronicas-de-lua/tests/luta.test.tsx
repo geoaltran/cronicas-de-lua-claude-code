@@ -1,5 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
+import { LIMITE_APP, altDaCena, fonteDaCena, medida } from './cena'
 
 const FAIXA = {
   plugin: 'cronicas-de-lua',
@@ -37,8 +38,7 @@ async function comecar($: Dolar, on: On, ferramentas: readonly Ferramenta[] = []
   await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount(FAIXA)
   const svg = async () => {
-    const no = await ui.find({ type: 'Svg' })
-    return String((no as { props?: { source?: string } })?.props?.source ?? '')
+    return fonteDaCena(ui)
   }
   return { clock, ui, svg }
 }
@@ -139,12 +139,12 @@ test('em todo redesenho da luta o SVG cabe no limite do app', async ($, on) => {
   const { clock, ui, svg } = await comecar($, on, [['WebSearch', 2600]])
   const p = $.tool.call({ tool: 'WebSearch', query: 'pixel art' })
   await clock.settle()
-  let maior = (await svg()).length
+  let maior = medida(await svg())
   for (let t = 0; t < 12000; t += 70) {
     await clock.advance(70)
-    maior = Math.max(maior, (await svg()).length)
+    maior = Math.max(maior, medida(await svg()))
   }
   await p
-  expect(maior).toBeLessThan(131072)
+  expect(maior).toBeLessThan(LIMITE_APP)
   await ui.unmount()
 })

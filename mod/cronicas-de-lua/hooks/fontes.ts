@@ -20,12 +20,16 @@ const face = (familia: string, url: string, extra = '') => `@font-face{font-fami
 /** A lista de famílias dos textos curtos (barras, títulos, nome do chefão). */
 export const familiaCurta = () => (ehCJK() ? "'Fusion','Fusion Longa',ui-monospace,monospace" : "'Silkscreen',ui-monospace,monospace")
 
-/** Classes de texto da cena (.t curto com contorno, .l longo) com a fonte curta embutida. */
-export function cssTexto(): string {
+/**
+ * Classes de texto da cena (.t curto com contorno, .l longo) com a fonte curta
+ * embutida. `semCurta`: sem a Silkscreen (os balões só escrevem na Pixelify; a
+ * árvore da faixa inteira tem teto no app e são 9 balões). No CJK a Fusion fica.
+ */
+export function cssTexto(semCurta = false): string {
   const f = fusion()
   return (
     // Silkscreen: grade de 8 px; 12 px = 1,5 px de tela por pixel da fonte. Fusion: 12 px = 1 para 1.
-    (f === undefined ? face('Silkscreen', FONTE) : face('Fusion', f.cena)) +
+    (f === undefined ? (semCurta ? '' : face('Silkscreen', FONTE)) : face('Fusion', f.cena)) +
     `.t{font-family:${familiaCurta()};font-size:12px;fill:#fff6d8;stroke:#1d1433;stroke-width:2px;paint-order:stroke;text-rendering:optimizeSpeed}` +
     '.m{text-anchor:middle}.e{text-anchor:end}.n{fill:#e9d9ff}.b{font-size:12px}' +
     // textos longos (balões, aviso de lua nova): Pixelify Sans, com minúsculas; ou a Fusion, sempre em 12 px

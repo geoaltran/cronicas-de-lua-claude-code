@@ -1,6 +1,7 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 import { nivelDe } from '../hooks/cena'
+import { LIMITE_APP, altDaCena, fonteDaCena, medida } from './cena'
 
 // 1.0.2: o estado da faixa (barras, luta, caminho, chefão) é de cada sessão
 // ($.state); só o progresso (XP, páginas, lutas, troféus) é compartilhado
@@ -63,8 +64,7 @@ function leitura(on: On, clock: ReturnType<typeof mock.clock>, ms: number) {
 async function faixa($: Dolar) {
   const ui = await $.ui.mount(FAIXA)
   const svg = async () => {
-    const no = await ui.find({ type: 'Svg' })
-    return String((no as { props?: { source?: string } })?.props?.source ?? '')
+    return fonteDaCena(ui)
   }
   return { ui, svg }
 }

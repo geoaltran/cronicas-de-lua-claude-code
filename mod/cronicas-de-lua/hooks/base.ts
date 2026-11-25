@@ -43,6 +43,12 @@ export class Doc {
   private ids = new Set<string>()
   private n = 0
 
+  /** `pre` nos ids e classes: duas cenas (cenário e frente) cabem num SVG só sem trocar nomes. */
+  private readonly pre: string
+  constructor(pre = '') {
+    this.pre = pre
+  }
+
   /** Cada imagem entra uma vez só (em <defs>) e é reusada com <use>. */
   img(nome: string): string {
     if (!this.ids.has(nome)) {
@@ -55,7 +61,7 @@ export class Doc {
 
   id(prefixo: string): string {
     this.n += 1
-    return `${prefixo}${this.n}`
+    return `${this.pre}${prefixo}${this.n}`
   }
 
   private quadros = new Map<string, string>()

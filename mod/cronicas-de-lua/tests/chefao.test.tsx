@@ -1,6 +1,7 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 import { PONTOS_POR_TAREFA, chefaoPeloNome, crescer, critico, defesa, ferir, novoChefao, vidaEmTarefas } from '../hooks/chefao'
+import { CORTE, LIMITE_APP, altDaCena, fonteDaCena, medida } from './cena'
 
 const FAIXA = {
   plugin: 'cronicas-de-lua',
@@ -38,12 +39,10 @@ async function comecar($: Dolar, on: On, ferramentas: readonly Ferramenta[] = []
   await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount(FAIXA)
   const svg = async () => {
-    const no = await ui.find({ type: 'Svg' })
-    return String((no as { props?: { source?: string } })?.props?.source ?? '')
+    return fonteDaCena(ui)
   }
   const alt = async () => {
-    const no = await ui.find({ type: 'Svg' })
-    return String((no as { props?: { alt?: string } })?.props?.alt ?? '')
+    return altDaCena(ui)
   }
   return { clock, ui, svg, alt }
 }
@@ -142,10 +141,10 @@ test('com o chefão em cena todo redesenho cabe no limite do app', async ($, on)
   let maior = 0
   for (let t = 0; t < 12000; t += 70) {
     await clock.advance(70)
-    maior = Math.max(maior, (await svg()).length)
+    maior = Math.max(maior, medida(await svg()))
   }
   await p
-  expect(maior).toBeLessThan(131072)
+  expect(maior).toBeLessThan(LIMITE_APP)
   await ui.unmount()
 })
 
@@ -167,7 +166,7 @@ async function apareceu(clock: { advance(ms: number): Promise<void> }, svg: () =
   for (let t = 0; t < ms; t += 70) {
     await clock.advance(70)
     const s = await svg()
-    maior = Math.max(maior, s.length)
+    maior = Math.max(maior, medida(s))
     viu = viu || s.includes(texto)
   }
   return { viu, maior }
@@ -222,7 +221,7 @@ test('no chefão de lista a ferramenta bate no escudo e a vida não cai de bloco
   await p
   const escudo = await apareceu(clock, svg, 'id="escudo"', 4000)
   expect(escudo.viu).toBe(true)
-  expect(escudo.maior).toBeLessThan(131072)
+  expect(escudo.maior).toBeLessThan(LIMITE_APP)
   // o escudo defendeu: a Lua não comemora; fica em dúvida com o "?" azul
   let viuDuvida = false
   let viuPergunta = false
@@ -249,7 +248,7 @@ test('no chefão de lista a ferramenta bate no escudo e a vida não cai de bloco
   await usar($, clock, { tool: FECHO, recap: 'pronto' })
   const crit = await apareceu(clock, svg, 'CRÍTICO!', 3200)
   expect(crit.viu).toBe(true)
-  expect(crit.maior).toBeLessThan(131072)
+  expect(crit.maior).toBeLessThan(LIMITE_APP)
   expect(await svg()).toContain('PÁGINA 1/10')
   await ui.unmount()
 })
@@ -311,7 +310,7 @@ test('modo quadro (balões e fonte longa no SVG): Relojoeiro e Ignis trocam o bi
   on('command.register', () => ({ value: { command: 'cronicas' } }))
   await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount({ ...FAIXA, props: { ...FAIXA.props, bodyColumns: 120 } })
-  const svg = async () => String(((await ui.find({ type: 'Svg' })) as { props?: { source?: string } })?.props?.source ?? '')
+  const svg = async () => await fonteDaCena(ui)
   const cmd = (args: string) => $.command.run({ command: 'cronicas', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 } })
   for (const [nome, bioma] of [['relojoeiro', 'torre'], ['ignis', 'vulcao'], ['golem', 'ruinas'], ['relojoeiro', 'torre']] as const) {
     await cmd(`chefao ${nome}`)
@@ -319,7 +318,36 @@ test('modo quadro (balões e fonte longa no SVG): Relojoeiro e Ignis trocam o bi
       await clock.advance(passo)
       const f = await svg()
       expect(f).toContain(`id="b_${bioma}_chao"`)
+      // no modo quadro a cena é um Svg só (interativo): vale o limite documentado
+      expect(f.split(CORTE).length).toBe(1)
       expect(f.length).toBeLessThan(131072)
+    }
+  }
+  await ui.unmount()
+})
+
+test('desktop: cenário e frente em dois Svg; Relojoeiro e Ignis trocam o bioma e cada Svg cabe no teto codificado', async ($, on) => {
+  const clock = mock.clock(on, { now: T0 })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5 }, ajustes: {} })
+  on('session.usage', () => ({
+    value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [{ kind: 'five_hour', percentUsed: 28 }] },
+  }))
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('command.register', () => ({ value: { command: 'cronicas' } }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ ...FAIXA, props: { ...FAIXA.props, bodyColumns: 120 } })
+  const svg = async () => await fonteDaCena(ui)
+  const cmd = (args: string) => $.command.run({ command: 'cronicas', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 } })
+  for (const [nome, bioma] of [['relojoeiro', 'torre'], ['ignis', 'vulcao'], ['golem', 'ruinas'], ['relojoeiro', 'torre']] as const) {
+    await cmd(`chefao ${nome}`)
+    for (const passo of [100, 1500, 3000]) {
+      await clock.advance(passo)
+      const f = await svg()
+      const [fundo, frente] = f.split(CORTE)
+      expect(frente).toBeDefined()
+      expect(fundo).toContain(`id="b_${bioma}_chao"`)
+      expect(frente).not.toContain(`id="b_${bioma}_chao"`)
+      expect(medida(f)).toBeLessThan(LIMITE_APP)
     }
   }
   await ui.unmount()

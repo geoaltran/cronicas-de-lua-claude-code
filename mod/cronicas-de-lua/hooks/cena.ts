@@ -1138,7 +1138,7 @@ export function balaoSolto(nome: string, desc: string, escala: number, larguraCe
   })
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges">` +
-    `<style>${cssTexto()}${cssFonteLonga()}</style>${r}</svg>`
+    `<style>${cssTexto(true)}${cssFonteLonga()}</style>${r}</svg>`
   return { svg, largura: w, altura: h }
 }
 
@@ -1203,15 +1203,35 @@ function marcaNoCeu(W: number, H: number, t: number): string {
   )
 }
 
-export function montar(v: Vista): { svg: string; largura: number; altura: number; alvos: Alvo[] } {
+/** O SVG por fora: tamanho na tela, recorte e o pixel nítido. */
+function envelope(v: Vista, Ht: number, estilo: string, defs: string, corpo: string): string {
+  const s = v.escala
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${v.W * s}" height="${Ht * s}" viewBox="0 0 ${v.W} ${Ht}" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges">` +
+    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${estilo}</style>` +
+    `<defs>${defs}</defs>${corpo}</svg>`
+  )
+}
+
+/** Tamanho que conta no app: o SVG vira endereço (data:), e o teto vale para ele codificado. */
+export const tamanhoNoApp = (svg: string): number => encodeURIComponent(svg).length
+
+/**
+ * A cena em três formas: `svg` (tudo num só, para o editor e o celular) e, para
+ * o app desktop, `fundo` (só o cenário) e `frente` (personagens, efeitos, HUD,
+ * botões, assinatura, fundo transparente), desenhados um sobre o outro. O app
+ * recusa um SVG acima de ~124 mil codificado; separados, cada um cabe com folga.
+ * Os dois tiram o tempo do mesmo relógio (atrasos negativos): ficam em sincronia.
+ */
+export function montar(v: Vista): { svg: string; fundo: string; frente: string; largura: number; altura: number; alvos: Alvo[] } {
   const d = new Doc()
+  const dc = new Doc('c') // o cenário: ids próprios para caber junto no SVG único
   const H = alturaCena(v.modo)
   const dist = distancia(v.caminho, v.agora)
   const l = luar(v.hud, v.agora)
   const ab = faseAbertura(v)
   const corpo: string[] = []
-  corpo.push(`<svg x="0" y="0" width="${v.W}" height="${H}" overflow="hidden">`)
-  corpo.push(cenario(d, v, dist, ab?.fase === 1))
+  const atras = cenario(dc, v, dist, ab?.fase === 1)
   if (ab?.fase === 1) {
     corpo.push(marcaNoCeu(v.W, H, ab.t))
   }
@@ -1252,27 +1272,27 @@ export function montar(v: Vista): { svg: string; largura: number; altura: number
   if (hd.botoesNaCena) {
     corpo.push(botoes(d, v.W - 4, 4, false, v.W, v.estadoBotoes, v.agora, v.semBaloes !== true))
   }
-  if (lt !== undefined && lt.tremor.length > 0) {
-    // golpe crítico: a cena inteira treme (o HUD fica parado)
-    const cena = corpo.splice(1).join('')
-    corpo.push(d.pista(lt.tremor, v.agora, cena))
-  }
+  // golpe crítico: a cena inteira treme (o HUD fica parado); o cenário treme
+  // junto, no SVG dele, com a mesma trilha
+  const treme = lt !== undefined && lt.tremor.length > 0 ? lt.tremor : undefined
+  const frenteCena = corpo.join('')
   // assinatura do autor (pedido do usuário): discreta no canto de cima à
   // esquerda, fora do tremor; vai junto em todo print da faixa
-  if (v.semAssinatura !== true) {
-    corpo.push(`<use href="${d.img('assinatura')}" x="4" y="4" opacity="0.72"/>`)
-  }
-  corpo.push('</svg>')
-  corpo.push(hd.svg)
+  const assinatura = v.semAssinatura !== true ? `<use href="${d.img('assinatura')}" x="4" y="4" opacity="0.72"/>` : ''
+  const abre = `<svg x="0" y="0" width="${v.W}" height="${H}" overflow="hidden">`
   const Ht = H + ALTURA_HUD
-  const s = v.escala
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${v.W * s}" height="${Ht * s}" viewBox="0 0 ${v.W} ${Ht}" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges">` +
-    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${ab?.fase === 1 ? MARCA.css : ''}${cssTexto()}${v.semFonteLonga !== true && (v.textoLongo === true || l.desmaiada) ? cssFonteLonga() : ''}${CSS_BOTOES}${d.css.join('')}</style>` +
-    `<defs>${d.defs.join('')}</defs>` +
-    corpo.join('') +
-    `</svg>`
-  return { svg, largura: v.W * s, altura: Ht * s, alvos: hd.alvos }
+  const estiloFrente = `${ab?.fase === 1 ? MARCA.css : ''}${cssTexto()}${v.semFonteLonga !== true && (v.textoLongo === true || l.desmaiada) ? cssFonteLonga() : ''}${CSS_BOTOES}`
+  // a mesma trilha de tremor embrulha a frente (e, no SVG único, a cena toda);
+  // o cenário separado ganha a dele (classes do cenário)
+  const [antes, depois] = treme === undefined ? ['', ''] : (d.pista(treme, v.agora, '\u0000').split('\u0000') as [string, string])
+  const atrasTreme = treme === undefined ? atras : dc.pista(treme, v.agora, atras)
+  const cssC = dc.css.join('')
+  const cssF = d.css.join('')
+  // o SVG único: o cenário e a frente tremem juntos, como antes
+  const unico = envelope(v, Ht, estiloFrente + cssC + cssF, [...new Set([...dc.defs, ...d.defs])].join(''), abre + antes + atras + frenteCena + depois + assinatura + '</svg>' + hd.svg)
+  const fundo = envelope(v, Ht, cssC, dc.defs.join(''), abre + atrasTreme + '</svg>')
+  const frente = envelope(v, Ht, estiloFrente + cssF, d.defs.join(''), abre + antes + frenteCena + depois + assinatura + '</svg>' + hd.svg)
+  return { svg: unico, fundo, frente, largura: v.W * v.escala, altura: Ht * v.escala, alvos: hd.alvos }
 }
 
 

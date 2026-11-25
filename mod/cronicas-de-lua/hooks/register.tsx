@@ -4,7 +4,7 @@ import type { EngineInterface, Register, RenderChildren, SessionContextUsage, Se
 import type { AbaDoLivro, Botoes, Caminho, Chefao, Elite, Golpe, Hud, Jogo, Luta, Lutas, TipoTrofeu } from '../types'
 import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
 import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
-import { ABERTURA, BOTOES, FIM_ABERTURA, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua } from './cena'
+import { ABERTURA, BOTOES, FIM_ABERTURA, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua, tamanhoNoApp } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
 import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, tp, usarIdioma } from './t'
 import { DEMORADA_MS, ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu, xpDaFerramenta } from './luta'
@@ -12,11 +12,13 @@ import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critic
 
 const PLUGIN = 'cronicas-de-lua'
 /** O app desenha SVG de até 131.072 caracteres; uma margem para não arriscar. */
-// O app documenta 131.072 caracteres. ATENÇÃO (prova de 24/11/2026): no desktop o
-// teto parece valer para o Svg CODIFICADO (encodeURIComponent ~128 mil: base64,
-// aspas, espaços e <> viram 3 letras), o que dá ~105 mil caracteres crus numa
-// cena. A saída é dividir a cena em dois Svg (PROXIMA_SESSAO, 16ª sessão).
+// O app documenta 131.072 caracteres (crus): vale para o Svg único (editor, celular,
+// modo quadro). No desktop (prova de 24/11/2026) o teto real vale para o Svg
+// CODIFICADO como endereço (encodeURIComponent: base64, aspas, espaços e <> viram
+// 3 letras): recusa de ~128 mil para cima. Por isso lá a cena vai em dois Svg
+// (cenário atrás, frente por cima), cada um medido codificado, até 124 mil.
 const LIMITE_SVG = 129_000
+const LIMITE_CODIFICADO = 124_000
 
 const JOGO0: Jogo = { xp: 0, paginas: 0, lutas: 0 }
 const HUD0: Hud = { luz: null, mana: {}, mochila: null, jogo: JOGO0 }
@@ -1760,29 +1762,33 @@ export const register: Register = on => {
       livro: bt.livro,
     }
     const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }), ...(ab !== null && luta === undefined && ch === null ? { abertura: ab } : {}) } as const
+    // desktop (sem quadro, teste ou prova): cenário e frente em dois Svg sobrepostos
+    const dividida = !remota && !a.quadro && !a.teste && a.prova !== true
+    const tamanho = (m: ReturnType<typeof montar>): number => (dividida ? Math.max(tamanhoNoApp(m.fundo), tamanhoNoApp(m.frente)) : m.svg.length)
+    const limite = dividida ? LIMITE_CODIFICADO : LIMITE_SVG
     // celular: menos animação (sem partículas nem a tira de andar na luta)
-    const montada = montar(sup === 'mobile' ? { ...vista, economia: true } : vista)
-    let { svg } = montada
+    let montada = montar(sup === 'mobile' ? { ...vista, economia: true } : vista)
     const { altura, alvos } = montada
-    if (svg.length > LIMITE_SVG) {
+    if (tamanho(montada) > limite) {
       // não coube: sem partículas e sem a tira de andar na luta; se ainda não
       // couber, sem a assinatura; por fim, a cena sem a luta (o app recusa
-      // um Svg acima de 131.072 caracteres e a faixa sumiria)
+      // um Svg grande demais e a faixa ficaria parada no desenho anterior)
       // (os biomas da noite são pesados: no modo quadro ou com a Lua dormindo, os
       // balões e a fonte dos textos longos saem antes da luta)
       const leve = { economia: true, semAssinatura: true, textoLongo: false, semBaloes: true, semFonteLonga: true } as const
       const tentativas = [{ economia: true }, { economia: true, semAssinatura: true }, leve] as const
       for (const t of tentativas) {
-        svg = montar({ ...vista, ...t }).svg
-        if (svg.length <= LIMITE_SVG) {
+        montada = montar({ ...vista, ...t })
+        if (tamanho(montada) <= limite) {
           break
         }
       }
-      if (svg.length > LIMITE_SVG) {
+      if (tamanho(montada) > limite) {
         const { luta: _fora, ...semLuta } = vista as typeof vista & { luta?: unknown }
-        svg = montar({ ...semLuta, ...leve }).svg
+        montada = montar({ ...semLuta, ...leve })
       }
     }
+    const { svg, fundo, frente } = montada
 
     // altura fixa: se a cena passar da largura da faixa, o app corta a sobra à
     // direita (preserveAspectRatio slice) em vez de encolher o desenho
@@ -1815,7 +1821,10 @@ export const register: Register = on => {
       <Svg source={svg} isInteractive height={altura} alt={alt} />
     ) : (
       <Box position="relative">
-        <Svg source={svg} height={altura} alt={alt} />
+        <Svg source={fundo} height={altura} alt={alt} />
+        <Box position="absolute" top={0} left={0} right={0}>
+          <Svg source={frente} height={altura} alt={alt} />
+        </Box>
         {areasDeHover($.ui.resolve(e) as Elementos, a, e.props.bodyColumns, W, alvos, false)}
         {botoesDoHud($, $.ui.resolve(e) as Elementos, a, e.props.bodyColumns, W, alvos)}
         {faseAbertura(vista) === undefined ? null : areaDePular($, $.ui.resolve(e) as Elementos, a, e.props.bodyColumns)}

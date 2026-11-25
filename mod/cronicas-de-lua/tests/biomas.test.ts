@@ -1,5 +1,5 @@
 import { expect, test } from 'claude-code/testing'
-import { biomaDe, montar } from '../hooks/cena'
+import { biomaDe, montar, tamanhoNoApp } from '../hooks/cena'
 import { novoChefao } from '../hooks/chefao'
 
 const T = 1_800_000_000_000
@@ -47,9 +47,14 @@ test('todo bioma cabe no limite do app nas cenas mais pesadas', () => {
   for (const bioma of ['floresta', 'ruinas', 'mar', 'vulcao', 'torre', 'aurora', 'castelo_vidro', 'ceu_estelar', 'eclipse']) {
     for (const W of [508, 760, 958]) {
       for (const e of estados) {
-        const { svg } = montar({ agora: T, W, escala: 2, modo: 'compacto', caminho: parada, hud: hud(2), botoes: true, bioma, ...e } as Parameters<typeof montar>[0])
+        const { svg, fundo, frente } = montar({ agora: T, W, escala: 2, modo: 'compacto', caminho: parada, hud: hud(2), botoes: true, bioma, ...e } as Parameters<typeof montar>[0])
         expect(svg.length).toBeLessThan(129000)
         expect(svg).toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
+        // desktop: cenário e frente em dois Svg, cada um bem abaixo do teto codificado (~124 mil)
+        expect(tamanhoNoApp(fundo)).toBeLessThan(99000)
+        expect(tamanhoNoApp(frente)).toBeLessThan(99000)
+        expect(fundo).toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
+        expect(frente).not.toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
       }
     }
   }

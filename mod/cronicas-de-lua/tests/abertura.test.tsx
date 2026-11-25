@@ -1,5 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
+import { LIMITE_APP, altDaCena, fonteDaCena, medida } from './cena'
 
 const FAIXA = {
   plugin: 'cronicas-de-lua',
@@ -17,7 +18,7 @@ const FAIXA = {
 } as const
 
 const T0 = 1_800_000_000_000
-const LIMITE = 129_000
+const LIMITE = LIMITE_APP
 const CMD = { origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } } as const
 
 type On = Parameters<TestBody>[1]
@@ -34,8 +35,7 @@ async function comecar($: Dolar, on: On, guardado: Record<string, unknown> = {})
   await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount(FAIXA)
   const svg = async () => {
-    const no = await ui.find({ type: 'Svg' })
-    return String((no as { props?: { source?: string } })?.props?.source ?? '')
+    return fonteDaCena(ui)
   }
   return { clock, ui, svg }
 }
@@ -48,14 +48,14 @@ test('primeira sessão do dia: a marca no céu, depois a floresta e a Lua chegan
   // (2 páginas: a jornada está nas Ruínas, o bioma do Golem)
   expect(f1).not.toMatch(/id="(b_[a-z_]+_)?meio"/)
   expect(f1).not.toContain('id="lua_parada"')
-  expect(f1.length).toBeLessThan(LIMITE)
+  expect(medida(f1)).toBeLessThan(LIMITE)
   // fase 2: o cenário da página atual clareia e a Lua entra andando
   await clock.advance(4100)
   const f2 = await svg()
   expect(f2).not.toContain('id="mc-metal"')
   expect(f2).toContain('id="b_ruinas_meio"')
   expect(f2).toContain('id="lua_andar"')
-  expect(f2.length).toBeLessThan(LIMITE)
+  expect(medida(f2)).toBeLessThan(LIMITE)
   // depois: a cena de sempre, a Lua parada no lugar dela
   await clock.advance(4000)
   const f3 = await svg()

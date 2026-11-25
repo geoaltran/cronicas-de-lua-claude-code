@@ -2,6 +2,7 @@ import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 
 import { alvoDe, nomeDoErro, tipoTrofeu } from '../hooks/luta'
+import { LIMITE_APP, altDaCena, fonteDaCena, medida } from './cena'
 
 const FAIXA = {
   plugin: 'cronicas-de-lua',
@@ -52,7 +53,7 @@ test('erro consertado: a mesma ação dá certo e a próxima luta é o Golem com
   on('command.register', () => ({ value: { command: 'cronicas' } }))
   await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount(FAIXA)
-  const svg = async () => String(((await ui.find({ type: 'Svg' })) as { props?: { source?: string } })?.props?.source ?? '')
+  const svg = async () => await fonteDaCena(ui)
   const usar = async (input: Record<string, unknown>) => {
     const p = chamar($, input)
     await clock.advance(150)
@@ -99,18 +100,18 @@ test('a teia da Vespera gira (4 quadros) e cabe no limite', async ($, on) => {
   on('command.register', () => ({ value: { command: 'cronicas' } }))
   await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
   const ui = await $.ui.mount(FAIXA)
-  const svg = async () => String(((await ui.find({ type: 'Svg' })) as { props?: { source?: string } })?.props?.source ?? '')
+  const svg = async () => await fonteDaCena(ui)
   const p = chamar($, { tool: 'Read', file_path: '/a' })
   let maior = 0
   let viuTeia = false
   for (let t = 0; t < 12000; t += 70) {
     await clock.advance(70)
     const s = await svg()
-    maior = Math.max(maior, s.length)
+    maior = Math.max(maior, medida(s))
     viuTeia ||= ['teia_0', 'teia_1', 'teia_2', 'teia_3'].every(k => s.includes(`id="${k}"`)) && s.includes('id="vespera_sem_teia"')
   }
   await p
   expect(viuTeia).toBe(true)
-  expect(maior).toBeLessThan(131072)
+  expect(maior).toBeLessThan(LIMITE_APP)
   await ui.unmount()
 })

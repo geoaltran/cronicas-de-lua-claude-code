@@ -2,6 +2,7 @@ import { expect, mock, test } from 'claude-code/testing'
 import type { TestBody } from 'claude-code/testing'
 
 import { VIGILIA_MAX, msgVigilia, pedidoResumo } from '../hooks/register'
+import { fonteDaCena } from './cena'
 
 const FAIXA = {
   plugin: 'cronicas-de-lua',
@@ -64,7 +65,7 @@ async function preparar($: Dolar, on: On) {
   return { clock, r }
 }
 
-const fonteDe = async (ui: { find: (q: { type: 'Svg' }) => Promise<unknown> }) => String(((await ui.find({ type: 'Svg' })) as { props?: { source?: string } })?.props?.source ?? '')
+const fonteDe = fonteDaCena
 
 test('os 4 botões aparecem sempre, com rótulo invisível e balão no hover', async ($, on) => {
   await preparar($, on)
