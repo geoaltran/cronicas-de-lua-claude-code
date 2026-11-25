@@ -248,7 +248,8 @@ const PARTICULAS_BIOMA: Record<string, ParticulaBioma> = {
   // (ajustes do usuário, 25/11/2026: mais poeira e de tamanhos variados na Torre;
   // pétalas com contraste na Aurora; mais brilhos e maiores no Castelo; mais
   // estrelas e de tamanhos variados no Céu Estelar)
-  torre: { jeito: 'cai', cores: ['#ffd27a', '#e0b060', '#fff0c0'], n: 12, y: [80, 140], dur: [7000, 10000], tamanhos: [1, 2, 2, 3] },
+  // (25/11/2026: 12 -> 8 para caber as engrenagens girando no teto da faixa)
+  torre: { jeito: 'cai', cores: ['#ffd27a', '#e0b060', '#fff0c0'], n: 8, y: [80, 140], dur: [7000, 10000], tamanhos: [1, 2, 2, 3] },
   aurora: { jeito: 'cai', cores: ['#ffffff', '#ff9eb5', '#fff3d6'], n: 10, y: [80, 140], dur: [6500, 9500], tamanhos: [2, 2, 3], sombra: '#8a5a2b' },
   castelo_vidro: { jeito: 'pisca', cores: ['#ffffff', '#b3e5fc', '#ffffff'], n: 16, y: [95, 200], dur: [2000, 4000], tamanhos: [1, 3, 3, 4], sombra: '#4a9fd4' },
   ceu_estelar: { jeito: 'cai', cores: ['#fff59d', '#e1d5ff', '#ffffff'], n: 16, y: [75, 150], dur: [6000, 9000], tamanhos: [1, 1, 2, 3, 4] },
@@ -882,6 +883,8 @@ export type Bioma = {
   reflexo?: { x: number; y: number; n: number; ms: number }
   torre?: { x: number; y: number }
   relogio?: { centro: readonly [number, number]; minuto: number; hora: number; cor: readonly [number, number, number] }
+  /** Engrenagens girando sobre o meio.png (engrenagens_torre.py): folhas de n quadros. */
+  engrenagens?: readonly { img: string; x: number; y: number; w: number; h: number; n: number; por_dente: number }[]
 }
 const BIOMAS = (META as unknown as { biomas: { biomas: Record<string, Bioma>; do_chefao: Record<string, string> } }).biomas
 
@@ -1067,7 +1070,14 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
     const fg = v.economia === true ? undefined : FUMACAS[nome]
     const fumacaGalhos =
       fg === undefined ? '' : metadeEspelhada(d, sopros(d, fg.pontas, fg.galhos, -topo, agora, v.luta !== undefined ? 2 : 3) + brasasNasPontas(d, fg.pontas, -topo, agora))
-    partes.push(rolo(camadaComLava(pre + 'meio', md) + fumacaGalhos, md.vel))
+    // engrenagens girando nas paredes (Torre): todas andam um dente a cada 900 ms (as
+    // que se tocam giram ao contrário; a outra metade é espelhada); a grande tem 2
+    // quadros por dente, as pequenas 3
+    const engrenagens =
+      b.engrenagens === undefined || v.economia === true
+        ? ''
+        : metadeEspelhada(d, b.engrenagens.map((e) => d.tira(`${pre}eng_${e.img}`, e.x, e.y - topo, e.w, e.h, Array.from({ length: e.n }, (_, q): Q => [q, 900 / e.por_dente]), agora)).join(''))
+    partes.push(rolo(camadaComLava(pre + 'meio', md) + engrenagens + fumacaGalhos, md.vel))
     // Mar: cristas das ondas subindo e espuma batendo nas pedras (rolam com o meio; nada na economia)
     if (v.economia !== true && (CRISTAS[nome] !== undefined || ESPUMA[nome] !== undefined)) {
       partes.push(rolo(cristasDasOndas(d, nome, camadaBioma(d, pre + 'meio', md, md.oy - topo, 1), topo, agora) + espumaNasPedras(d, nome, topo, agora), md.vel))

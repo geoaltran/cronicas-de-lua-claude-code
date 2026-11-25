@@ -63,8 +63,9 @@ test('todo bioma cabe no limite do app nas cenas mais pesadas', () => {
         expect(svg).toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
         // desktop: cenário e frente em dois Svg, cada um abaixo do teto codificado
         // (~124 mil; recusa de ~127 mil para cima), com 14 mil de folga. A Torre
-        // é a mais pesada (~100 mil com vapor, ponteiros e lanternas)
-        expect(tamanhoNoApp(fundo)).toBeLessThan(110000)
+        // é a mais pesada (~112 mil com vapor, ponteiros, lanternas e engrenagens
+        // girando: o usuário escolheu as engrenagens suaves, com teto de 112 mil só nela)
+        expect(tamanhoNoApp(fundo)).toBeLessThan(bioma === 'torre' ? 112000 : 110000)
         expect(tamanhoNoApp(frente)).toBeLessThan(110000)
         expect(fundo).toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
         expect(frente).not.toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)

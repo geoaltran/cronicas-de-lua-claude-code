@@ -1,0 +1,86 @@
+{
+ "quadros_por_dente": 3,
+ "engrenagens": {
+  "grande": {
+   "x": 5,
+   "y": 134,
+   "w": 33,
+   "h": 33,
+   "quadros": 8,
+   "por_dente": 2,
+   "sentido": 1,
+   "dentes": 12,
+   "centro": [
+    21.5,
+    150.0
+   ],
+   "ponta": 13.6,
+   "nota": 0.739
+  },
+  "cima": {
+   "x": 33,
+   "y": 134,
+   "w": 19,
+   "h": 19,
+   "quadros": 3,
+   "por_dente": 3,
+   "sentido": -1,
+   "dentes": 8,
+   "centro": [
+    42.5,
+    143.5
+   ],
+   "ponta": 7.0,
+   "nota": 0.369
+  },
+  "baixo": {
+   "x": 32,
+   "y": 151,
+   "w": 23,
+   "h": 23,
+   "quadros": 3,
+   "por_dente": 3,
+   "sentido": -1,
+   "dentes": 8,
+   "centro": [
+    43.5,
+    162.5
+   ],
+   "ponta": 8.2,
+   "nota": 0.18
+  },
+  "dir_cima": {
+   "x": 429,
+   "y": 133,
+   "w": 19,
+   "h": 19,
+   "quadros": 3,
+   "por_dente": 3,
+   "sentido": 1,
+   "dentes": 8,
+   "centro": [
+    438.5,
+    142.5
+   ],
+   "ponta": 7.0,
+   "nota": 0.351
+  },
+  "dir_baixo": {
+   "x": 426,
+   "y": 151,
+   "w": 23,
+   "h": 23,
+   "quadros": 3,
+   "por_dente": 3,
+   "sentido": -1,
+   "dentes": 8,
+   "centro": [
+    437.5,
+    162.0
+   ],
+   "ponta": 8.4,
+   "nota": 0.204
+  }
+ },
+ "obs": "folhas sobre o meio.png (x, y no meio.png, 1a metade; a 2a é espelhada); um quadro avança 1/F de dente"
+}

@@ -294,6 +294,14 @@ def biomas():
         if mod_.get("torre"):
             guarda(pre + "torre", abre(pasta / mod_["torre"]["arquivo"]))
             b["torre"] = {"x": mod_["torre"]["x"], "y": mod_["torre"]["y"]}
+        # engrenagens girando (engrenagens_torre.py --aplicar): folhas sobre o meio.png
+        if (pasta / "engrenagens.json").exists():
+            ej = json.loads((pasta / "engrenagens.json").read_text())
+            b["engrenagens"] = []
+            for nome_e, e in ej["engrenagens"].items():
+                guarda(f"{pre}eng_{nome_e}", abre(pasta / f"engrenagem_{nome_e}.png"))
+                b["engrenagens"].append({"img": nome_e, "x": e["x"], "y": e["y"], "w": e["w"], "h": e["h"], "n": e["quadros"],
+                                          "por_dente": e.get("por_dente", ej["quadros_por_dente"])})
         out[nome] = b
     # estrelas tingidas (mesma conta da prévia): azul-clara e vermelha (vulcão)
     est = abre(A / "particulas" / "estrela_4f.png")
