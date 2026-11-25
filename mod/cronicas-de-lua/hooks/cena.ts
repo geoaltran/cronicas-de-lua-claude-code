@@ -1181,6 +1181,60 @@ function nevoaNaFrente(d: Doc, v: Vista, dist: number): string {
   return d.rolo(vento, x0 - PAD + dist, andando ? VEL : 0, para)
 }
 
+/**
+ * Aurora (fase B, prévia `brilho_sol`): a luz corre do sol para fora pelos
+ * raios desenhados no céu. A máscara dos raios (construir_mod.py) aparece só
+ * onde passa uma das duas ondas de luz: anéis que se abrem do sol (~38 px/s,
+ * 52 px entre um e outro, como na prévia). Mais forte que na prévia.
+ */
+function raiosDoSol(d: Doc, b: Bioma, pre: string, x0: number, fT: number, agora: number): string {
+  const rs = b.raios
+  if (rs === undefined) {
+    return ''
+  }
+  const cx = rs.centro[0] - x0
+  const cy = rs.centro[1] - fT
+  const dur = 104 / 38
+  const mk = d.id('rm')
+  const anel = (atraso: number) =>
+    `<circle cx='${cx}' cy='${cy}' r='${rs.raio}' fill='none' stroke='#fff' stroke-width='18'>` +
+    `<animate attributeName='r' from='${rs.raio}' to='${rs.raio + 104}' dur='${dur.toFixed(2)}s' begin='${(-atraso / 1000).toFixed(2)}s' repeatCount='indefinite'/></circle>`
+  const t0 = mod(agora, dur * 1000)
+  d.defs.push(`<mask id='${mk}' maskUnits='userSpaceOnUse' x='-2000' y='-500' width='4000' height='1000'>${anel(t0)}${anel(t0 + (dur * 1000) / 2)}</mask>`)
+  return `<g mask='url(#${mk})' opacity='0.8'><use href='${d.img(pre + 'raios')}' x='${rs.x - x0}' y='${rs.y - fT}'/></g>`
+}
+
+/**
+ * Aurora (fase B, prévia `meio_com_vento`): o pano das bandeiras ondula preso
+ * ao mastro. Fatiado em tiras de 2 px: cada tira sobe e desce (até ~2 px na
+ * ponta, nada junto do mastro), com o atraso crescendo para a ponta (a onda
+ * corre do mastro para fora), um quadro a cada 110 ms como na prévia. O pano
+ * foi tirado do meio pelo construir_mod.py; a outra metade é espelhada.
+ */
+function bandeirasAoVento(d: Doc, b: Bioma, pre: string, topo: number, agora: number): string {
+  if (b.bandeiras === undefined) {
+    return ''
+  }
+  const periodo = ((2 * Math.PI) / 0.55) * 110
+  let s = ''
+  b.bandeiras.forEach((bd, k) => {
+    const u = d.img(`${pre}bandeira_${k}`)
+    for (let j = 0; j < bd.w; j += 2) {
+      const dm = j + 1 // distância do mastro
+      const amp = (2.2 * dm) / bd.w
+      let qs = ''
+      for (let i = 0; i < 12; i++) {
+        const dy = Math.round(amp * Math.sin((i / 12) * 2 * Math.PI))
+        qs += `${((i / 12) * 100).toFixed(1)}%{transform:translateY(${dy}px)}`
+      }
+      const atraso = ((0.45 * dm) / 0.55) * 110
+      const kk = d.anim(qs, periodo, 'step-end', -mod(agora - atraso, periodo), 'infinite')
+      s += `<svg x='${bd.x + j}' y='${bd.y - topo}' width='2' height='${bd.h}' overflow='hidden'><use href='${u}' x='${-j}' class='${kk}'/></svg>`
+    }
+  })
+  return s
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -1267,6 +1321,10 @@ export type Bioma = {
   relogio?: { centro: readonly [number, number]; minuto: number; hora: number; cor: readonly [number, number, number] }
   /** Engrenagens girando sobre o meio.png (engrenagens_torre.py): folhas de n quadros. */
   engrenagens?: readonly { img: string; x: number; y: number; w: number; h: number; n: number; por_dente: number }[]
+  /** Máscara dos raios do sol (construir_mod.py): onde fica no fundo, o centro e o raio do sol. */
+  raios?: { x: number; y: number; centro: readonly [number, number]; raio: number }
+  /** Pano das bandeiras recortado do meio (mastro à esquerda): caixa no meio.png. */
+  bandeiras?: readonly { x: number; y: number; w: number; h: number }[]
 }
 const BIOMAS = (META as unknown as { biomas: { biomas: Record<string, Bioma>; do_chefao: Record<string, string> } }).biomas
 
@@ -1342,6 +1400,9 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // lados, tiras do próprio centro (o vai-e-volta do fundo largo)
   partes.push(fundoBioma(d, b, pre, x0, W, b.fundo_oy - fT))
   partes.push(haloDoSol(d, nome, x0, topo, agora))
+  if (v.economia !== true) {
+    partes.push(raiosDoSol(d, b, pre, x0, fT, agora))
+  }
   if (v.economia !== true) {
     partes.push(haloDaLua(d, nome, x0, fT, agora))
   }
@@ -1467,7 +1528,15 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
       b.engrenagens === undefined || v.economia === true
         ? ''
         : metadeEspelhada(d, b.engrenagens.map((e) => d.tira(`${pre}eng_${e.img}`, e.x, e.y - topo, e.w, e.h, Array.from({ length: e.n }, (_, q): Q => [q, 900 / e.por_dente]), agora)).join(''))
-    partes.push(rolo(camadaComLava(pre + 'meio', md) + engrenagens + fumacaGalhos, md.vel))
+    // bandeiras: o pano tirado do meio volta ondulando (na economia, parado)
+    const panos =
+      b.bandeiras === undefined
+        ? ''
+        : metadeEspelhada(
+            d,
+            v.economia === true ? b.bandeiras.map((bd, k) => `<use href='${d.img(`${pre}bandeira_${k}`)}' x='${bd.x}' y='${bd.y - topo}'/>`).join('') : bandeirasAoVento(d, b, pre, topo, agora),
+          )
+    partes.push(rolo(camadaComLava(pre + 'meio', md) + engrenagens + panos + fumacaGalhos, md.vel))
     // Mar: cristas das ondas subindo e espuma batendo nas pedras (rolam com o meio; nada na economia)
     if (v.economia !== true && (CRISTAS[nome] !== undefined || ESPUMA[nome] !== undefined)) {
       partes.push(rolo(cristasDasOndas(d, nome, camadaBioma(d, pre + 'meio', md, md.oy - topo, 1), topo, agora) + espumaNasPedras(d, nome, topo, agora), md.vel))

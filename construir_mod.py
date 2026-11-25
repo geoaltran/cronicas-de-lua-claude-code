@@ -211,6 +211,38 @@ def _fundo_em_tiras(im, pad=241, w_centro=479):
     return Image.fromarray(np.ascontiguousarray(a[:, pad:pad + w_centro])), tiras, sobras
 
 
+# Fase B que precisa de recortes da arte aprovada (feitos aqui, sem arquivo
+# novo em assets/): valores de BIOMAS no cenario_bioma.py
+FASE_B = {
+    "aurora": {
+        "sol": (382, 140, 38),     # centro e raio do sol (arte de 479 px): raios com a onda de luz
+        "bandeiras": [(397, 156, 422, 175), (433, 153, 457, 176)],  # pano (mastro à esquerda)
+    },
+}
+
+
+def raios_do_sol(fundo, sol, pad=241):
+    """Máscara dos raios desenhados no céu (mesma regra do previa() do
+    cenario_bioma.py): pixels que diferem da cor mais comum da linha, bem
+    amarelos (R > 240, B < 150), num anel em volta do sol e acima dele."""
+    fa = np.array(fundo.convert("RGB")).astype(int)
+    h, w = fa.shape[:2]
+    sx, sy, sr = sol
+    yy, xx = np.mgrid[0:h, 0:w]
+    dist = np.hypot(xx - (sx + pad), yy - sy)
+    m = np.zeros((h, w), bool)
+    for y in range(h):
+        u, n = np.unique(fa[y], axis=0, return_counts=True)
+        moda = u[n.argmax()]
+        m[y] = (np.abs(fa[y] - moda).sum(1) > 0) & (fa[y][:, 2] < 150) & (fa[y][:, 0] > 240)
+    m &= (dist > sr + 2) & (dist < sr + 100) & (yy < sy - 25)
+    ys, xs = np.nonzero(m)
+    x0, y0, x1, y1 = xs.min(), ys.min(), xs.max() + 1, ys.max() + 1
+    a = np.zeros((y1 - y0, x1 - x0, 4), np.uint8)
+    a[m[y0:y1, x0:x1]] = (255, 252, 215, 255)
+    return Image.fromarray(a), int(x0), int(y0)
+
+
 def biomas():
     """Os 8 biomas novos (cenario_bioma.py --mod): só o que aparece na faixa
     compacta, cada camada como meia largura quando a outra metade é espelho ou
@@ -240,11 +272,29 @@ def biomas():
         b["ceu_escuro"] = bool((reg[..., 0] * 0.3 + reg[..., 1] * 0.59 + reg[..., 2] * 0.11).mean() < 128)
         b["fundo_tiras"] = tiras
         b["fundo_sobras"] = len(sobras)
+        if FASE_B.get(nome, {}).get("sol"):
+            sol = FASE_B[nome]["sol"]
+            rim, rx, ry = raios_do_sol(fundo, sol)
+            guarda(pre + "raios", rim)
+            b["raios"] = {"x": rx, "y": ry, "centro": [sol[0] + 241, sol[1]], "raio": sol[2]}
         for arq, vel in (("nuvens", None), ("longe", None), ("meio", None), ("chao", None)):
             c = cams.get(f"{arq}.png")
             if c is None or c.get("vazia") or not (pasta / f"{arq}.png").exists():
                 continue
             im = abre(pasta / f"{arq}.png")
+            fb = FASE_B.get(nome, {})
+            if arq == "meio" and fb.get("bandeiras"):
+                # o pano das bandeiras sai do meio (as duas metades) e vira recorte
+                # próprio, que ondula no mod; o mastro fica
+                a_ = np.array(im)
+                b["bandeiras"] = []
+                for k_, (bx0, by0, bx1, by1) in enumerate(fb["bandeiras"]):
+                    caixa = (bx0, by0 - 3, bx1, by1 + 3)
+                    guarda(f"{pre}bandeira_{k_}", im.crop(caixa))
+                    b["bandeiras"].append({"x": caixa[0], "y": caixa[1], "w": bx1 - bx0, "h": caixa[3] - caixa[1]})
+                    a_[caixa[1]:caixa[3], bx0:bx1] = 0
+                    a_[caixa[1]:caixa[3], im.width - bx1:im.width - bx0] = 0
+                im = Image.fromarray(a_)
             dn = c.get("desce", desce) if arq == "nuvens" else 0
             vis = _faixa_visivel(im, JANELA_Y[0] - dn, JANELA_Y[1] - dn)
             if vis is None:
