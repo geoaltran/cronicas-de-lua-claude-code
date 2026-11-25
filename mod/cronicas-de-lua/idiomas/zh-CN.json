@@ -14,7 +14,19 @@
   },
   "chefao": {
     "pagina": "+书页 {pagina}/10",
-    "novo_jogo": "新游戏+"
+    "novo_jogo": "新游戏+",
+    "passagem": "第{pagina}页 · {bioma}",
+    "biomas": {
+      "floresta": "森林",
+      "ruinas": "遗迹",
+      "mar": "大海",
+      "vulcao": "火山",
+      "torre": "钟楼",
+      "aurora": "黎明",
+      "castelo_vidro": "玻璃城堡",
+      "ceu_estelar": "星空",
+      "eclipse": "日食"
+    }
   },
   "luta": {
     "critico": "暴击！",

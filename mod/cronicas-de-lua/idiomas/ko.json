@@ -14,7 +14,19 @@
   },
   "chefao": {
     "pagina": "+페이지 {pagina}/10",
-    "novo_jogo": "뉴 게임+"
+    "novo_jogo": "뉴 게임+",
+    "passagem": "{pagina}페이지 · {bioma}",
+    "biomas": {
+      "floresta": "숲",
+      "ruinas": "유적",
+      "mar": "바다",
+      "vulcao": "화산",
+      "torre": "시계탑",
+      "aurora": "새벽",
+      "castelo_vidro": "유리성",
+      "ceu_estelar": "별하늘",
+      "eclipse": "일식"
+    }
   },
   "luta": {
     "critico": "크리티컬!",

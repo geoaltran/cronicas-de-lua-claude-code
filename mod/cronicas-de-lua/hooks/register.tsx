@@ -1,10 +1,10 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, RenderChildren, SessionContextUsage, SessionRateLimit, Timer } from 'claude-code'
 
-import type { AbaDoLivro, Botoes, Caminho, Chefao, Elite, Golpe, Hud, Jogo, Luta, Lutas, TipoTrofeu } from '../types'
+import type { AbaDoLivro, Botoes, Caminho, Chefao, Elite, Golpe, Hud, Jogo, Luta, Lutas, Passagem, TipoTrofeu } from '../types'
 import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
 import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
-import { ABERTURA, BOTOES, FIM_ABERTURA, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua, tamanhoNoApp } from './cena'
+import { ABERTURA, BOTOES, FIM_ABERTURA, FIM_PASSAGEM, PASSAGEM, biomaDe, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua, tamanhoNoApp } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
 import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, tp, usarIdioma } from './t'
 import { DEMORADA_MS, ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu, xpDaFerramenta } from './luta'
@@ -40,6 +40,7 @@ const BOTOES0: Botoes = { vigilia: { ligada: false, envios: 0 }, mochila: 'nada'
 const botoes = atom({ plugin: 'cronicas-de-lua', key: 'botoes' } as const, BOTOES0, { shape: 'botoes-1' })
 const livroAba = atom({ plugin: 'cronicas-de-lua', key: 'livroAba' } as const, 'ficha' as AbaDoLivro)
 const abertura = atom({ plugin: 'cronicas-de-lua', key: 'abertura' } as const, null as number | null)
+const passagem = atom({ plugin: 'cronicas-de-lua', key: 'passagem' } as const, null as Passagem | null, { shape: 'passagem-1' })
 /** Quantos erros de ações diferentes o elite lembra (os mais velhos saem). */
 const ERROS_MAX = 20
 /** Quantos troféus ficam guardados. */
@@ -250,6 +251,39 @@ async function abrirAbertura($: $, app?: string): Promise<void> {
   }
 }
 
+// ---------------------------------------------------------------- passagem de fase
+
+let alarmesPassagem: Timer[] = []
+
+/**
+ * O chefão caiu e saiu de cena em `at`: a jornada passa do bioma dele para o
+ * da próxima página (a Lua sai andando, escurece, o bioma novo clareia com o
+ * título e ela entra pela esquerda). Dois redesenhos, marcados no relógio.
+ */
+async function comecarPassagem($: $, ch: Chefao, at: number): Promise<void> {
+  const agora = await $.clock.now()
+  if (agora >= at + FIM_PASSAGEM) {
+    return
+  }
+  const h = await read($, hud)
+  const de = biomaDe({ agora: ch.caiu ?? at, hud: h, chefao: ch })
+  const para = biomaDe({ agora, hud: h })
+  const pagina = (h.jogo.paginas % 10) + 1
+  for (const t of alarmesPassagem) {
+    t.cancel()
+  }
+  await update($, passagem, () => ({ at, de, para, pagina }))
+  alarmesPassagem = [
+    // a entrada (o bioma novo) é um redesenho novo
+    $.clock.after(Math.max(0, at + PASSAGEM.saida - agora) + 20, () => {
+      void update($, tique, n => n + 1)
+    }),
+    $.clock.after(at + FIM_PASSAGEM - agora + 20, () => {
+      void update($, passagem, () => null)
+    }),
+  ]
+}
+
 async function pularAbertura($: $): Promise<void> {
   for (const t of alarmesAbertura) {
     t.cancel()
@@ -430,6 +464,7 @@ async function revisar($: $, turnoAcabou = false): Promise<void> {
   }
   if (ch !== null && ch.caiu !== undefined && final === undefined && agora >= ch.caiu + QUEDA_MS) {
     await update($, chefao, () => null)
+    await comecarPassagem($, ch, ch.caiu + QUEDA_MS)
     ch = null
   }
   const presente = dePe(ch)
@@ -1741,6 +1776,7 @@ export const register: Register = on => {
     ])
     const ch = await read($, chefao)
     const ab = await read($, abertura)
+    const ps = await read($, passagem)
     colunasPor[sup] = e.props.bodyColumns
     ultimaSup = sup
     const pxColuna = pxColunaDe(a, sup)
@@ -1761,7 +1797,7 @@ export const register: Register = on => {
       estandarte: bt.estandarte === 'nada' ? 'enrolado' : bt.estandarte,
       livro: bt.livro,
     }
-    const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }), ...(ab !== null && luta === undefined && ch === null ? { abertura: ab } : {}) } as const
+    const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }), ...(ab !== null && luta === undefined && ch === null ? { abertura: ab } : {}), ...(ps !== null && ab === null && luta === undefined && ch === null ? { passagem: ps } : {}) } as const
     // desktop (sem quadro, teste ou prova): cenário e frente em dois Svg sobrepostos
     const dividida = !remota && !a.quadro && !a.teste && a.prova !== true
     const tamanho = (m: ReturnType<typeof montar>): number => (dividida ? Math.max(tamanhoNoApp(m.fundo), tamanhoNoApp(m.frente)) : m.svg.length)

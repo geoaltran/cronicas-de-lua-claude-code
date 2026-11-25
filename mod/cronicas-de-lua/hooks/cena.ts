@@ -6,7 +6,7 @@
 import { MARCA, META } from './arte'
 import { cssFonteLonga, cssTexto, ehCJK, larguraCurta, larguraLonga, quebrarPorLargura } from './fontes'
 import { ANDAR, Doc, P, PARADA, type Q, art, esc, mod, r, sorteio } from './base'
-import type { Caminho, Chefao, Hud, Luta } from '../types'
+import type { Caminho, Chefao, Hud, Luta, Passagem } from '../types'
 import { desenharLuta } from './luta'
 import { t as tx, tp } from './t'
 import { barraNoLugar, chefaoEm, chefaoEmCena, fimDoChefao, paginaRecuperada, paginasNoCiclo, proximoChefao, tingir } from './chefao'
@@ -70,6 +70,8 @@ export type Vista = {
   semFonteLonga?: boolean
   /** Bioma à força (testes e prévia); sem isso, o da página da jornada. */
   bioma?: string
+  /** A passagem de fase em andamento (o chefão do bioma caiu). */
+  passagem?: Passagem
 }
 
 /**
@@ -108,6 +110,51 @@ export function faseAbertura(v: Pick<Vista, 'abertura' | 'agora'>): FaseAbertura
     return undefined
   }
   return e < ABERTURA.fase2 ? { fase: 1, t: e } : { fase: 2, t: e - ABERTURA.fase2 }
+}
+
+/**
+ * Passagem de fase (aprovada pelo usuário em 24/11/2026), em dois redesenhos:
+ *   sai (0 até saida): no bioma velho, o cenário para; a Lua apressa o passo
+ *     até passar da borda direita e a tela escurece;
+ *   entra (saida até o fim): o bioma novo clareia, o cartão de título aparece
+ *     e a Lua chega andando pela esquerda (como na abertura).
+ */
+export const PASSAGEM = {
+  /** a Lua anda até a borda (ms): a velocidade sai da largura da faixa. */
+  anda: 4000,
+  /** a tela escurece nos últimos ms da saída (ela já está passando da borda). */
+  escurece: 800,
+  /** fim da saída: redesenho no bioma novo. */
+  saida: 4300,
+  /** o bioma novo clareia em (ms, contados da entrada). */
+  clareia: 900,
+  /** o título aparece e some (ms, contados da entrada). */
+  tituloEntra: 500,
+  tituloSai: 3600,
+  /** fim da entrada (a Lua já chegou e o título sumiu). */
+  entrada: 4000,
+} as const
+/** Fim da passagem (ms, contados da queda do chefão). */
+export const FIM_PASSAGEM = PASSAGEM.saida + PASSAGEM.entrada
+
+export type FasePassagem = { fase: 'sai' | 'entra'; t: number; p: Passagem }
+
+/** Em que fase da passagem a cena está (t: ms desde o começo da fase), ou nada. */
+export function fasePassagem(v: Pick<Vista, 'passagem' | 'agora'>): FasePassagem | undefined {
+  const p = v.passagem
+  if (p === undefined) {
+    return undefined
+  }
+  const e = v.agora - p.at
+  if (e < 0 || e >= FIM_PASSAGEM) {
+    return undefined
+  }
+  return e < PASSAGEM.saida ? { fase: 'sai', t: e, p } : { fase: 'entra', t: e - PASSAGEM.saida, p }
+}
+
+/** O texto do cartão: "PÁGINA 6 · TORRE DO RELÓGIO" (no idioma do jogo). */
+export function tituloDaPassagem(p: Passagem): string {
+  return tx('chefao.passagem', { pagina: p.pagina, bioma: tx(`chefao.biomas.${p.para}`) }).toLocaleUpperCase()
 }
 
 const NOITE = '#0b0a20'
@@ -569,16 +616,39 @@ function lua(d: Doc, v: Vista, desmaiada: boolean, naLuta?: { corpo: string; tri
   const { nivel } = nivelDe(v.hud.jogo.xp)
   let corpo: string
   const ab = faseAbertura(v)
-  if (ab?.fase === 2) {
-    // abertura: ela entra andando pela esquerda (o chão não rola) e para no lugar
+  const ps = fasePassagem(v)
+  // chegando pela esquerda: na abertura (fase 2) e na entrada da passagem
+  const chega = ab?.fase === 2 ? ab.t : ps?.fase === 'entra' ? ps.t : undefined
+  // (um redesenho depois do fim de uma animação desenha o estado final direto:
+  // o Chrome não segura o fill="freeze" de uma animação que acabou antes de a
+  // imagem abrir)
+  const andaChega = Math.ceil((ABERTURA.distancia / VEL) * 1000) + ABERTURA.anda
+  if (ps?.fase === 'sai' && ps.t >= PASSAGEM.anda) {
+    // já passou da borda
+    corpo = ''
+  } else if (chega !== undefined && chega >= andaChega) {
+    // já chegou
+    corpo = d.tira('lua_parada', 0, 0, QW, 100, PARADA, v.agora)
+  } else if (ps?.fase === 'sai') {
+    // passagem: o chão parou; ela apressa o passo até passar da borda direita
+    // (os quadros acompanham a pressa até 2,4x; depois ela corre um pouco solta)
+    const dx = v.W - x + 6
+    const vel = Math.max(VEL, dx / (PASSAGEM.anda / 1000))
+    const fr = Math.max(45, Math.round((110 * VEL) / vel))
+    const tempo = `dur="${seg(PASSAGEM.anda)}" begin="${seg(-ps.t)}" fill="freeze"`
+    corpo =
+      `<g><animateTransform attributeName="transform" type="translate" values="0 0;${dx} 0" ${tempo}/>` +
+      `${d.tira('lua_andar', 0, 0, QW, 100, ANDAR.map(q => [q[0], fr, q[2]] as const), ps.t)}</g>`
+  } else if (chega !== undefined) {
+    // ela entra andando pela esquerda (o chão não rola) e para no lugar
     const anda = Math.ceil((ABERTURA.distancia / VEL) * 1000)
     const total = ABERTURA.anda + anda
-    const tempo = `dur="${seg(total)}" begin="${seg(-ab.t)}" fill="freeze"`
+    const tempo = `dur="${seg(total)}" begin="${seg(-chega)}" fill="freeze"`
     const k = (ABERTURA.anda / total).toFixed(3)
     corpo =
       `<g><animate attributeName="opacity" values="1;0" keyTimes="0;1" calcMode="discrete" ${tempo}/>` +
       `<g transform="translate(${-ABERTURA.distancia} 0)"><animateTransform attributeName="transform" type="translate" values="${-ABERTURA.distancia} 0;${-ABERTURA.distancia} 0;0 0" keyTimes="0;${k};1" ${tempo}/>` +
-      `${d.tira('lua_andar', 0, 0, QW, 100, ANDAR, ab.t)}</g></g>` +
+      `${d.tira('lua_andar', 0, 0, QW, 100, ANDAR, chega)}</g></g>` +
       `<g opacity="0"><animate attributeName="opacity" values="0;1" keyTimes="0;1" calcMode="discrete" ${tempo}/>` +
       `${d.tira('lua_parada', 0, 0, QW, 100, PARADA, v.agora)}</g>`
   } else if (desmaiada) {
@@ -1188,6 +1258,40 @@ function sobreChefao(c: Chefao | undefined, lutas: number): string {
   return tp('barras.xp.chefao_vida', c.vida)
 }
 
+/**
+ * O cartão de título da passagem: uma fita em pixel (dourada, com as pontas
+ * cortadas atrás) no alto da cena, com "PÁGINA 6 · TORRE DO RELÓGIO".
+ * Aparece e some sozinho (tempos da entrada).
+ */
+function cartaoDeTitulo(W: number, texto: string, t: number): string {
+  const cjk = ehCJK()
+  const letra = cjk ? 12 : 16
+  const larg = cjk ? larguraCurta(texto) : Math.ceil([...texto].length * 12)
+  const w = Math.min(W - 40, larg + 28)
+  const h = 24
+  const x = Math.round((W - w) / 2)
+  const y = 22
+  const borda = '#f2c14e'
+  const fundo = '#2a2050'
+  const ponta = '#8a5a1c'
+  // as pontas da fita, atrás do corpo, com o corte em V
+  const pontas =
+    `<polygon points="${x + 6},${y + 6} ${x - 14},${y + 6} ${x - 8},${y + 6 + h / 2} ${x - 14},${y + 6 + h} ${x + 6},${y + 6 + h}" fill="${ponta}"/>` +
+    `<polygon points="${x + w - 6},${y + 6} ${x + w + 14},${y + 6} ${x + w + 8},${y + 6 + h / 2} ${x + w + 14},${y + 6 + h} ${x + w - 6},${y + 6 + h}" fill="${ponta}"/>`
+  const corpo =
+    `<rect x="${x + 2}" y="${y}" width="${w - 4}" height="${h}" fill="${borda}"/>` +
+    `<rect x="${x}" y="${y + 2}" width="${w}" height="${h - 4}" fill="${borda}"/>` +
+    `<rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" fill="${fundo}"/>`
+  const P_ = PASSAGEM
+  const kt = (ms: number) => (ms / P_.entrada).toFixed(3)
+  return (
+    `<g opacity="0"><animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;${kt(P_.tituloEntra)};${kt(P_.tituloEntra + 300)};${kt(P_.tituloSai)};${kt(P_.tituloSai + 300)};1" dur="${seg(P_.entrada)}" begin="${seg(-t)}" fill="freeze"/>` +
+    pontas +
+    corpo +
+    `<text class="t m" x="${W / 2}" y="${y + h / 2 + (cjk ? 4 : 6)}" style="font-size:${letra}px;fill:#ffe27a">${esc(texto)}</text></g>`
+  )
+}
+
 /** Abertura, fase 1: a marca no meio do céu, aparecendo e sumindo; a noite fecha no fim. */
 function marcaNoCeu(W: number, H: number, t: number): string {
   const x = Math.round((W - MARCA.w) / 2)
@@ -1224,6 +1328,11 @@ export const tamanhoNoApp = (svg: string): number => encodeURIComponent(svg).len
  * Os dois tiram o tempo do mesmo relógio (atrasos negativos): ficam em sincronia.
  */
 export function montar(v: Vista): { svg: string; fundo: string; frente: string; largura: number; altura: number; alvos: Alvo[] } {
+  const ps = fasePassagem(v)
+  if (ps !== undefined) {
+    // passagem: o bioma de cada metade e o chão parado (a Lua anda sozinha)
+    v = { ...v, bioma: ps.fase === 'sai' ? ps.p.de : ps.p.para, caminho: { andando: false, desde: v.agora, dist0: distancia(v.caminho, v.agora) } }
+  }
   const d = new Doc()
   const dc = new Doc('c') // o cenário: ids próprios para caber junto no SVG único
   const H = alturaCena(v.modo)
@@ -1253,6 +1362,15 @@ export function montar(v: Vista): { svg: string; fundo: string; frente: string; 
   if (ab?.fase === 2) {
     // a noite da fase 1 abre e mostra a floresta
     corpo.push(`<rect width="${v.W}" height="${H}" fill="${NOITE}" opacity="0"><animate attributeName="opacity" values="1;0" dur="${seg(ABERTURA.clareia)}" begin="${seg(-ab.t)}" fill="freeze"/></rect>`)
+  }
+  if (ps?.fase === 'sai') {
+    // a tela escurece enquanto ela passa da borda
+    const k = ((PASSAGEM.saida - PASSAGEM.escurece) / PASSAGEM.saida).toFixed(3)
+    corpo.push(`<rect width="${v.W}" height="${H}" fill="${NOITE}" opacity="0"><animate attributeName="opacity" values="0;0;1" keyTimes="0;${k};1" dur="${seg(PASSAGEM.saida)}" begin="${seg(-ps.t)}" fill="freeze"/></rect>`)
+  } else if (ps?.fase === 'entra') {
+    // o bioma novo clareia e o título aparece
+    corpo.push(`<rect width="${v.W}" height="${H}" fill="${NOITE}" opacity="0"><animate attributeName="opacity" values="1;0" dur="${seg(PASSAGEM.clareia)}" begin="${seg(-ps.t)}" fill="freeze"/></rect>`)
+    corpo.push(cartaoDeTitulo(v.W, tituloDaPassagem(ps.p), ps.t))
   }
   if (lt !== undefined) {
     corpo.push(lt.efeitos)

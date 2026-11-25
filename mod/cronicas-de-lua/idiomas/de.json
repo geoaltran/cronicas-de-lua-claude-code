@@ -14,7 +14,19 @@
   },
   "chefao": {
     "pagina": "+SEITE {pagina}/10",
-    "novo_jogo": "NEUES SPIEL+"
+    "novo_jogo": "NEUES SPIEL+",
+    "passagem": "SEITE {pagina} · {bioma}",
+    "biomas": {
+      "floresta": "Wald",
+      "ruinas": "Ruinen",
+      "mar": "Meer",
+      "vulcao": "Vulkan",
+      "torre": "Uhrturm",
+      "aurora": "Morgenrot",
+      "castelo_vidro": "Glasschloss",
+      "ceu_estelar": "Sternenhimmel",
+      "eclipse": "Finsternis"
+    }
   },
   "luta": {
     "critico": "KRITISCH!",

@@ -5,6 +5,13 @@
 export type Caminho = { andando: boolean; desde: number; dist0: number; ate?: number }
 
 /**
+ * A passagem de fase: o chefão caiu em `at` e a jornada vai do bioma `de` para
+ * o `para` (a Lua sai andando, a tela escurece, o bioma novo clareia com o
+ * título "PÁGINA `pagina` · BIOMA" e a Lua entra pela esquerda).
+ */
+export type Passagem = { at: number; de: string; para: string; pagina: number }
+
+/**
  * O resultado de uma ferramenta numa luta: quando voltou, se deu certo e o dano do golpe.
  * Num chefão, o que o golpe fez com a vida dele (em pontos): `escudo` (golpe
  * comum defendido: tirou pouco, às vezes 0), `tarefa` (uma tarefa concluída:
@@ -157,6 +164,8 @@ declare module 'claude-code' {
       livroAba: AbaDoLivro
       /** Hora (ms) em que a tela de abertura começou; null fora dela. */
       abertura: number | null
+      /** A passagem de fase em andamento; null fora dela. */
+      passagem: Shaped<Passagem | null>
     }
   }
 }

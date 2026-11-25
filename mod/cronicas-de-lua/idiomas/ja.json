@@ -14,7 +14,19 @@
   },
   "chefao": {
     "pagina": "+ページ {pagina}/10",
-    "novo_jogo": "強くてニューゲーム"
+    "novo_jogo": "強くてニューゲーム",
+    "passagem": "第{pagina}ページ · {bioma}",
+    "biomas": {
+      "floresta": "森",
+      "ruinas": "遺跡",
+      "mar": "海",
+      "vulcao": "火山",
+      "torre": "時計塔",
+      "aurora": "夜明け",
+      "castelo_vidro": "ガラスの城",
+      "ceu_estelar": "星空",
+      "eclipse": "日食"
+    }
   },
   "luta": {
     "critico": "クリティカル！",

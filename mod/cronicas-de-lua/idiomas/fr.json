@@ -14,7 +14,19 @@
   },
   "chefao": {
     "pagina": "+PAGE {pagina}/10",
-    "novo_jogo": "NOUVELLE PARTIE+"
+    "novo_jogo": "NOUVELLE PARTIE+",
+    "passagem": "PAGE {pagina} · {bioma}",
+    "biomas": {
+      "floresta": "Forêt",
+      "ruinas": "Ruines",
+      "mar": "Mer",
+      "vulcao": "Volcan",
+      "torre": "Tour de l'Horloge",
+      "aurora": "Aurore",
+      "castelo_vidro": "Château de Verre",
+      "ceu_estelar": "Ciel Étoilé",
+      "eclipse": "Éclipse"
+    }
   },
   "luta": {
     "critico": "CRITIQUE !",

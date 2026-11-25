@@ -14,7 +14,19 @@
   },
   "chefao": {
     "pagina": "+PÁGINA {pagina}/10",
-    "novo_jogo": "NOVO JOGO+"
+    "novo_jogo": "NOVO JOGO+",
+    "passagem": "PÁGINA {pagina} · {bioma}",
+    "biomas": {
+      "floresta": "Floresta",
+      "ruinas": "Ruínas",
+      "mar": "Mar",
+      "vulcao": "Vulcão",
+      "torre": "Torre do Relógio",
+      "aurora": "Aurora",
+      "castelo_vidro": "Castelo de Vidro",
+      "ceu_estelar": "Céu Estelar",
+      "eclipse": "Eclipse"
+    }
   },
   "luta": {
     "_critico": "aparece em vermelho, grande, sobre o monstro; Silkscreen 16 px",
