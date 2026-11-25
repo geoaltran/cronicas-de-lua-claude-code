@@ -1,0 +1,222 @@
+{
+ "tamanho_nativo": [
+  479,
+  268
+ ],
+ "pes_dos_personagens_y": 209,
+ "horizonte_y": 117,
+ "lua_ceu": {
+  "x": 453,
+  "y": 22,
+  "w": 56,
+  "h": 56
+ },
+ "camadas": [
+  {
+   "arquivo": "fundo.png",
+   "velocidade": 0.0,
+   "rola": false
+  },
+  {
+   "arquivo": "nuvens.png",
+   "velocidade": 0.15,
+   "rola": true,
+   "vento_px_por_s": 2,
+   "vazia": false,
+   "desce": 48
+  },
+  {
+   "ilhas": [
+    {
+     "arquivo": "ilha_1.png",
+     "x": 356,
+     "y": 40
+    },
+    {
+     "arquivo": "ilha_2.png",
+     "x": 554,
+     "y": 46
+    }
+   ],
+   "velocidade": 0.2,
+   "balanco_px": 2
+  },
+  {
+   "arquivo": "longe.png",
+   "velocidade": 0.3,
+   "rola": true,
+   "obs": "campo ao longe (da placa), entre o marco e o meio"
+  },
+  {
+   "arquivo": "meio.png",
+   "velocidade": 0.5,
+   "rola": true
+  },
+  {
+   "arquivo": "chao.png",
+   "velocidade": 1.0,
+   "rola": true
+  }
+ ],
+ "velocidade_1": "px por px que a Lua anda",
+ "modos": {
+  "compacto": {
+   "janela_y": [
+    70,
+    226
+   ],
+   "camadas_de_tras_descem": 48
+  }
+ },
+ "mod": {
+  "lua_fixa": true,
+  "ilhas_na_frente": true,
+  "estrelas": [
+   [
+    247,
+    38,
+    1,
+    0
+   ],
+   [
+    598,
+    5,
+    0,
+    0
+   ],
+   [
+    35,
+    18,
+    3,
+    1
+   ],
+   [
+    903,
+    24,
+    0,
+    0
+   ],
+   [
+    241,
+    22,
+    0,
+    0
+   ],
+   [
+    424,
+    10,
+    0,
+    1
+   ],
+   [
+    897,
+    8,
+    0,
+    0
+   ],
+   [
+    836,
+    2,
+    1,
+    0
+   ],
+   [
+    715,
+    38,
+    0,
+    1
+   ],
+   [
+    574,
+    2,
+    3,
+    0
+   ],
+   [
+    561,
+    21,
+    0,
+    0
+   ],
+   [
+    931,
+    38,
+    2,
+    1
+   ],
+   [
+    41,
+    33,
+    3,
+    0
+   ],
+   [
+    865,
+    2,
+    3,
+    0
+   ],
+   [
+    925,
+    22,
+    1,
+    1
+   ],
+   [
+    14,
+    1,
+    1,
+    0
+   ],
+   [
+    426,
+    33,
+    2,
+    0
+   ],
+   [
+    102,
+    2,
+    3,
+    1
+   ],
+   [
+    218,
+    34,
+    3,
+    0
+   ],
+   [
+    547,
+    7,
+    2,
+    0
+   ],
+   [
+    926,
+    6,
+    2,
+    1
+   ],
+   [
+    869,
+    22,
+    0,
+    0
+   ],
+   [
+    538,
+    27,
+    3,
+    0
+   ],
+   [
+    67,
+    2,
+    2,
+    1
+   ]
+  ],
+  "estrela_cor": "azul"
+ }
+}

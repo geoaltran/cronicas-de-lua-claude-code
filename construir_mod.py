@@ -95,6 +95,223 @@ def cenario():
     return meta
 
 
+# bioma de cada chefão (página da jornada); Vespera e Dama Penumbra ficam na floresta
+BIOMA_DO_CHEFAO = {
+    "golem_obsidiana": "ruinas", "leviata": "mar", "ignis": "vulcao", "relojoeiro": "torre",
+    "sir_solis": "aurora", "rei_espelho": "castelo_vidro", "nebula": "ceu_estelar", "malakor": "eclipse",
+}
+JANELA_Y = (70, 226)  # faixa compacta (a única desde 22/11/2026)
+
+
+def _como_repete(im):
+    """Camada de 958 px que dá a volta: a metade da direita é o espelho da
+    esquerda (espelhar_emendavel) ou a mesma (nuvens repetidas). Quando o
+    usuário retocou só um lado, vai meia camada + remendos pequenos onde as
+    metades diferem (desenhados por cima). Devolve (modo, metade, remendos);
+    modo "inteira" quando não compensa (ou quando o retoque apagou pixels,
+    que um remendo por cima não consegue apagar)."""
+    from scipy import ndimage as nd
+
+    a = np.array(im)
+    if a.shape[1] != 958:
+        return "inteira", im, []
+    a[a[..., 3] == 0] = 0  # transparente é transparente (a cor escondida não conta)
+    esq, dir_ = a[:, :479], a[:, 479:]
+    def comum(x, y):
+        # só o que as duas metades têm opaco (o que um lado apagou some da
+        # base); onde as duas são opacas e diferentes, vale x e o outro lado
+        # recebe remendo
+        m = (x[..., 3] > 0) & (y[..., 3] > 0)
+        out = np.zeros_like(x)
+        out[m] = x[m]
+        return out
+
+    melhor = None
+    for modo, base in (("espelho", esq), ("espelho", dir_[:, ::-1]), ("repete", esq), ("repete", dir_),
+                       ("espelho", comum(esq, dir_[:, ::-1])), ("repete", comum(esq, dir_))):
+        outra = base[:, ::-1] if modo == "espelho" else base
+        g = np.concatenate([base, outra], 1)
+        dif = (g != a).any(2)
+        if (dif & (a[..., 3] == 0) & (g[..., 3] > 0)).any():
+            continue  # retoque que apagou: remendo por cima não resolve
+        rem = []
+        if dif.any():
+            # um remendo só: os pixels que diferem (o resto transparente)
+            ys, xs = np.nonzero(dif)
+            y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+            r_ = np.zeros((y1 - y0, x1 - x0, 4), np.uint8)
+            m_ = dif[y0:y1, x0:x1]
+            r_[m_] = a[y0:y1, x0:x1][m_]
+            rem.append((int(x0), int(y0), Image.fromarray(r_)))
+        custo = len(png_sem_perdas(Image.fromarray(base))) + sum(len(png_sem_perdas(r[2])) for r in rem) + 60 * len(rem)
+        if melhor is None or custo < melhor[0]:
+            melhor = (custo, modo, Image.fromarray(np.ascontiguousarray(base)), rem)
+    if melhor is None or melhor[0] > len(png_sem_perdas(im)) * 0.9:
+        return "inteira", im, []
+    return melhor[1], melhor[2], melhor[3]
+
+
+def _faixa_visivel(im, y0, y1):
+    """Linhas com algum pixel dentro de [y0, y1) (o resto nunca aparece)."""
+    a = np.array(im)[..., 3][max(y0, 0):y1].max(1)
+    ys = np.nonzero(a)[0]
+    if not len(ys):
+        return None
+    return max(y0, 0) + int(ys.min()), max(y0, 0) + int(ys.max()) + 1
+
+
+def _fundo_em_tiras(im, pad=241, w_centro=479):
+    """O fundo largo (960 px) é a ilustração no centro e, dos lados, faixas dela
+    em vai-e-volta (alargar_fundo). Vai só o centro; cada lateral vira tiras
+    [x na tela do fundo, x no centro, largura, espelhada] desenhadas do centro.
+    Colunas que não existem no centro (pintadas à mão) vão como sobras."""
+    a = np.array(im)
+    a[a[..., 3] == 0] = 0
+    W_ = a.shape[1]
+    col = {}
+    for c in range(pad, pad + w_centro):
+        col.setdefault(a[:, c].tobytes(), []).append(c)
+    lados = [c for c in range(W_) if c < pad or c >= pad + w_centro]
+    tiras, sobras_cols = [], []
+    i = 0
+    while i < len(lados):
+        c = lados[i]
+        cands = col.get(a[:, c].tobytes(), [])
+        melhor = None
+        for s0 in cands:
+            for passo in (1, -1):
+                n = 1
+                while (i + n < len(lados) and lados[i + n] == c + n and 0 <= s0 + passo * n
+                       and a[:, s0 + passo * n].tobytes() == a[:, c + n].tobytes()
+                       and pad <= s0 + passo * n < pad + w_centro):
+                    n += 1
+                if melhor is None or n > melhor[0]:
+                    melhor = (n, s0, passo)
+        if melhor is None or melhor[0] < 3:
+            sobras_cols.append(c)
+            i += 1
+            continue
+        n, s0, passo = melhor
+        x_src = s0 if passo == 1 else s0 - n + 1
+        tiras.append([c, x_src - pad, n, passo == -1])
+        i += n
+    sobras = []
+    if sobras_cols:
+        # colunas vizinhas juntas numa imagem só
+        grupos, g = [], [sobras_cols[0]]
+        for c in sobras_cols[1:]:
+            if c == g[-1] + 1:
+                g.append(c)
+            else:
+                grupos.append(g)
+                g = [c]
+        grupos.append(g)
+        for g in grupos:
+            sobras.append((g[0], Image.fromarray(np.ascontiguousarray(a[:, g[0]:g[-1] + 1]))))
+    return Image.fromarray(np.ascontiguousarray(a[:, pad:pad + w_centro])), tiras, sobras
+
+
+def biomas():
+    """Os 8 biomas novos (cenario_bioma.py --mod): só o que aparece na faixa
+    compacta, cada camada como meia largura quando a outra metade é espelho ou
+    repetição (o mod desenha a outra metade)."""
+    out = {}
+    for nome in sorted(set(BIOMA_DO_CHEFAO.values())):
+        pasta = A / "cenarios" / nome
+        meta = json.loads((pasta / "cenario.json").read_text())
+        mod_ = meta.get("mod", {})
+        desce = meta["modos"]["compacto"]["camadas_de_tras_descem"]
+        cams = {c.get("arquivo", "ilhas"): c for c in meta["camadas"]}
+        b = {"desce": desce, "camadas": {}, "lua_fixa": mod_.get("lua_fixa", True),
+             "ilhas_na_frente": mod_.get("ilhas_na_frente", False),
+             "estrelas": mod_.get("estrelas", []), "estrela_cor": mod_.get("estrela_cor", "azul")}
+        pre = f"b_{nome}_"
+        # fundo parado: só as linhas que a faixa mostra (desce = quanto ele baixa na tela)
+        fundo = abre(pasta / "fundo.png")
+        f0 = max(0, JANELA_Y[0] - desce)
+        fv = fundo.crop((0, f0, fundo.width, JANELA_Y[1] - desce))
+        centro, tiras, sobras = _fundo_em_tiras(fv)
+        guarda(pre + "fundo", centro, x=241)
+        for j, (sx, sim) in enumerate(sobras):
+            guarda(f"{pre}fundo_s{j}", sim, x=sx)
+        b["fundo_oy"] = f0
+        # céu escuro no alto da faixa (onde fica o nome do chefão): o nome vira claro
+        reg = np.array(fv.convert("RGB")).astype(float)[2:16, 240:720]
+        b["ceu_escuro"] = bool((reg[..., 0] * 0.3 + reg[..., 1] * 0.59 + reg[..., 2] * 0.11).mean() < 128)
+        b["fundo_tiras"] = tiras
+        b["fundo_sobras"] = len(sobras)
+        for arq, vel in (("nuvens", None), ("longe", None), ("meio", None), ("chao", None)):
+            c = cams.get(f"{arq}.png")
+            if c is None or c.get("vazia") or not (pasta / f"{arq}.png").exists():
+                continue
+            im = abre(pasta / f"{arq}.png")
+            dn = c.get("desce", desce) if arq == "nuvens" else 0
+            vis = _faixa_visivel(im, JANELA_Y[0] - dn, JANELA_Y[1] - dn)
+            if vis is None:
+                continue
+            modo, metade, remendos = _como_repete(im.crop((0, vis[0], im.width, vis[1])))
+            guarda(pre + arq, metade)
+            for j, (rx, ry, rim) in enumerate(remendos):
+                guarda(f"{pre}{arq}_r{j}", rim, x=rx, y=ry)
+            b["camadas"][arq] = {"oy": vis[0], "desce": dn, "repete": modo, "vel": c["velocidade"],
+                                 "remendos": len(remendos),
+                                 **({"vento": c["vento_px_por_s"]} if arq == "nuvens" else {})}
+        il = cams["ilhas"]
+        b["ilhas"] = []
+        for k, i in enumerate(il["ilhas"], 1):
+            guarda(f"{pre}ilha_{k}", abre(pasta / i["arquivo"]))
+            ent = {"x": i["x"], "y": i["y"]}
+            e = i.get("engrenagem")
+            if e:
+                guarda(f"{pre}ilha_{k}_roda", abre(pasta / e["engrenagem"]))
+                guarda(f"{pre}ilha_{k}_espelho", abre(pasta / e["espelho"]))
+                ent["engrenagem"] = {"centro": e["centro"], "pecas": e["pecas"]}
+                cac = abre(pasta / e["cacos"])
+                for j, pc in enumerate(e["pecas"]):
+                    guarda(f"{pre}ilha_{k}_caco_{j}", cac.crop((pc["x"], pc["y"], pc["x"] + pc["w"], pc["y"] + pc["h"])))
+            b["ilhas"].append(ent)
+        b["ilhas_vel"] = il["velocidade"]
+        b["balanco"] = il["balanco_px"]
+        if meta.get("marco"):
+            guarda(pre + "marco", abre(pasta / meta["marco"]["arquivo"]))
+            b["marco"] = {"x": meta["marco"]["x"], "y_tela": meta["marco"]["y_tela"]}
+        if meta.get("lua_sprite"):
+            ls = meta["lua_sprite"]
+            guarda(pre + "lua", abre(pasta / ls["arquivo"]))
+            b["lua"] = {"x": ls["x"], "y_tela": ls["y_tela"], **({"eclipse": ls["eclipse"]} if "eclipse" in ls else {})}
+        if meta.get("reflexo"):
+            rf = meta["reflexo"]
+            for j, f in enumerate(rf["arquivos"]):
+                im = abre(pasta / f)
+                vis = _faixa_visivel(im, 0, im.height)
+                ys_x = np.nonzero(np.array(im)[..., 3].max(0))[0]
+                x0r, x1r = int(ys_x.min()), int(ys_x.max()) + 1
+                guarda(f"{pre}reflexo_{j}", im.crop((x0r, vis[0], x1r, vis[1])))
+                if j == 0:
+                    b["reflexo"] = {"x": rf["x"] + x0r, "y": rf["y"] + vis[0], "n": len(rf["arquivos"]), "ms": rf["ms"]}
+        if mod_.get("relogio"):
+            b["relogio"] = mod_["relogio"]
+        if mod_.get("torre"):
+            guarda(pre + "torre", abre(pasta / mod_["torre"]["arquivo"]))
+            b["torre"] = {"x": mod_["torre"]["x"], "y": mod_["torre"]["y"]}
+        out[nome] = b
+    # estrelas tingidas (mesma conta da prévia): azul-clara e vermelha (vulcão)
+    est = abre(A / "particulas" / "estrela_4f.png")
+    ea = np.array(est).astype(int)
+    lum = ea[..., :3].mean(2)
+    az = ea.copy()
+    az[..., 0], az[..., 1], az[..., 2] = np.clip(lum * 0.55, 0, 255), np.clip(lum * 0.8, 0, 255), np.clip(lum * 1.15 + 20, 0, 255)
+    vm = ea.copy()
+    vm[..., 0], vm[..., 1], vm[..., 2] = np.clip(lum * 1.1 + 30, 0, 255), np.clip(lum * 0.45, 0, 255), np.clip(lum * 0.35, 0, 255)
+    q = est.height
+    guarda("p_estrela_azul", Image.fromarray(az.astype(np.uint8)), n=4, q=q)
+    guarda("p_estrela_vermelha", Image.fromarray(vm.astype(np.uint8)), n=4, q=q)
+    for nome, b in out.items():
+        tam = sum(len(v["u"]) for k, v in ARTE.items() if k.startswith(f"b_{nome}_"))
+        print(f"bioma {nome}: {tam // 1000} mil caracteres de imagem")
+    return {"biomas": out, "do_chefao": BIOMA_DO_CHEFAO}
+
+
 # poses guardadas em assets/ mas fora do jogo (alternativa não escolhida)
 POSES_FORA = {"triste"}
 
@@ -279,6 +496,7 @@ def main():
     mod = Path(sys.argv[1]) if len(sys.argv) > 1 else MOD_PADRAO
     meta = {
         "cenario": cenario(),
+        "biomas": biomas(),
         "poses": lua(),
         "efeitos": efeitos(),
         "chefoes": monstros(),

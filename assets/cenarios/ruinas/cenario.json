@@ -1,0 +1,197 @@
+{
+ "tamanho_nativo": [
+  479,
+  268
+ ],
+ "pes_dos_personagens_y": 209,
+ "lua_ceu": {
+  "x": 455,
+  "y": 18,
+  "w": 52,
+  "h": 52,
+  "obs": "caixa da lua no fundo.png (para a lua minguar)"
+ },
+ "camadas": [
+  {
+   "arquivo": "fundo.png",
+   "velocidade": 0.0,
+   "rola": false
+  },
+  {
+   "arquivo": "nuvens.png",
+   "velocidade": 0.15,
+   "rola": true,
+   "vento_px_por_s": 2,
+   "vazia": false
+  },
+  {
+   "ilhas": [
+    {
+     "arquivo": "ilha_1.png",
+     "x": 360,
+     "y": 40
+    },
+    {
+     "arquivo": "ilha_2.png",
+     "x": 547,
+     "y": 50
+    }
+   ],
+   "velocidade": 0.2,
+   "balanco_px": 2
+  },
+  {
+   "arquivo": "meio.png",
+   "velocidade": 0.5,
+   "rola": true
+  },
+  {
+   "arquivo": "chao.png",
+   "velocidade": 1.0,
+   "rola": true
+  }
+ ],
+ "velocidade_1": "px por px que a Lua anda",
+ "modos": {
+  "compacto": {
+   "janela_y": [
+    70,
+    226
+   ],
+   "camadas_de_tras_descem": 34
+  }
+ },
+ "mod": {
+  "lua_fixa": true,
+  "ilhas_na_frente": false,
+  "estrelas": [
+   [
+    624,
+    1,
+    3,
+    0
+   ],
+   [
+    702,
+    2,
+    2,
+    0
+   ],
+   [
+    351,
+    1,
+    3,
+    1
+   ],
+   [
+    231,
+    3,
+    3,
+    0
+   ],
+   [
+    847,
+    1,
+    3,
+    0
+   ],
+   [
+    799,
+    1,
+    0,
+    1
+   ],
+   [
+    737,
+    1,
+    3,
+    0
+   ],
+   [
+    574,
+    2,
+    3,
+    0
+   ],
+   [
+    304,
+    2,
+    3,
+    1
+   ],
+   [
+    655,
+    2,
+    1,
+    0
+   ],
+   [
+    65,
+    2,
+    3,
+    0
+   ],
+   [
+    382,
+    1,
+    0,
+    1
+   ],
+   [
+    14,
+    1,
+    1,
+    0
+   ],
+   [
+    190,
+    2,
+    2,
+    0
+   ],
+   [
+    534,
+    2,
+    1,
+    1
+   ],
+   [
+    419,
+    2,
+    2,
+    0
+   ],
+   [
+    931,
+    1,
+    0,
+    0
+   ],
+   [
+    902,
+    1,
+    0,
+    1
+   ],
+   [
+    272,
+    1,
+    1,
+    0
+   ],
+   [
+    761,
+    2,
+    1,
+    0
+   ],
+   [
+    87,
+    1,
+    3,
+    1
+   ]
+  ],
+  "estrela_cor": "azul"
+ }
+}

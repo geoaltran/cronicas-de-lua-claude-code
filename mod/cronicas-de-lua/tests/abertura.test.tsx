@@ -45,14 +45,15 @@ test('primeira sessão do dia: a marca no céu, depois a floresta e a Lua chegan
   // fase 1: céu + marca animada (máscara do metal), sem árvores e sem a Lua
   const f1 = await svg()
   expect(f1).toContain('id="mc-metal"')
-  expect(f1).not.toContain('id="meio"')
+  // (2 páginas: a jornada está nas Ruínas, o bioma do Golem)
+  expect(f1).not.toMatch(/id="(b_[a-z_]+_)?meio"/)
   expect(f1).not.toContain('id="lua_parada"')
   expect(f1.length).toBeLessThan(LIMITE)
-  // fase 2: a floresta clareia e a Lua entra andando
+  // fase 2: o cenário da página atual clareia e a Lua entra andando
   await clock.advance(4100)
   const f2 = await svg()
   expect(f2).not.toContain('id="mc-metal"')
-  expect(f2).toContain('id="meio"')
+  expect(f2).toContain('id="b_ruinas_meio"')
   expect(f2).toContain('id="lua_andar"')
   expect(f2.length).toBeLessThan(LIMITE)
   // depois: a cena de sempre, a Lua parada no lugar dela

@@ -1,0 +1,242 @@
+{
+ "tamanho_nativo": [
+  479,
+  268
+ ],
+ "pes_dos_personagens_y": 209,
+ "horizonte_y": 198,
+ "lua_ceu": {
+  "x": 347,
+  "y": 20,
+  "w": 38,
+  "h": 38
+ },
+ "camadas": [
+  {
+   "arquivo": "fundo.png",
+   "velocidade": 0.0,
+   "rola": false
+  },
+  {
+   "arquivo": "nuvens.png",
+   "velocidade": 0.15,
+   "rola": true,
+   "vento_px_por_s": 2,
+   "vazia": false,
+   "desce": 48
+  },
+  {
+   "ilhas": [
+    {
+     "arquivo": "ilha_1.png",
+     "x": 335,
+     "y": 28
+    },
+    {
+     "arquivo": "ilha_2.png",
+     "x": 556,
+     "y": 38
+    }
+   ],
+   "velocidade": 0.2,
+   "balanco_px": 2
+  },
+  {
+   "arquivo": "longe.png",
+   "velocidade": 0.3,
+   "rola": true,
+   "obs": "campo ao longe (da placa), entre o marco e o meio"
+  },
+  {
+   "arquivo": "meio.png",
+   "velocidade": 0.5,
+   "rola": true
+  },
+  {
+   "arquivo": "chao.png",
+   "velocidade": 1.0,
+   "rola": true
+  }
+ ],
+ "velocidade_1": "px por px que a Lua anda",
+ "modos": {
+  "compacto": {
+   "janela_y": [
+    70,
+    226
+   ],
+   "camadas_de_tras_descem": 48
+  }
+ },
+ "mod": {
+  "lua_fixa": true,
+  "ilhas_na_frente": false,
+  "estrelas": [
+   [
+    247,
+    38,
+    1,
+    0
+   ],
+   [
+    598,
+    5,
+    0,
+    0
+   ],
+   [
+    934,
+    31,
+    2,
+    1
+   ],
+   [
+    568,
+    15,
+    1,
+    0
+   ],
+   [
+    738,
+    31,
+    3,
+    0
+   ],
+   [
+    885,
+    10,
+    1,
+    1
+   ],
+   [
+    654,
+    10,
+    3,
+    0
+   ],
+   [
+    763,
+    1,
+    0,
+    0
+   ],
+   [
+    35,
+    18,
+    3,
+    1
+   ],
+   [
+    824,
+    37,
+    3,
+    0
+   ],
+   [
+    141,
+    24,
+    0,
+    0
+   ],
+   [
+    510,
+    14,
+    2,
+    1
+   ],
+   [
+    692,
+    28,
+    2,
+    0
+   ],
+   [
+    435,
+    33,
+    3,
+    0
+   ],
+   [
+    591,
+    23,
+    3,
+    1
+   ],
+   [
+    702,
+    2,
+    2,
+    0
+   ],
+   [
+    558,
+    37,
+    0,
+    0
+   ],
+   [
+    855,
+    37,
+    2,
+    1
+   ],
+   [
+    295,
+    8,
+    0,
+    0
+   ],
+   [
+    424,
+    10,
+    0,
+    0
+   ],
+   [
+    304,
+    28,
+    3,
+    1
+   ],
+   [
+    49,
+    39,
+    0,
+    0
+   ],
+   [
+    11,
+    5,
+    0,
+    0
+   ],
+   [
+    618,
+    35,
+    0,
+    1
+   ]
+  ],
+  "estrela_cor": "azul",
+  "relogio": {
+   "centro": [
+    481,
+    71
+   ],
+   "minuto": 8,
+   "hora": 5,
+   "cor": [
+    123,
+    96,
+    87
+   ],
+   "obs": "centro no fundo.png"
+  },
+  "torre": {
+   "arquivo": "torre.png",
+   "x": 444,
+   "y": 0,
+   "obs": "x e y no fundo.png; desenhada depois das nuvens"
+  }
+ }
+}

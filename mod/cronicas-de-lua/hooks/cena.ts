@@ -9,7 +9,7 @@ import { ANDAR, Doc, P, PARADA, type Q, art, esc, mod, r, sorteio } from './base
 import type { Caminho, Chefao, Hud, Luta } from '../types'
 import { desenharLuta } from './luta'
 import { t as tx, tp } from './t'
-import { barraNoLugar, chefaoEm, chefaoEmCena, fimDoChefao, paginaRecuperada, paginasNoCiclo, tingir } from './chefao'
+import { barraNoLugar, chefaoEm, chefaoEmCena, fimDoChefao, paginaRecuperada, paginasNoCiclo, proximoChefao, tingir } from './chefao'
 
 /** px por segundo que o chão rola enquanto a Lua anda (5 px por quadro de 110 ms). */
 export const VEL = 5 / 0.11
@@ -66,6 +66,10 @@ export type Vista = {
   textoLongo?: boolean
   /** Hora (ms) em que a tela de abertura começou; some sozinha em ABERTURA.fim. */
   abertura?: number
+  /** Sem a Pixelify embutida (último recurso do limite: o aviso de lua nova usa a fonte do sistema). */
+  semFonteLonga?: boolean
+  /** Bioma à força (testes e prévia); sem isso, o da página da jornada. */
+  bioma?: string
 }
 
 /**
@@ -169,7 +173,216 @@ function particula(d: Doc, nome: string, x: number, y: number, fasesMs: number, 
   return d.tira(`p_${nome}`, x, y, q, q, seq, agora + fasesMs)
 }
 
+// ---------------------------------------------------------------- biomas
+
+type CamadaBioma = { oy: number; desce: number; repete: 'espelho' | 'repete' | 'inteira'; vel: number; remendos: number; vento?: number }
+type IlhaBioma = { x: number; y: number }
+export type Bioma = {
+  desce: number
+  fundo_oy: number
+  /** Laterais do fundo largo: [x no fundo, x no centro, largura, espelhada]. */
+  fundo_tiras: readonly (readonly [number, number, number, boolean])[]
+  fundo_sobras: number
+  /** Céu escuro no alto da faixa (o nome do chefão vai claro). */
+  ceu_escuro: boolean
+  camadas: Partial<Record<'nuvens' | 'longe' | 'meio' | 'chao', CamadaBioma>>
+  ilhas: readonly IlhaBioma[]
+  ilhas_vel: number
+  balanco: number
+  ilhas_na_frente: boolean
+  estrelas: readonly (readonly [number, number, number, number])[]
+  estrela_cor: string
+  marco?: { x: number; y_tela: number }
+  lua?: { x: number; y_tela: number }
+  reflexo?: { x: number; y: number; n: number; ms: number }
+  torre?: { x: number; y: number }
+  relogio?: { centro: readonly [number, number]; minuto: number; hora: number; cor: readonly [number, number, number] }
+}
+const BIOMAS = (META as unknown as { biomas: { biomas: Record<string, Bioma>; do_chefao: Record<string, string> } }).biomas
+
+/**
+ * O bioma da cena: o do chefão em cena; sem chefão, o da página da jornada
+ * (o próximo chefão). Vespera e Dama Penumbra ficam na floresta.
+ */
+export function biomaDe(v: Pick<Vista, 'bioma' | 'chefao' | 'agora' | 'hud'>): string {
+  if (v.bioma !== undefined) {
+    return v.bioma in BIOMAS.biomas ? v.bioma : 'floresta'
+  }
+  const nome = v.chefao !== undefined && fimDoChefao(v.chefao) > v.agora ? v.chefao.nome : proximoChefao(v.hud.jogo.paginas).nome
+  return BIOMAS.do_chefao[nome] ?? 'floresta'
+}
+
+/** Se o alto da cena é escuro (noite): textos por cima dele vão claros. */
+export function ceuEscuro(bioma: string): boolean {
+  return BIOMAS.biomas[bioma]?.ceu_escuro ?? false
+}
+
+/** Uma camada que dá a volta (958 px): meia largura + a outra metade espelhada ou repetida, e os remendos. */
+function camadaBioma(d: Doc, nome: string, c: CamadaBioma, y: number, copias: number): string {
+  const u = d.img(nome)
+  const rem: string[] = []
+  for (let j = 0; j < c.remendos; j++) {
+    const a = art(`${nome}_r${j}`)
+    rem.push(`<use href="${d.img(`${nome}_r${j}`)}" x="${a['x'] as number}" y="${y + (a['y'] as number)}"/>`)
+  }
+  let s = ''
+  for (let k = 0; k < copias; k++) {
+    const dx = k * P
+    if (c.repete === 'inteira') {
+      s += `<use href="${u}" x="${dx}" y="${y}"/>`
+    } else if (c.repete === 'repete') {
+      s += `<use href="${u}" x="${dx}" y="${y}"/><use href="${u}" x="${dx + P / 2}" y="${y}"/>`
+    } else {
+      s += `<use href="${u}" x="${dx}" y="${y}"/><use href="${u}" transform="translate(${dx + P},0) scale(-1,1)" y="${y}"/>`
+    }
+    if (rem.length > 0) {
+      s += `<g transform="translate(${dx},0)">${rem.join('')}</g>`
+    }
+  }
+  return s
+}
+
+const COR_ESTRELA: Record<string, string> = { azul: 'p_estrela_azul', vermelha: 'p_estrela_vermelha' }
+
+function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: string): string {
+  const b = BIOMAS.biomas[nome] as Bioma
+  const pre = `b_${nome}_`
+  const { W, agora } = v
+  const topo = JANELA.compacto.topo
+  const fT = topo - b.desce // linha do fundo no alto da faixa
+  const x0 = Math.floor(480 - W / 2)
+  const t = agora / 1000
+  const andando = andandoAgora(v.caminho, agora)
+  const para = andando && v.caminho.ate !== undefined ? v.caminho.ate - agora : undefined
+  const rolo = (conteudo: string, vel: number, base = x0 - PAD) => d.rolo(conteudo, base + dist * vel, andando ? VEL * vel : 0, para)
+  const partes: string[] = []
+
+  // 1. fundo parado (céu, lua, o que fica longe de verdade): o centro e, dos
+  // lados, tiras do próprio centro (o vai-e-volta do fundo largo)
+  partes.push(fundoBioma(d, b, pre, x0, W, b.fundo_oy - fT))
+  if (b.lua !== undefined) {
+    partes.push(`<use href="${d.img(pre + 'lua')}" x="${b.lua.x - x0}" y="${b.lua.y_tela - topo}"/>`)
+  }
+  // estrelas cintilando, só no céu limpo (posições do cenario_bioma.py)
+  for (const [sx, sy, fase, cor] of b.estrelas) {
+    const x = sx - x0
+    if (x < -8 || x > W) {
+      continue
+    }
+    const ms = 220
+    const seq: Q[] = [[0, ms], [1, ms], [2, ms], [3, ms], [-1, ms * 4]]
+    const tira = cor === 1 ? COR_ESTRELA[b.estrela_cor] ?? 'p_estrela_azul' : 'p_estrela'
+    partes.push(d.tira(tira, x, sy, 7, 7, seq, agora + fase * 440))
+  }
+  // marco: parado, de pé no horizonte (farol, vulcão)
+  if (b.marco !== undefined) {
+    partes.push(`<use href="${d.img(pre + 'marco')}" x="${b.marco.x - x0}" y="${b.marco.y_tela - topo}"/>`)
+  }
+  // 2. nuvens: parallax lento + vento (cada bioma desce as nuvens do seu jeito)
+  const nv = b.camadas.nuvens
+  if (nv !== undefined) {
+    const yN = nv.oy - (topo - nv.desce)
+    const caminhada = rolo(camadaBioma(d, pre + 'nuvens', nv, yN, 3), nv.vel)
+    partes.push(d.rolo(caminhada, t * (nv.vento ?? 2), nv.vento ?? 2))
+  }
+  // a torre do relógio passa na frente das nuvens
+  if (b.torre !== undefined) {
+    partes.push(`<use href="${d.img(pre + 'torre')}" x="${b.torre.x - x0}" y="${b.torre.y - fT}"/>`)
+  }
+  if (b.relogio !== undefined) {
+    partes.push(ponteiros(b.relogio, b.relogio.centro[0] - x0, b.relogio.centro[1] - fT))
+  }
+  // 3. ilhas flutuantes: parallax + balanço
+  let ilhas = ''
+  b.ilhas.forEach((ilha, k) => {
+    const base = mod(ilha.x - x0, P)
+    const u = d.img(`${pre}ilha_${k + 1}`)
+    for (const dx of [0, P]) {
+      ilhas += d.balanco(`<use href="${u}" x="${base + dx}" y="${ilha.y - fT}"/>`, b.balanco, 3100, k * 1400, agora)
+    }
+  })
+  const camIlhas = d.rolo(ilhas, dist * b.ilhas_vel, andando ? VEL * b.ilhas_vel : 0, para)
+  if (!b.ilhas_na_frente) {
+    partes.push(camIlhas)
+  }
+  if (soCeu) {
+    return partes.join('')
+  }
+  // 4. longe (campo, mar, planície da placa)
+  const lg = b.camadas.longe
+  if (lg !== undefined) {
+    partes.push(rolo(camadaBioma(d, pre + 'longe', lg, lg.oy - topo, 2), lg.vel))
+  }
+  if (b.ilhas_na_frente) {
+    partes.push(camIlhas)
+  }
+  // reflexo da lua no mar: parado sob a lua, entre o longe e o meio; os quadros se alternam
+  if (b.reflexo !== undefined) {
+    const rf = b.reflexo
+    for (let j = 0; j < rf.n; j++) {
+      const de = (j / rf.n) * 100
+      const ate = ((j + 1) / rf.n) * 100
+      const k = d.anim(`0%{opacity:0}${de.toFixed(2)}%{opacity:1}${ate.toFixed(2)}%{opacity:0}100%{opacity:0}`, rf.ms * rf.n, 'step-end', -mod(agora, rf.ms * rf.n), 'infinite')
+      partes.push(`<g class="${k}"><use href="${d.img(`${pre}reflexo_${j}`)}" x="${rf.x + PAD - x0}" y="${rf.y - topo}"/></g>`)
+    }
+  }
+  // 5. meio
+  const md = b.camadas.meio
+  if (md !== undefined) {
+    partes.push(rolo(camadaBioma(d, pre + 'meio', md, md.oy - topo, 2), md.vel))
+  }
+  if (v.chefao !== undefined && fimDoChefao(v.chefao) > agora && v.tom === 'fundo') {
+    partes.push(tingir(v.chefao, W, alturaCena(v.modo), 0.3))
+  }
+  // 6. chão da frente
+  const ch = b.camadas.chao
+  if (ch !== undefined) {
+    partes.push(rolo(camadaBioma(d, pre + 'chao', ch, ch.oy - topo, 2), ch.vel))
+  }
+  return partes.join('')
+}
+
+function fundoBioma(d: Doc, b: Bioma, pre: string, x0: number, W: number, y: number): string {
+  const nome = pre + 'fundo'
+  const c = art(nome)
+  const u = d.img(nome)
+  const cx = c['x'] as number
+  let s = `<use href="${u}" x="${cx - x0}" y="${y}"/>`
+  for (const [dest, src, n, espelho] of b.fundo_tiras) {
+    if (dest + n <= x0 || dest >= x0 + W) {
+      continue
+    }
+    const tira = `<svg x="0" y="${y}" width="${n}" height="${c.h}" viewBox="${src} 0 ${n} ${c.h}"><use href="${u}"/></svg>`
+    s += espelho
+      ? `<g transform="translate(${dest - x0 + n},0) scale(-1,1)">${tira}</g>`
+      : `<g transform="translate(${dest - x0},0)">${tira}</g>`
+  }
+  for (let j = 0; j < b.fundo_sobras; j++) {
+    const a = art(`${nome}_s${j}`)
+    const sx = a['x'] as number
+    if (sx + a.w <= x0 || sx >= x0 + W) {
+      continue
+    }
+    s += `<use href="${d.img(`${nome}_s${j}`)}" x="${sx - x0}" y="${y}"/>`
+  }
+  return s
+}
+
+/** Ponteiros do relógio da torre (10h10 por enquanto; girar fica para as animações de detalhe). */
+function ponteiros(rel: NonNullable<Bioma['relogio']>, cx: number, cy: number): string {
+  const cor = `rgb(${rel.cor.join(',')})`
+  const linha = (graus: number, comp: number) => {
+    const a = (graus * Math.PI) / 180
+    return `<line x1="${cx + 0.5}" y1="${cy + 0.5}" x2="${(cx + 0.5 + Math.sin(a) * comp).toFixed(1)}" y2="${(cy + 0.5 - Math.cos(a) * comp).toFixed(1)}" stroke="${cor}" stroke-width="1"/>`
+  }
+  return linha(300, rel.hora) + linha(60, rel.minuto) + `<rect x="${cx}" y="${cy}" width="1" height="1" fill="${cor}"/>`
+}
+
 function cenario(d: Doc, v: Vista, dist: number, soCeu = false): string {
+  const bioma = biomaDe(v)
+  if (bioma !== 'floresta') {
+    return cenarioBioma(d, v, dist, soCeu, bioma)
+  }
   const { W, modo, agora } = v
   const { topo, fundoTopo } = JANELA[modo]
   const x0 = Math.floor(480 - W / 2)
@@ -1004,7 +1217,7 @@ export function montar(v: Vista): { svg: string; largura: number; altura: number
   }
   const pes = 209 - JANELA[v.modo].topo
   const ch = v.chefao !== undefined && fimDoChefao(v.chefao) > v.agora ? v.chefao : undefined
-  const palco = { W: v.W, H, pes, agora: v.agora }
+  const palco = { W: v.W, H, pes, agora: v.agora, nomeClaro: ceuEscuro(biomaDe(v)) }
   if (ch !== undefined && (v.tom ?? 'todo') === 'todo') {
     corpo.push(tingir(ch, v.W, H, 0.16))
   }
@@ -1055,7 +1268,7 @@ export function montar(v: Vista): { svg: string; largura: number; altura: number
   const s = v.escala
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${v.W * s}" height="${Ht * s}" viewBox="0 0 ${v.W} ${Ht}" preserveAspectRatio="xMinYMin slice" shape-rendering="crispEdges">` +
-    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${ab?.fase === 1 ? MARCA.css : ''}${cssTexto()}${v.textoLongo === true || l.desmaiada ? cssFonteLonga() : ''}${CSS_BOTOES}${d.css.join('')}</style>` +
+    `<style>svg,image,use{image-rendering:crisp-edges;image-rendering:pixelated}${ab?.fase === 1 ? MARCA.css : ''}${cssTexto()}${v.semFonteLonga !== true && (v.textoLongo === true || l.desmaiada) ? cssFonteLonga() : ''}${CSS_BOTOES}${d.css.join('')}</style>` +
     `<defs>${d.defs.join('')}</defs>` +
     corpo.join('') +
     `</svg>`

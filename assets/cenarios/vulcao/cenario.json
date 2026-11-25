@@ -1,0 +1,209 @@
+{
+ "tamanho_nativo": [
+  479,
+  268
+ ],
+ "pes_dos_personagens_y": 209,
+ "horizonte_y": 160,
+ "lua_ceu": {
+  "x": 455,
+  "y": 26,
+  "w": 50,
+  "h": 48
+ },
+ "camadas": [
+  {
+   "arquivo": "fundo.png",
+   "velocidade": 0.0,
+   "rola": false
+  },
+  {
+   "arquivo": "nuvens.png",
+   "velocidade": 0.15,
+   "rola": true,
+   "vento_px_por_s": 2,
+   "vazia": true
+  },
+  {
+   "ilhas": [
+    {
+     "arquivo": "ilha_1.png",
+     "x": 369,
+     "y": 34
+    },
+    {
+     "arquivo": "ilha_2.png",
+     "x": 556,
+     "y": 42
+    }
+   ],
+   "velocidade": 0.2,
+   "balanco_px": 2
+  },
+  {
+   "arquivo": "longe.png",
+   "velocidade": 0.3,
+   "rola": true,
+   "obs": "campo ao longe (da placa), entre o marco e o meio"
+  },
+  {
+   "arquivo": "meio.png",
+   "velocidade": 0.5,
+   "rola": true
+  },
+  {
+   "arquivo": "chao.png",
+   "velocidade": 1.0,
+   "rola": true
+  }
+ ],
+ "velocidade_1": "px por px que a Lua anda",
+ "modos": {
+  "compacto": {
+   "janela_y": [
+    70,
+    226
+   ],
+   "camadas_de_tras_descem": 42
+  }
+ },
+ "marco": {
+  "arquivo": "marco.png",
+  "x": 383,
+  "y_tela": 128,
+  "obs": "parado, de pé no horizonte (na tela)"
+ },
+ "mod": {
+  "lua_fixa": true,
+  "ilhas_na_frente": false,
+  "estrelas": [
+   [
+    644,
+    9,
+    0,
+    0
+   ],
+   [
+    269,
+    30,
+    1,
+    0
+   ],
+   [
+    403,
+    2,
+    0,
+    1
+   ],
+   [
+    167,
+    6,
+    2,
+    0
+   ],
+   [
+    802,
+    4,
+    2,
+    0
+   ],
+   [
+    735,
+    55,
+    3,
+    1
+   ],
+   [
+    141,
+    47,
+    0,
+    0
+   ],
+   [
+    268,
+    56,
+    2,
+    0
+   ],
+   [
+    857,
+    50,
+    2,
+    1
+   ],
+   [
+    550,
+    53,
+    1,
+    0
+   ],
+   [
+    702,
+    4,
+    2,
+    0
+   ],
+   [
+    734,
+    28,
+    2,
+    1
+   ],
+   [
+    94,
+    45,
+    0,
+    0
+   ],
+   [
+    24,
+    38,
+    3,
+    0
+   ],
+   [
+    791,
+    54,
+    0,
+    1
+   ],
+   [
+    49,
+    6,
+    3,
+    0
+   ],
+   [
+    568,
+    36,
+    1,
+    0
+   ],
+   [
+    421,
+    38,
+    2,
+    1
+   ],
+   [
+    892,
+    44,
+    2,
+    0
+   ],
+   [
+    389,
+    59,
+    3,
+    0
+   ],
+   [
+    653,
+    31,
+    2,
+    1
+   ]
+  ],
+  "estrela_cor": "vermelha"
+ }
+}

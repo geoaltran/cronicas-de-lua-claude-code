@@ -279,3 +279,48 @@ test('o chefão das 12 lutas continua igual (3 de vida, sem escudo) e o último 
   expect(viuCritico).toBe(true)
   await ui.unmount()
 })
+
+test('/cronicas chefao troca o chefão em cena (e o bioma vai junto); no céu escuro o nome fica claro', async ($, on) => {
+  const { clock, ui, svg } = await comecar($, on)
+  const cmd = (args: string) => $.command.run({ command: 'cronicas', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } })
+  await cmd('chefao golem')
+  await clock.advance(3000)
+  expect(await svg()).toContain('id="b_ruinas_chao"')
+  const r = await cmd('chefao malakor')
+  expect(JSON.stringify(r)).toContain('Malakor')
+  await clock.advance(3000)
+  const f = await svg()
+  expect(f).toContain('id="b_eclipse_chao"')
+  expect(f).not.toContain('id="b_ruinas_chao"')
+  expect(f).toContain('fill:#fbe6a2') // nome claro, com contorno, no céu do eclipse
+  await cmd('chefao sir solis')
+  await clock.advance(3000)
+  const g = await svg()
+  expect(g).toContain('id="b_aurora_chao"')
+  expect(g).not.toContain('fill:#fbe6a2') // céu claro: o nome escuro de sempre
+  await ui.unmount()
+})
+
+test('modo quadro (balões e fonte longa no SVG): Relojoeiro e Ignis trocam o bioma e cabem no limite', async ($, on) => {
+  const clock = mock.clock(on, { now: T0 })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5 }, ajustes: { quadro: true } })
+  on('session.usage', () => ({
+    value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [{ kind: 'five_hour', percentUsed: 28 }] },
+  }))
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('command.register', () => ({ value: { command: 'cronicas' } }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const ui = await $.ui.mount({ ...FAIXA, props: { ...FAIXA.props, bodyColumns: 120 } })
+  const svg = async () => String(((await ui.find({ type: 'Svg' })) as { props?: { source?: string } })?.props?.source ?? '')
+  const cmd = (args: string) => $.command.run({ command: 'cronicas', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 } })
+  for (const [nome, bioma] of [['relojoeiro', 'torre'], ['ignis', 'vulcao'], ['golem', 'ruinas'], ['relojoeiro', 'torre']] as const) {
+    await cmd(`chefao ${nome}`)
+    for (const passo of [100, 1500, 3000]) {
+      await clock.advance(passo)
+      const f = await svg()
+      expect(f).toContain(`id="b_${bioma}_chao"`)
+      expect(f.length).toBeLessThan(131072)
+    }
+  }
+  await ui.unmount()
+})

@@ -1,0 +1,223 @@
+{
+ "tamanho_nativo": [
+  479,
+  268
+ ],
+ "pes_dos_personagens_y": 209,
+ "horizonte_y": 132,
+ "lua_ceu": {
+  "x": 437,
+  "y": 18,
+  "w": 88,
+  "h": 84,
+  "obs": "caixa da lua no fundo.png (para a lua minguar)"
+ },
+ "camadas": [
+  {
+   "arquivo": "fundo.png",
+   "velocidade": 0.0,
+   "rola": false,
+   "obs": "parado e centralizado; a ilustração original fica no meio"
+  },
+  {
+   "arquivo": "nuvens.png",
+   "velocidade": 0.15,
+   "rola": true,
+   "vento_px_por_s": 2,
+   "vazia": true
+  },
+  {
+   "ilhas": [
+    {
+     "arquivo": "ilha_1.png",
+     "x": 374,
+     "y": 22
+    },
+    {
+     "arquivo": "ilha_2.png",
+     "x": 550,
+     "y": 30
+    }
+   ],
+   "velocidade": 0.2,
+   "balanco_px": 2,
+   "obs": "coordenadas no fundo.png; sobem e descem devagar"
+  },
+  {
+   "arquivo": "longe.png",
+   "velocidade": 0.3,
+   "rola": true,
+   "obs": "mar ao longe (água calma), entre as ilhas e o meio; o reflexo fica em cima dele"
+  },
+  {
+   "arquivo": "meio.png",
+   "velocidade": 0.5,
+   "rola": true
+  },
+  {
+   "arquivo": "chao.png",
+   "velocidade": 1.0,
+   "rola": true
+  }
+ ],
+ "velocidade_1": "px por px que a Lua anda",
+ "modos": {
+  "compacto": {
+   "janela_y": [
+    70,
+    226
+   ],
+   "camadas_de_tras_descem": 62
+  }
+ },
+ "marco": {
+  "arquivo": "marco.png",
+  "x": 505,
+  "y_tela": 115,
+  "obs": "x no fundo.png; y já na tela (não desce): de pé no horizonte, parado"
+ },
+ "reflexo": {
+  "arquivos": [
+   "reflexo_0.png",
+   "reflexo_1.png",
+   "reflexo_2.png"
+  ],
+  "x": 0,
+  "y": 132,
+  "ms": 330,
+  "obs": "parado na tela (não rola nem desce), entre o longe e o meio; os quadros se alternam (tremor do luar na água)"
+ },
+ "mod": {
+  "lua_fixa": true,
+  "ilhas_na_frente": false,
+  "estrelas": [
+   [
+    561,
+    9,
+    2,
+    0
+   ],
+   [
+    609,
+    3,
+    2,
+    0
+   ],
+   [
+    847,
+    18,
+    3,
+    1
+   ],
+   [
+    103,
+    3,
+    1,
+    0
+   ],
+   [
+    586,
+    7,
+    1,
+    0
+   ],
+   [
+    131,
+    5,
+    3,
+    1
+   ],
+   [
+    356,
+    5,
+    3,
+    0
+   ],
+   [
+    922,
+    10,
+    0,
+    0
+   ],
+   [
+    897,
+    8,
+    0,
+    1
+   ],
+   [
+    11,
+    5,
+    0,
+    0
+   ],
+   [
+    36,
+    13,
+    3,
+    0
+   ],
+   [
+    382,
+    17,
+    3,
+    1
+   ],
+   [
+    163,
+    13,
+    0,
+    0
+   ],
+   [
+    847,
+    1,
+    3,
+    0
+   ],
+   [
+    327,
+    11,
+    2,
+    1
+   ],
+   [
+    824,
+    3,
+    3,
+    0
+   ],
+   [
+    402,
+    3,
+    0,
+    0
+   ],
+   [
+    407,
+    17,
+    2,
+    1
+   ],
+   [
+    74,
+    14,
+    2,
+    0
+   ],
+   [
+    117,
+    19,
+    3,
+    0
+   ],
+   [
+    304,
+    12,
+    0,
+    1
+   ]
+  ],
+  "estrela_cor": "azul"
+ }
+}

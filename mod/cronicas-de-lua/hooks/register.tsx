@@ -12,6 +12,10 @@ import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critic
 
 const PLUGIN = 'cronicas-de-lua'
 /** O app desenha SVG de até 131.072 caracteres; uma margem para não arriscar. */
+// O app documenta 131.072 caracteres. ATENÇÃO (prova de 24/11/2026): no desktop o
+// teto parece valer para o Svg CODIFICADO (encodeURIComponent ~128 mil: base64,
+// aspas, espaços e <> viram 3 letras), o que dá ~105 mil caracteres crus numa
+// cena. A saída é dividir a cena em dois Svg (PROXIMA_SESSAO, 16ª sessão).
 const LIMITE_SVG = 129_000
 
 const JOGO0: Jogo = { xp: 0, paginas: 0, lutas: 0 }
@@ -323,11 +327,16 @@ function decidir(s: Lutas, agora: number, ja: boolean): Lutas {
 let alarmeLuta: Timer | undefined
 
 /** Um chefão entra em cena (se não há outro): a Lua para quando ele chega. */
-async function chamarChefao($: $, origem: Chefao['origem'], tarefas?: Chefao['tarefas'], escolhido?: string): Promise<boolean> {
+async function chamarChefao($: $, origem: Chefao['origem'], tarefas?: Chefao['tarefas'], escolhido?: string, trocar = false): Promise<boolean> {
   const agora = await $.clock.now()
   const [atual, estado, ls] = await Promise.all([read($, chefao), read($, hud), read($, lutas)])
-  if (atual !== null) {
+  if (atual !== null && !trocar) {
     return false
+  }
+  if (atual !== null && tarefas === undefined && dePe(atual) && atual.origem === 'lista') {
+    // trocado pelo comando no meio de uma lista de verdade: o novo herda as tarefas
+    origem = 'lista'
+    tarefas = atual.tarefas
   }
   await update($, chefao, () => novoChefao(estado.jogo.paginas, origem, agora, tarefas, escolhido))
   if (lutaDaVez(ls.lista, agora) === undefined) {
@@ -1401,7 +1410,8 @@ export const register: Register = on => {
       if (pedido !== '' && escolhido === undefined) {
         return { text: tx('comando.chefao.desconhecido', { pedido, lista: JORNADA.map(n => NOME_CHEFAO[n] ?? n).join(', ') }) }
       }
-      const veio = await chamarChefao($, comLista ? 'lista' : 'lutas', tarefas, escolhido)
+      // pedido explícito: troca o chefão que estiver em cena (o bioma vai junto)
+      const veio = await chamarChefao($, comLista ? 'lista' : 'lutas', tarefas, escolhido, true)
       await revisar($)
       const ch = await read($, chefao)
       if (!veio || ch === null) {
@@ -1711,7 +1721,10 @@ export const register: Register = on => {
       // não coube: sem partículas e sem a tira de andar na luta; se ainda não
       // couber, sem a assinatura; por fim, a cena sem a luta (o app recusa
       // um Svg acima de 131.072 caracteres e a faixa sumiria)
-      const tentativas = [{ economia: true }, { economia: true, semAssinatura: true }] as const
+      // (os biomas da noite são pesados: no modo quadro ou com a Lua dormindo, os
+      // balões e a fonte dos textos longos saem antes da luta)
+      const leve = { economia: true, semAssinatura: true, textoLongo: false, semBaloes: true, semFonteLonga: true } as const
+      const tentativas = [{ economia: true }, { economia: true, semAssinatura: true }, leve] as const
       for (const t of tentativas) {
         svg = montar({ ...vista, ...t }).svg
         if (svg.length <= LIMITE_SVG) {
@@ -1720,7 +1733,7 @@ export const register: Register = on => {
       }
       if (svg.length > LIMITE_SVG) {
         const { luta: _fora, ...semLuta } = vista as typeof vista & { luta?: unknown }
-        svg = montar({ ...semLuta, economia: true, semAssinatura: true }).svg
+        svg = montar({ ...semLuta, ...leve }).svg
       }
     }
 

@@ -176,7 +176,14 @@ export function crescer(c: Chefao, t: Chefao['tarefas']): Chefao {
 
 // ---------------------------------------------------------------- desenho
 
-export type PalcoChefao = { W: number; H: number; pes: number; agora: number }
+export type PalcoChefao = {
+  W: number
+  H: number
+  pes: number
+  agora: number
+  /** Céu escuro no alto da faixa (biomas da noite): o nome do chefão vai claro, com contorno. */
+  nomeClaro?: boolean
+}
 
 /** Onde o chefão fica (o mesmo lugar do monstro nas lutas). */
 export function lugar(c: Chefao, W: number, pes: number): { mx: number; my: number; w: number; h: number } {
@@ -223,6 +230,7 @@ const O = '#1c0f16'
 const G1 = '#f7cf4a'
 const G2 = '#de8e2c'
 const VAZIO = '#22121b'
+const NOME_CLARO = '#fbe6a2'
 const R1 = '#f2405a'
 const R2 = '#c21e4f'
 const D1 = '#c62a3e'
@@ -247,7 +255,7 @@ function ponta(x: number, y: number): string {
 }
 
 /** A barra (com o nome em cima, Silkscreen preta) a `y` do topo, de `x` a `x + w`. */
-export function barraDeVida(d: Doc, c: Chefao, x: number, y: number, w: number, agora: number): string {
+export function barraDeVida(d: Doc, c: Chefao, x: number, y: number, w: number, agora: number, nomeClaro = false): string {
   const ix = x + 5
   const iw = w - 10
   const larg = (v: number) => r((iw * Math.max(0, v)) / Math.max(1, c.vidaMax))
@@ -280,7 +288,10 @@ export function barraDeVida(d: Doc, c: Chefao, x: number, y: number, w: number, 
   }
   s += ponta(x - 1, y) + ponta(x + w - 5, y)
   const nome = (NOME_CHEFAO[c.nome] ?? c.nome).toUpperCase()
-  s += `<text x="${x + 3}" y="${y - 4}" style="font-family:${familiaCurta()};font-size:12px;fill:${O}">${esc(nome)}</text>`
+  // no céu claro, o nome escuro de sempre; no céu escuro, dourado-claro com
+  // contorno escuro de 1 px (o traço vai por baixo do preenchimento)
+  const cor = nomeClaro ? `fill:${NOME_CLARO};stroke:${O};stroke-width:2px;paint-order:stroke;stroke-linejoin:miter` : `fill:${O}`
+  s += `<text x="${x + 3}" y="${y - 4}" style="font-family:${familiaCurta()};font-size:12px;${cor}">${esc(nome)}</text>`
   return `<g>${s}</g>`
 }
 
@@ -289,7 +300,7 @@ export function barraNoLugar(d: Doc, c: Chefao, p: PalcoChefao): string {
   const { mx } = lugar(c, p.W, p.pes)
   const w = Math.max(80, Math.min(160, mx - 14))
   const x = Math.max(8, mx - 2 - w)
-  return d.janela(-Infinity, c.caiu === undefined ? Infinity : c.caiu + DESFAZ, p.agora, barraDeVida(d, c, x, 17, w, p.agora))
+  return d.janela(-Infinity, c.caiu === undefined ? Infinity : c.caiu + DESFAZ, p.agora, barraDeVida(d, c, x, 17, w, p.agora, p.nomeClaro === true))
 }
 
 /** "+PÁGINA 3/10" (e "NOVO JOGO+" depois do Malakor), subindo devagar no meio da cena. */
