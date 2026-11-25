@@ -451,6 +451,123 @@ function reflexoNoVidro(d: Doc, nome: string, topo: number, agora: number): stri
   return s
 }
 
+/**
+ * Mar (fase B): o reflexo da lua tremendo mais vivo. Tracinhos claros de 1 px
+ * de altura acendem e apagam depressa dentro da coluna do reflexo (larga no
+ * horizonte, estreita embaixo). Parado na tela, entre o longe e o meio (as
+ * pedras e os barcos passam na frente). `cx`, `y0`, `y1` já na tela.
+ */
+function brilhosDoReflexo(d: Doc, cx: number, y0: number, y1: number, agora: number, quantos: number): string {
+  const rnd = sorteio(29)
+  let s = ''
+  for (let i = 0; i < quantos; i++) {
+    const f = rnd()
+    const y = Math.floor(y0 + f * (y1 - y0 - 1))
+    const meia = 38 - f * 26
+    const w = Math.max(2, Math.round((6 - f * 4) * (0.6 + rnd() * 0.6)))
+    const x = Math.round(cx + (rnd() * 2 - 1) * meia - w / 2)
+    const ms = 700 + Math.floor(rnd() * 900)
+    // poucos desenhos de animação, reaproveitados (cada regra nova pesa no teto da faixa)
+    const liga = [12, 34, 56][Math.floor(rnd() * 3)] ?? 12
+    const dura = [20, 30][i % 2] ?? 20
+    const cor = i % 3 === 0 ? '#fffbe6' : '#f3e9b8'
+    const k = d.anim(`0%{opacity:0}${liga}%{opacity:1}${liga + dura}%{opacity:0}100%{opacity:0}`, ms, 'step-end', -mod(agora + rnd() * ms, ms), 'infinite')
+    s += `<rect class='${k}' x='${x}' y='${y}' width='${w}' height='1' fill='${cor}'/>`
+  }
+  return s
+}
+
+/**
+ * Mar (fase B): cristas das ondas subindo e descendo. Uma cópia só da espuma
+ * clara do próprio meio (filtro que deixa passar os pixels claros) sobe 1–2 px
+ * e volta, cada onda no seu tempo. Caixas no meio.png (x0, y0, x1, y1), com
+ * folga de 3 px em cima; a outra metade do meio é espelhada (x -> 957 - x).
+ * `meio` é o conteúdo da camada (uma volta, 0..958). Rola com o meio.
+ */
+const CRISTAS: Record<string, readonly (readonly [number, number, number, number])[]> = {
+  mar: [[30, 140, 96, 166], [165, 168, 228, 183], [236, 158, 296, 183], [338, 157, 412, 177], [425, 168, 479, 187]],
+}
+
+/**
+ * A metade esquerda (0..479) desenhada uma vez, a direita espelhada com um
+ * <use> (como o próprio meio), e as duas de novo em +958 (a camada dá a volta).
+ * Os dois lados ficam no mesmo compasso; quase nunca estão os dois na tela.
+ */
+function metadeEspelhada(d: Doc, metade: string): string {
+  const me = d.id('mh')
+  const a = d.id('ma')
+  return `<g id='${a}'><g id='${me}'>${metade}</g><use href='#${me}' transform='translate(${P},0) scale(-1,1)'/></g><use href='#${a}' x='${P}'/>`
+}
+
+function cristasDasOndas(d: Doc, nome: string, meio: string, topo: number, agora: number): string {
+  const lista = CRISTAS[nome]
+  if (lista === undefined) {
+    return ''
+  }
+  const fl = d.id('ef')
+  const mid = d.id('em')
+  // alfa = só os pixels claros (média acima de ~0,62), nas cores da arte (clareada, a espuma toda ficava branca demais)
+  d.defs.push(
+    `<filter id='${fl}' x='0' y='0' width='1' height='1' color-interpolation-filters='sRGB'><feColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 10 10 10 0 -18.6'/></filter>` +
+      `<g id='${mid}' filter='url(#${fl})'>${meio}</g>`,
+  )
+  const rnd = sorteio(31)
+  let s = ''
+  for (const [x0, y0, x1, y1] of lista) {
+    const cp = d.id('cc')
+    const ms = 1500 + Math.floor(rnd() * 900)
+    const k = d.anim('0%{transform:translateY(0px)}25%{transform:translateY(-1px)}50%{transform:translateY(-2px)}75%{transform:translateY(-1px)}100%{transform:translateY(0px)}', ms, 'step-end', -mod(agora + rnd() * ms, ms), 'infinite')
+    s += `<clipPath id='${cp}'><rect x='${x0}' y='${y0 - topo}' width='${x1 - x0}' height='${y1 - y0}'/></clipPath><g clip-path='url(#${cp})'><use href='#${mid}' class='${k}'/></g>`
+  }
+  return metadeEspelhada(d, s)
+}
+
+/**
+ * Mar (fase B): espuma batendo nas pedras e nos naufrágios. De tempos em
+ * tempos sobe um respingo (gotinhas brancas e azul-claras num arco, com um
+ * clarão na base) e cai de volta. Pontos no meio.png (x, y, lado: -1 esquerda,
+ * 1 direita); a outra metade é espelhada. Rola com o meio.
+ */
+const ESPUMA: Record<string, readonly (readonly [number, number, number])[]> = {
+  mar: [[103, 168, -1], [131, 176, 1], [298, 160, -1], [341, 161, 1], [374, 169, -1], [426, 178, 1]],
+}
+
+/** As gotinhas de um respingo: [para o lado, para cima] (lado da pedra = +). */
+const GOTAS: readonly (readonly [number, number])[] = [[2, 9], [4, 6], [-1, 7], [5, 4]]
+
+function espumaNasPedras(d: Doc, nome: string, topo: number, agora: number): string {
+  const lista = ESPUMA[nome]
+  if (lista === undefined) {
+    return ''
+  }
+  const rnd = sorteio(37)
+  let s = ''
+  for (const [px, py, lado] of lista) {
+    const ms = 2200 + Math.floor(rnd() * 1600)
+    const atraso = -mod(agora + rnd() * ms, ms)
+    const y = py - topo - 1
+    // clarão na base: acende no começo do respingo
+    const kc = d.anim('0%{opacity:0.95}8%{opacity:0.7}16%{opacity:0}100%{opacity:0}', ms, 'step-end', atraso, 'infinite')
+    s += `<rect class='${kc}' x='${px - 2}' y='${y}' width='5' height='2' fill='#eef8ff'/>`
+    GOTAS.forEach(([vai0, sobe], i) => {
+      const vai = vai0 * lado
+      // arco em passos: sobe rápido, para no alto, cai e some (só ~30% do ciclo); o
+      // desenho de cada gota é o mesmo em todas as pedras (só o atraso muda)
+      const p = (a: number, b: number) => `transform:translate(${r(a)}px,${r(b)}px)`
+      const kq = d.anim(
+        `0%{${p(0, 0)};opacity:1}6%{${p(vai * 0.4, -sobe * 0.7)}}12%{${p(vai * 0.7, -sobe)}}18%{${p(vai * 0.9, -sobe * 0.8)}}` +
+          `24%{${p(vai, -sobe * 0.35)};opacity:1}30%{${p(vai * 1.1, 1)};opacity:0}100%{${p(0, 0)};opacity:0}`,
+        ms,
+        'step-end',
+        atraso,
+        'infinite',
+      )
+      s += `<rect class='${kq}' x='${px}' y='${y}' width='${i === 0 ? 2 : 1}' height='1' fill='${i % 2 === 0 ? '#fff' : '#bfe3f7'}'/>`
+    })
+  }
+  return metadeEspelhada(d, s)
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -681,11 +798,20 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
       const k = d.anim(`0%{opacity:0}${de.toFixed(2)}%{opacity:1}${ate.toFixed(2)}%{opacity:0}100%{opacity:0}`, rf.ms * rf.n, 'step-end', -mod(agora, rf.ms * rf.n), 'infinite')
       partes.push(`<g class="${k}"><use href="${d.img(`${pre}reflexo_${j}`)}" x="${rf.x + PAD - x0}" y="${rf.y - topo}"/></g>`)
     }
+    // brilhos tremendo no reflexo (menos na luta, nenhum na economia)
+    if (v.economia !== true) {
+      const a0 = art(`${pre}reflexo_0`)
+      partes.push(brilhosDoReflexo(d, rf.x + PAD - x0 + (a0.w as number) / 2, rf.y - topo, rf.y - topo + (a0.h as number), agora, v.luta !== undefined ? 8 : 14))
+    }
   }
   // 5. meio
   const md = b.camadas.meio
   if (md !== undefined) {
     partes.push(rolo(camadaBioma(d, pre + 'meio', md, md.oy - topo, 2), md.vel))
+    // Mar: cristas das ondas subindo e espuma batendo nas pedras (rolam com o meio; nada na economia)
+    if (v.economia !== true && (CRISTAS[nome] !== undefined || ESPUMA[nome] !== undefined)) {
+      partes.push(rolo(cristasDasOndas(d, nome, camadaBioma(d, pre + 'meio', md, md.oy - topo, 1), topo, agora) + espumaNasPedras(d, nome, topo, agora), md.vel))
+    }
   }
   // reflexo correndo no vidro (Castelo), rola com o meio; nada na economia
   if (md !== undefined && VIDRO[nome] !== undefined && v.economia !== true) {
