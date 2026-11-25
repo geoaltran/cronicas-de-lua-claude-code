@@ -631,6 +631,102 @@ function luzDoFarol(d: Doc, lx: number, ly: number, agora: number): string {
   return `<g transform='translate(${lx},${ly})'><g class='${kg}'>${facho}</g></g>${lampada}`
 }
 
+/**
+ * Vulcão (fase B, prévia `brilho_lava`): a lava do chão, do campo ao longe e
+ * das rachaduras do meio pulsando devagar, com uma onda de calor que corre por
+ * ela em faixas inclinadas (os pixels não acendem todos juntos). A lava sai da
+ * própria camada por um filtro (R > 190, G > 70, B < 120, como a máscara da
+ * prévia) e ganha um amarelo-claro por cima, mais forte que na prévia.
+ * Devolve o que vai na mesma rolagem da camada, logo depois dela.
+ */
+const LAVA = new Set(['vulcao'])
+const lavaDefs = new WeakMap<Doc, { filtro: string; mascara: string }>()
+
+function lavaPulsando(d: Doc, camada: string, agora: number): string {
+  let ids = lavaDefs.get(d)
+  if (ids === undefined) {
+    ids = { filtro: d.id('lf'), mascara: d.id('lm') }
+    lavaDefs.set(d, ids)
+    const um = (n: number, de: number, val: number) => Array.from({ length: n }, (_, i) => (i >= de ? val : 1 - val)).join(' ')
+    const gr = d.id('lg')
+    const pt = d.id('lp')
+    // pulso lento (28 s) por baixo e a onda (faixas de 90 px, ~6 px/s) por cima
+    const kp = d.anim('0%{opacity:0.12}50%{opacity:0.45}100%{opacity:0.12}', 28000, 'ease-in-out', -mod(agora, 28000), 'infinite')
+    const ko = d.anim('from{transform:translateX(0px)}to{transform:translateX(90px)}', 14000, 'linear', -mod(agora, 14000), 'infinite')
+    d.defs.push(
+      `<filter id='${ids.filtro}' color-interpolation-filters='sRGB'>` +
+        `<feComponentTransfer><feFuncR type='discrete' tableValues='${um(17, 13, 1)}'/><feFuncG type='discrete' tableValues='${um(11, 3, 1)}'/><feFuncB type='discrete' tableValues='${um(17, 8, 0)}'/></feComponentTransfer>` +
+        `<feColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 0.88 0 0 0 0 0.51 1 1 1 0 -2'/></filter>` +
+        `<linearGradient id='${gr}'><stop offset='0.09' stop-color='#000'/><stop offset='0.25' stop-color='#fff'/><stop offset='0.41' stop-color='#000'/></linearGradient>` +
+        `<pattern id='${pt}' patternUnits='userSpaceOnUse' width='90' height='400' patternTransform='skewX(-65)'><rect width='90' height='400' fill='url(#${gr})'/></pattern>` +
+        `<mask id='${ids.mascara}' maskUnits='userSpaceOnUse' x='-100' y='-50' width='2200' height='400'>` +
+        `<rect class='${kp}' x='-100' y='-50' width='2200' height='400' fill='#fff'/>` +
+        `<g class='${ko}'><rect x='-400' y='-50' width='2600' height='400' fill='url(#${pt})'/></g></mask>`,
+    )
+  }
+  return `<g filter='url(#${ids.filtro})' mask='url(#${ids.mascara})' opacity='0.75'>${camada}</g>`
+}
+
+/**
+ * Vulcão (fase B, prévia `brilho_cratera`): a aura laranja sobre a cratera,
+ * em 4 anéis, pulsando de forma irregular (soma de senos, um quadro a cada
+ * 110 ms como na prévia). Atrás do vulcão: aparece no céu, em cima da cratera.
+ * Mais forte que na prévia. `cx`, `cy`: a boca da cratera, já na tela.
+ */
+const CRATERA: Record<string, readonly [number, number]> = {
+  vulcao: [98, 0], // no marco.png: a primeira linha com pixels (79..117)
+}
+
+function auraDaCratera(d: Doc, cx: number, cy: number, agora: number): string {
+  const n = 40
+  const passo = 110
+  let qs = ''
+  for (let i = 0; i < n; i++) {
+    const t = i
+    const f = 0.55 + 0.25 * Math.sin(t * 0.9) + 0.15 * Math.sin(t * 2.3 + 1) + 0.1 * Math.sin(t * 5.1 + 2)
+    const esc = 0.75 + 0.35 * f
+    qs += `${((i / n) * 100).toFixed(1)}%{transform:scale(${esc.toFixed(2)});opacity:${Math.min(1, 0.6 + 0.6 * f).toFixed(2)}}`
+  }
+  const k = d.anim(qs, n * passo, 'step-end', -mod(agora, n * passo), 'infinite')
+  const aneis = ([[26, 13, 0.22], [18, 9, 0.32], [11, 6, 0.48], [5, 3, 0.7]] as const)
+    .map(([rx, ry, a], j) => `<ellipse rx='${rx}' ry='${ry}' fill='rgb(255,${120 + 30 * j},${40 + 20 * j})' opacity='${a}'/>`)
+    .join('')
+  return `<g transform='translate(${cx},${cy})'><g class='${k}' shape-rendering='crispEdges'>${aneis}</g></g>`
+}
+
+/**
+ * Vulcão (fase B, prévia `lava_no_ar`): gotas de lava estourando da cratera
+ * em arco (gravidade) e apagando. Três arcos, para os dois lados (espelhados),
+ * cada um em duas fases: 12 gotas e só 3 desenhos de animação. Um ciclo de
+ * ~3 s, gota no ar em ~2 s (como na prévia: 14 de 22 unidades, 7,3 por s).
+ */
+const ARCOS: readonly (readonly [number, number])[] = [[0.5, 3.4], [1.1, 2.8], [1.5, 3.2]]
+const CORES_LAVA = ['#ffc846', '#ff8c28', '#ff5a1e']
+const ALTO = 1.8
+
+function lavaNoAr(d: Doc, cx: number, cy: number, agora: number, fases: number): string {
+  const ms = 3030
+  const rnd = sorteio(41)
+  let s = ''
+  ARCOS.forEach(([vx, vy], a) => {
+    let qs = ''
+    for (let u = 0; u <= 14; u += 2) {
+      const pc = ((u / 22) * 100).toFixed(1)
+      // ALTO: o arco da prévia esticado na altura (usuário, 25/11/2026: subir mais antes de cair), caindo no mesmo tempo
+      qs += `${pc}%{transform:translate(${r(vx * u)}px,${r(ALTO * (-vy * u + 0.28 * u * u))}px);opacity:${(1 - u / 15).toFixed(2)}}`
+    }
+    qs += `64%{opacity:0}100%{transform:translate(0px,0px);opacity:0}`
+    for (const lado of [1, -1]) {
+      for (let f = 0; f < fases; f++) {
+        const k = d.anim(qs, ms, 'linear', -mod(agora + rnd() * ms, ms), 'infinite')
+        const cor = CORES_LAVA[(a + f + (lado > 0 ? 0 : 1)) % 3] ?? '#ff8c28'
+        s += `<g transform='translate(${cx},${cy}) scale(${lado},1)'><rect class='${k}' x='0' y='0' width='${f === 0 ? 2 : 1}' height='${f === 0 ? 2 : 1}' fill='${cor}' opacity='0'/></g>`
+      }
+    }
+  })
+  return s
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -779,6 +875,12 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   const para = andando && v.caminho.ate !== undefined ? v.caminho.ate - agora : undefined
   const rolo = (conteudo: string, vel: number, base = x0 - PAD) => d.rolo(conteudo, base + dist * vel, andando ? VEL * vel : 0, para)
   const partes: string[] = []
+  // a camada e, no Vulcão, a lava dela pulsando por cima (na mesma rolagem; nada na economia)
+  const comLava = LAVA.has(nome) && v.economia !== true
+  const camadaComLava = (img: string, c: CamadaBioma) => {
+    const base = camadaBioma(d, img, c, c.oy - topo, 2)
+    return comLava ? base + lavaPulsando(d, base, agora) : base
+  }
 
   // 1. fundo parado (céu, lua, o que fica longe de verdade): o centro e, dos
   // lados, tiras do próprio centro (o vai-e-volta do fundo largo)
@@ -810,7 +912,17 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   }
   // marco: parado, de pé no horizonte (farol, vulcão)
   if (b.marco !== undefined) {
+    const cr = CRATERA[nome]
+    const boca = cr === undefined || v.economia === true ? undefined : ([b.marco.x - x0 + cr[0], b.marco.y_tela - topo + cr[1]] as const)
+    // aura da cratera atrás do vulcão (aparece no céu, em cima da boca)
+    if (boca !== undefined) {
+      partes.push(auraDaCratera(d, boca[0], boca[1], agora))
+    }
     partes.push(`<use href="${d.img(pre + 'marco')}" x="${b.marco.x - x0}" y="${b.marco.y_tela - topo}"/>`)
+    // gotas de lava estourando da cratera (menos na luta)
+    if (boca !== undefined) {
+      partes.push(lavaNoAr(d, boca[0], boca[1] + 1, agora, v.luta !== undefined ? 1 : 2))
+    }
     // luz girando no farol (antes das ilhas: elas passam na frente do facho)
     const lp = FAROL[nome]
     if (lp !== undefined && v.economia !== true) {
@@ -852,7 +964,7 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // 4. longe (campo, mar, planície da placa)
   const lg = b.camadas.longe
   if (lg !== undefined) {
-    partes.push(rolo(camadaBioma(d, pre + 'longe', lg, lg.oy - topo, 2), lg.vel))
+    partes.push(rolo(camadaComLava(pre + 'longe', lg), lg.vel))
   }
   if (b.ilhas_na_frente) {
     partes.push(camIlhas)
@@ -875,7 +987,7 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // 5. meio
   const md = b.camadas.meio
   if (md !== undefined) {
-    partes.push(rolo(camadaBioma(d, pre + 'meio', md, md.oy - topo, 2), md.vel))
+    partes.push(rolo(camadaComLava(pre + 'meio', md), md.vel))
     // Mar: cristas das ondas subindo e espuma batendo nas pedras (rolam com o meio; nada na economia)
     if (v.economia !== true && (CRISTAS[nome] !== undefined || ESPUMA[nome] !== undefined)) {
       partes.push(rolo(cristasDasOndas(d, nome, camadaBioma(d, pre + 'meio', md, md.oy - topo, 1), topo, agora) + espumaNasPedras(d, nome, topo, agora), md.vel))
@@ -902,7 +1014,7 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // 6. chão da frente
   const ch = b.camadas.chao
   if (ch !== undefined) {
-    partes.push(rolo(camadaBioma(d, pre + 'chao', ch, ch.oy - topo, 2), ch.vel))
+    partes.push(rolo(camadaComLava(pre + 'chao', ch), ch.vel))
   }
   return partes.join('')
 }
