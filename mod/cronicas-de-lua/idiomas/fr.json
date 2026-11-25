@@ -202,12 +202,30 @@
     "grimorio": {
       "titulo": "Grimoire",
       "subtitulo": "Les outils de Claude sont les sorts de Lua.",
-      "ler": { "nome": "Regard de Lumen", "desc": "Lire et chercher des fichiers. Réveille Vespera." },
-      "editar": { "nome": "Rune de Réécriture", "desc": "Modifier et écrire du code. Invoque l'Horloger et Sir Solis." },
-      "terminal": { "nome": "Flamme de Commande", "desc": "Commandes dans le terminal. Réveille Ignis." },
-      "web": { "nome": "Marée stellaire", "desc": "Chercher et lire sur le web. Amène le Léviathan et Nébula." },
-      "integracao": { "nome": "Pacte du Miroir", "desc": "Intégrations externes (MCP). Appelle le Roi Miroir." },
-      "subagente": { "nome": "Écho de Pénombre", "desc": "Appeler des aides (sous-agents). Clones de la Dame Pénombre." },
+      "ler": {
+        "nome": "Regard de Lumen",
+        "desc": "Lire et chercher des fichiers. Réveille Vespera."
+      },
+      "editar": {
+        "nome": "Rune de Réécriture",
+        "desc": "Modifier et écrire du code. Invoque l'Horloger et Sir Solis."
+      },
+      "terminal": {
+        "nome": "Flamme de Commande",
+        "desc": "Commandes dans le terminal. Réveille Ignis."
+      },
+      "web": {
+        "nome": "Marée stellaire",
+        "desc": "Chercher et lire sur le web. Amène le Léviathan et Nébula."
+      },
+      "integracao": {
+        "nome": "Pacte du Miroir",
+        "desc": "Intégrations externes (MCP). Appelle le Roi Miroir."
+      },
+      "subagente": {
+        "nome": "Écho de Pénombre",
+        "desc": "Appeler des aides (sous-agents). Clones de la Dame Pénombre."
+      },
       "total": {
         "um": "{n} sort lancé au total.",
         "outros": "{n} sorts lancés au total."
@@ -362,7 +380,8 @@
     "ajuda": {
       "estado": "As Crônicas de Lua : échelle {escala}x, {px} px par colonne, mode {modo}. Niveau {nivel}, {xp} XP, {paginas}/10 pages.",
       "uso": "Utilisez /cronicas scale 1|2|3, /cronicas ruler et /cronicas width <px> (calibrer la largeur), /cronicas image|frame, /cronicas test (comparer les deux), /cronicas new-moon (simuler un cache froid), /cronicas vigil (clair de lune presque fini, pour voir la Veille), /cronicas boss [nom] et /cronicas hit (essayer le boss), /cronicas elite (le prochain combat est l'élite) ou /cronicas language (langue du jeu).",
-      "trofeus": "Trophées : {lista}"
+      "trofeus": "Trophées : {lista}",
+      "uso_cenario": "Pour voir le décor : /cronicas walk [secondes] (Lua marche puis s'arrête en respirant) et /cronicas stage [biome] (changement de niveau vers le biome suivant ou celui demandé ; aucune page n'est comptée)."
     },
     "linha": "Hauteur de ligne : {n} px. Les zones de la souris ont été recalculées.",
     "teste": "Test activé : le bandeau s'affiche deux fois, A (cadre interactif) et B (image). /cronicas test à nouveau le désactive.",
@@ -377,6 +396,15 @@
       "auto": "Langue du système : {nome}.",
       "sem_traducao": "{nome} n'est pas encore traduit ; le jeu reste en {atual} pour l'instant.",
       "desconhecido": "Je ne connais pas la langue \"{pedido}\"."
+    },
+    "passear": {
+      "anda": "Lua se promène {s} s, puis s'arrête en respirant. Le sol fait le tour en 21 s environ ; les îles, bien plus lentes, en presque 2 min. Pour marcher plus longtemps : /cronicas walk 120.",
+      "ocupada": "Pas maintenant : Lua est en plein combat ou en changement de niveau. Réessaie dans un instant."
+    },
+    "fase": {
+      "vai": "Changement de niveau : {de} → {para}. Juste pour le décor : aucune page n'est comptée. Elle y reste jusqu'au prochain boss, qui apporte son propre biome.",
+      "chefao": "Pas maintenant : un boss est en scène. Bats-le avec /cronicas hit.",
+      "desconhecido": "Je ne connais pas le biome « {pedido} ». Les biomes : {lista}."
     }
   }
 }

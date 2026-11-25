@@ -202,12 +202,30 @@
     "grimorio": {
       "titulo": "魔導書",
       "subtitulo": "Claude のツールは Lua の呪文。",
-      "ler": { "nome": "ルーメンの瞳", "desc": "ファイルを読んで探す。Vespera を呼び覚ます。" },
-      "editar": { "nome": "改稿のルーン", "desc": "コードを編集して書く。時計職人と Sir Solis を呼び出す。" },
-      "terminal": { "nome": "命令の炎", "desc": "ターミナルのコマンド。Ignis を目覚めさせる。" },
-      "web": { "nome": "星明かりの潮", "desc": "Web を検索して読む。リヴァイアサンと Nébula を連れてくる。" },
-      "integracao": { "nome": "鏡の契約", "desc": "外部連携（MCP）。鏡の王を呼ぶ。" },
-      "subagente": { "nome": "半影のこだま", "desc": "助っ人を呼ぶ（サブエージェント）。半影の貴婦人の分身。" },
+      "ler": {
+        "nome": "ルーメンの瞳",
+        "desc": "ファイルを読んで探す。Vespera を呼び覚ます。"
+      },
+      "editar": {
+        "nome": "改稿のルーン",
+        "desc": "コードを編集して書く。時計職人と Sir Solis を呼び出す。"
+      },
+      "terminal": {
+        "nome": "命令の炎",
+        "desc": "ターミナルのコマンド。Ignis を目覚めさせる。"
+      },
+      "web": {
+        "nome": "星明かりの潮",
+        "desc": "Web を検索して読む。リヴァイアサンと Nébula を連れてくる。"
+      },
+      "integracao": {
+        "nome": "鏡の契約",
+        "desc": "外部連携（MCP）。鏡の王を呼ぶ。"
+      },
+      "subagente": {
+        "nome": "半影のこだま",
+        "desc": "助っ人を呼ぶ（サブエージェント）。半影の貴婦人の分身。"
+      },
       "total": {
         "um": "唱えた呪文は合計 {n} 回。",
         "outros": "唱えた呪文は合計 {n} 回。"
@@ -362,7 +380,8 @@
     "ajuda": {
       "estado": "As Crônicas de Lua：倍率 {escala}x、1 列 {px} px、{modo}モード。レベル {nivel}、{xp} XP、ページ {paginas}/10。",
       "uso": "使い方：/cronicas scale 1|2|3、/cronicas ruler と /cronicas width <px>（幅の調整）、/cronicas image|frame、/cronicas test（両方を比べる）、/cronicas new-moon（冷えたキャッシュを再現）、/cronicas vigil（月明かりを残りわずかにして夜番を見る）、/cronicas boss [名前] と /cronicas hit（ボス戦を試す）、/cronicas elite（次の戦いがエリートに）、/cronicas language（ゲームの言語）。",
-      "trofeus": "トロフィー：{lista}"
+      "trofeus": "トロフィー：{lista}",
+      "uso_cenario": "景色を見るには：/cronicas walk [秒]（ルナが歩いて、止まって息をする）と /cronicas stage [ステージ]（次のステージか指定したステージへ移動。ページは数えません）。"
     },
     "linha": "行の高さ：{n} px。マウスの反応範囲を計算し直しました。",
     "teste": "テストをオンにしました：帯が 2 つ出ます。A（操作できるフレーム）と B（画像）。もう一度 /cronicas test でオフ。",
@@ -377,6 +396,15 @@
       "auto": "システムの言語：{nome}。",
       "sem_traducao": "{nome} はまだ翻訳されていません。いまはゲームを {atual} のままにします。",
       "desconhecido": "「{pedido}」という言語は知りません。"
+    },
+    "passear": {
+      "anda": "ルナが {s} 秒散歩して、止まって息をします。地面は約 21 秒で一周、浮島はずっとゆっくりで約 2 分。もっと歩くなら：/cronicas walk 120。",
+      "ocupada": "今はできません：ルナは戦闘中かステージ移動中です。少しあとでもう一度どうぞ。"
+    },
+    "fase": {
+      "vai": "ステージ移動：{de} → {para}。景色を見るだけなので、ページは数えません。次のボスが自分のステージを連れてくるまで、そこにいます。",
+      "chefao": "今はできません：ボスがいます。/cronicas hit で倒してください。",
+      "desconhecido": "ステージ「{pedido}」はわかりません。ステージ：{lista}。"
     }
   }
 }

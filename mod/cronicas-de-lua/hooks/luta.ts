@@ -92,6 +92,27 @@ export function personagemDe(papel: string, vez: number): string {
   return ps[vez % Math.max(1, ps.length)]?.personagem ?? 'vespera'
 }
 
+/**
+ * Prévia do chefão: numa luta comum, o chefão da página da jornada às vezes
+ * entra no lugar do monstro da ferramenta (sorteado, mais ou menos 1 em 4, e
+ * nunca em lutas seguidas). O Malakor não: ele só aparece como chefe final.
+ */
+export const PREVIA = 'previa_chefao'
+const PREVIA_CHANCE = 0.25
+/** Lutas comuns, no mínimo, entre duas prévias. */
+const PREVIA_INTERVALO = 3
+
+export function previaDoChefao(n: number, agora: number, chefao: string, ultima: number | undefined): boolean {
+  if (chefao === 'malakor') {
+    return false
+  }
+  if (ultima !== undefined && n - ultima < PREVIA_INTERVALO) {
+    return false
+  }
+  // o número da luta e o segundo em que ela começou: cada sessão sorteia diferente
+  return sorteio(n * 7919 + Math.floor(agora / 1000))() < PREVIA_CHANCE
+}
+
 export type MonstroInfo = { w: number; h: number; espelhar: boolean; abreArena: boolean }
 
 export function monstroInfo(nome: string): MonstroInfo {

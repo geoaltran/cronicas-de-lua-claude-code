@@ -202,12 +202,30 @@
     "grimorio": {
       "titulo": "Grimoire",
       "subtitulo": "Claudes Werkzeuge sind Luas Zauber.",
-      "ler": { "nome": "Lumens Blick", "desc": "Dateien lesen und suchen. Weckt Vespera." },
-      "editar": { "nome": "Rune der Umschrift", "desc": "Code bearbeiten und schreiben. Ruft den Uhrmacher und Sir Solis." },
-      "terminal": { "nome": "Flamme des Befehls", "desc": "Befehle im Terminal. Weckt Ignis." },
-      "web": { "nome": "Sternenflut", "desc": "Im Web suchen und lesen. Bringt den Leviathan und Nébula." },
-      "integracao": { "nome": "Spiegelpakt", "desc": "Externe Integrationen (MCP). Ruft den Spiegelkönig." },
-      "subagente": { "nome": "Echo der Penumbra", "desc": "Helfer rufen (Subagenten). Klone der Dame Penumbra." },
+      "ler": {
+        "nome": "Lumens Blick",
+        "desc": "Dateien lesen und suchen. Weckt Vespera."
+      },
+      "editar": {
+        "nome": "Rune der Umschrift",
+        "desc": "Code bearbeiten und schreiben. Ruft den Uhrmacher und Sir Solis."
+      },
+      "terminal": {
+        "nome": "Flamme des Befehls",
+        "desc": "Befehle im Terminal. Weckt Ignis."
+      },
+      "web": {
+        "nome": "Sternenflut",
+        "desc": "Im Web suchen und lesen. Bringt den Leviathan und Nébula."
+      },
+      "integracao": {
+        "nome": "Spiegelpakt",
+        "desc": "Externe Integrationen (MCP). Ruft den Spiegelkönig."
+      },
+      "subagente": {
+        "nome": "Echo der Penumbra",
+        "desc": "Helfer rufen (Subagenten). Klone der Dame Penumbra."
+      },
       "total": {
         "um": "{n} Zauber insgesamt gewirkt.",
         "outros": "{n} Zauber insgesamt gewirkt."
@@ -362,7 +380,8 @@
     "ajuda": {
       "estado": "As Crônicas de Lua: Maßstab {escala}x, {px} px pro Spalte, Modus {modo}. Stufe {nivel}, {xp} XP, {paginas}/10 Seiten.",
       "uso": "Nutze /cronicas scale 1|2|3, /cronicas ruler und /cronicas width <px> (Breite kalibrieren), /cronicas image|frame, /cronicas test (beides vergleichen), /cronicas new-moon (kalten Cache simulieren), /cronicas vigil (Mondlicht fast zu Ende, um die Nachtwache zu sehen), /cronicas boss [Name] und /cronicas hit (den Boss ausprobieren), /cronicas elite (der nächste Kampf ist die Elite) oder /cronicas language (Spielsprache).",
-      "trofeus": "Trophäen: {lista}"
+      "trofeus": "Trophäen: {lista}",
+      "uso_cenario": "Um die Kulisse anzusehen: /cronicas walk [Sekunden] (Lua läuft und bleibt dann atmend stehen) und /cronicas stage [Biom] (Levelwechsel zum nächsten oder genannten Biom; zählt keine Seite)."
     },
     "linha": "Zeilenhöhe: {n} px. Die Mausbereiche wurden neu berechnet.",
     "teste": "Test an: Das Band erscheint zweimal, A (interaktiver Rahmen) und B (Bild). /cronicas test noch einmal schaltet ihn aus.",
@@ -377,6 +396,15 @@
       "auto": "Systemsprache: {nome}.",
       "sem_traducao": "{nome} ist noch nicht übersetzt; das Spiel bleibt vorerst auf {atual}.",
       "desconhecido": "Die Sprache \"{pedido}\" kenne ich nicht."
+    },
+    "passear": {
+      "anda": "Lua spaziert {s} s und bleibt dann atmend stehen. Der Boden läuft in etwa 21 s einmal durch, die Inseln, viel langsamer, in fast 2 min. Länger laufen: /cronicas walk 120.",
+      "ocupada": "Gerade nicht: Lua steckt mitten in einem Kampf oder einem Levelwechsel. Versuch es gleich noch einmal."
+    },
+    "fase": {
+      "vai": "Levelwechsel: {de} → {para}. Nur zum Anschauen: Es zählt keine Seite. Sie bleibt dort bis zum nächsten Boss, der sein eigenes Biom mitbringt.",
+      "chefao": "Gerade nicht: Ein Boss ist auf der Bühne. Besiege ihn mit /cronicas hit.",
+      "desconhecido": "Das Biom „{pedido}“ kenne ich nicht. Biome: {lista}."
     }
   }
 }

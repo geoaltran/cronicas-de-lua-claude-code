@@ -4,11 +4,11 @@ import type { EngineInterface, Register, RenderChildren, SessionContextUsage, Se
 import type { AbaDoLivro, Botoes, Caminho, Chefao, Elite, Golpe, Hud, Jogo, Luta, Lutas, Passagem, TipoTrofeu } from '../types'
 import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
 import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
-import { ABERTURA, BOTOES, FIM_ABERTURA, FIM_PASSAGEM, PASSAGEM, biomaDe, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua, tamanhoNoApp } from './cena'
+import { ABERTURA, BOTOES, FIM_ABERTURA, FIM_PASSAGEM, PASSAGEM, biomaDaPagina, biomaDe, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua, tamanhoNoApp } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
 import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, tp, usarIdioma } from './t'
-import { DEMORADA_MS, ELITE, ELITE_XP, ENTRA, JUNTA_MS, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, quandoAcerta, roteiro, tipoTrofeu, xpDaFerramenta } from './luta'
-import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, vidaEmTarefas, xpDoChefao } from './chefao'
+import { DEMORADA_MS, ELITE, ELITE_XP, ENTRA, JUNTA_MS, PREVIA, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, previaDoChefao, quandoAcerta, roteiro, tipoTrofeu, xpDaFerramenta } from './luta'
+import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, proximoChefao, vidaEmTarefas, xpDoChefao } from './chefao'
 
 const PLUGIN = 'cronicas-de-lua'
 /** O app desenha SVG de até 131.072 caracteres; uma margem para não arriscar. */
@@ -24,6 +24,33 @@ const JOGO0: Jogo = { xp: 0, paginas: 0, lutas: 0 }
 const HUD0: Hud = { luz: null, mana: {}, mochila: null, jogo: JOGO0 }
 const CAMINHO0: Caminho = { andando: false, desde: 0, dist0: 0 }
 const LUTAS0: Lutas = { lista: [], vezes: {}, n: 0 }
+
+/** /cronicas passear: quantos segundos a Lua anda (padrão e máximo). */
+const PASSEIO_S = 8
+const PASSEIO_MAX = 120
+/** Os biomas na ordem da jornada (a floresta guarda as duas primeiras páginas). */
+const ORDEM_BIOMAS = Array.from({ length: 10 }, (_, k) => biomaDaPagina(k)).filter((b, k, l) => l.indexOf(b) === k)
+
+/** O bioma pelo nome digitado (a chave ou o nome no idioma, com ou sem acento, só o começo). */
+function biomaPeloNome(texto: string): string | undefined {
+  const limpa = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]+/g, '')
+  const q = limpa(texto)
+  const nomes = (b: string) => [b, tx(`chefao.biomas.${b}`), ...(BIOMAS_EN[b] ?? [])].map(limpa)
+  return q === '' ? undefined : ORDEM_BIOMAS.find(b => nomes(b).some(n => n.startsWith(q)))
+}
+
+/** Nomes em inglês dos biomas, que valem em qualquer idioma (como os subcomandos). */
+const BIOMAS_EN: Readonly<Record<string, readonly string[]>> = {
+  floresta: ['forest'],
+  ruinas: ['ruins'],
+  mar: ['sea'],
+  vulcao: ['volcano'],
+  torre: ['tower', 'clock tower'],
+  aurora: ['dawn'],
+  castelo_vidro: ['castle', 'glass castle'],
+  ceu_estelar: ['sky', 'starry sky'],
+  eclipse: ['eclipse'],
+}
 
 // Mude a etiqueta quando o formato mudar: o valor antigo (que sobrevive ao
 // recarregar o mod) passa a ser lido como o inicial.
@@ -41,6 +68,8 @@ const botoes = atom({ plugin: 'cronicas-de-lua', key: 'botoes' } as const, BOTOE
 const livroAba = atom({ plugin: 'cronicas-de-lua', key: 'livroAba' } as const, 'ficha' as AbaDoLivro)
 const abertura = atom({ plugin: 'cronicas-de-lua', key: 'abertura' } as const, null as number | null)
 const passagem = atom({ plugin: 'cronicas-de-lua', key: 'passagem' } as const, null as Passagem | null, { shape: 'passagem-1' })
+/** Bioma visitado com /cronicas fase (só para ver o cenário); null = o da página da jornada. */
+const visita = atom({ plugin: 'cronicas-de-lua', key: 'visita' } as const, null as string | null)
 /** Quantos erros de ações diferentes o elite lembra (os mais velhos saem). */
 const ERROS_MAX = 20
 /** Quantos troféus ficam guardados. */
@@ -260,15 +289,15 @@ let alarmesPassagem: Timer[] = []
  * da próxima página (a Lua sai andando, escurece, o bioma novo clareia com o
  * título e ela entra pela esquerda). Dois redesenhos, marcados no relógio.
  */
-async function comecarPassagem($: $, ch: Chefao, at: number): Promise<void> {
+async function comecarPassagem($: $, ch: Chefao | null, at: number, destino?: Omit<Passagem, 'at'>): Promise<void> {
   const agora = await $.clock.now()
   if (agora >= at + FIM_PASSAGEM) {
     return
   }
   const h = await read($, hud)
-  const de = biomaDe({ agora: ch.caiu ?? at, hud: h, chefao: ch })
-  const para = biomaDe({ agora, hud: h })
-  const pagina = (h.jogo.paginas % 10) + 1
+  const de = destino?.de ?? biomaDe({ agora: ch?.caiu ?? at, hud: h, ...(ch === null ? {} : { chefao: ch }) })
+  const para = destino?.para ?? biomaDe({ agora, hud: h })
+  const pagina = destino?.pagina ?? (h.jogo.paginas % 10) + 1
   for (const t of alarmesPassagem) {
     t.cancel()
   }
@@ -315,7 +344,7 @@ function areaDePular($: $, els: Elementos, a: Ajustes, colunas: number) {
  * Uma ferramenta começou: entra na luta aberta, ou começa uma nova (agora, ou
  * logo depois da que está acabando). Devolve o número da luta.
  */
-function entrar(s: Lutas, agora: number, tool: string, ch: Chefao | null = null, trofeu?: string, trofeuTipo?: TipoTrofeu): { s: Lutas; n: number; nova: Luta | null } {
+function entrar(s: Lutas, agora: number, tool: string, ch: Chefao | null = null, trofeu?: string, trofeuTipo?: TipoTrofeu, daPagina?: string): { s: Lutas; n: number; nova: Luta | null } {
   // as que já acabaram ficam na lista até revisar() tirá-las (e devolver o caminho à Lua)
   const vivas = s.lista.filter(l => (roteiro(l).fim ?? Infinity) > agora)
   const ult = vivas[vivas.length - 1]
@@ -334,9 +363,15 @@ function entrar(s: Lutas, agora: number, tool: string, ch: Chefao | null = null,
     const nova: Luta = { n: s.n + 1, papel: 'elite', monstro: ELITE, t0, ativas: 1, golpes: [], trofeu, trofeuTipo: trofeuTipo ?? 'edicao' }
     return { s: { ...s, lista: [...s.lista, nova], n: nova.n }, n: nova.n, nova }
   }
+  const n = s.n + 1
+  if (daPagina !== undefined && previaDoChefao(n, agora, daPagina, s.vezes[PREVIA])) {
+    // de vez em quando o chefão da página aparece numa luta comum, como prévia do que vem
+    const nova: Luta = { n, papel, monstro: daPagina, t0, ativas: 1, golpes: [] }
+    return { s: { lista: [...s.lista, nova], vezes: { ...s.vezes, [PREVIA]: n }, n }, n, nova }
+  }
   const vez = s.vezes[papel] ?? 0
-  const nova: Luta = { n: s.n + 1, papel, monstro: personagemDe(papel, vez), t0, ativas: 1, golpes: [] }
-  return { s: { lista: [...s.lista, nova], vezes: { ...s.vezes, [papel]: vez + 1 }, n: nova.n }, n: nova.n, nova }
+  const nova: Luta = { n, papel, monstro: personagemDe(papel, vez), t0, ativas: 1, golpes: [] }
+  return { s: { lista: [...s.lista, nova], vezes: { ...s.vezes, [papel]: vez + 1 }, n }, n, nova }
 }
 
 function golpear(s: Lutas, n: number, g: Golpe): Lutas {
@@ -375,6 +410,8 @@ async function chamarChefao($: $, origem: Chefao['origem'], tarefas?: Chefao['ta
     tarefas = atual.tarefas
   }
   await update($, chefao, () => novoChefao(estado.jogo.paginas, origem, agora, tarefas, escolhido))
+  // o chefão traz o bioma dele: a visita do /cronicas fase acaba
+  await update($, visita, () => null)
   if (lutaDaVez(ls.lista, agora) === undefined) {
     await update($, caminho, c => (c.andando ? { ...c, ate: agora + ENTRA } : c))
   }
@@ -1326,6 +1363,8 @@ export const SUBCOMANDOS: Readonly<Record<string, string>> = {
   ruler: 'regua',
   boss: 'chefao',
   hit: 'golpe',
+  walk: 'passear',
+  stage: 'fase',
   vigil: 'vigilia',
   'new-moon': 'lua-nova',
 }
@@ -1531,6 +1570,41 @@ export const register: Register = on => {
               ? tx('comando.golpe.tarefa', { resta: v.resta, total: v.total })
               : tx('comando.golpe.golpe', { resta: v.resta, total: v.total }),
       }
+    } else if (chave === 'passear') {
+      // a Lua anda uns segundos pelo cenário (as camadas rolam em laço) e para respirando
+      const ch = await read($, chefao)
+      const agora = await $.clock.now()
+      if (dePe(ch) || lutaDaVez((await read($, lutas)).lista, agora) !== undefined || (await read($, passagem)) !== null) {
+        return { text: tx('comando.passear.ocupada') }
+      }
+      const seg = Number.isFinite(n) && n > 0 ? Math.min(PASSEIO_MAX, Math.round(n)) : PASSEIO_S
+      await update($, caminho, c => ({ andando: true, desde: agora, dist0: distancia(c, agora), ate: agora + seg * 1000 }))
+      $.clock.after(seg * 1000 + 20, () => {
+        void update($, tique, x => x + 1)
+      })
+      return { text: tx('comando.passear.anda', { s: seg }) }
+    } else if (chave === 'fase') {
+      // passagem de fase só para ver: a Lua sai, o próximo bioma (ou o pedido) entra; não conta página
+      const ch = await read($, chefao)
+      const agora = await $.clock.now()
+      if (ch !== null) {
+        return { text: tx('comando.fase.chefao') }
+      }
+      if (lutaDaVez((await read($, lutas)).lista, agora) !== undefined || (await read($, passagem)) !== null) {
+        return { text: tx('comando.passear.ocupada') }
+      }
+      const h = await read($, hud)
+      const de = (await read($, visita)) ?? biomaDe({ agora, hud: h })
+      const pedido = String(e.args ?? '').trim().split(/\s+/).slice(1).join(' ')
+      const para = pedido === '' ? ORDEM_BIOMAS[(ORDEM_BIOMAS.indexOf(de) + 1) % ORDEM_BIOMAS.length] ?? 'floresta' : biomaPeloNome(pedido)
+      if (para === undefined) {
+        return { text: tx('comando.fase.desconhecido', { pedido, lista: ORDEM_BIOMAS.map(b => tx(`chefao.biomas.${b}`)).join(', ') }) }
+      }
+      const i = Array.from({ length: 10 }, (_, k) => k).find(k => biomaDaPagina(k) === para) ?? 0
+      await update($, caminho, c => ({ andando: false, desde: agora, dist0: distancia(c, agora) }))
+      await comecarPassagem($, null, agora, { de, para, pagina: i + 1 })
+      await update($, visita, () => para)
+      return { text: tx('comando.fase.vai', { de: tx(`chefao.biomas.${de}`), para: tx(`chefao.biomas.${para}`) }) }
     } else if (chave === 'elite') {
       // para ver o elite sem esperar um erro de verdade: a próxima ferramenta chama o Golem
       // cada teste traz o próximo dos 4 troféus, para ver todos
@@ -1571,6 +1645,8 @@ export const register: Register = on => {
           tx('comando.ajuda.estado', { escala: a.escala, px: a.pxColuna, modo: tx(a.quadro ? 'comando.modo.quadro' : 'comando.modo.imagem'), nivel: nv.nivel, xp: atual.jogo.xp, paginas: paginasNoCiclo(atual.jogo.paginas) }) +
           '\n' +
           tx('comando.ajuda.uso') +
+          '\n' +
+          tx('comando.ajuda.uso_cenario') +
           ((atual.jogo.trofeus ?? []).length > 0 ? '\n' + tx('comando.ajuda.trofeus', { lista: (atual.jogo.trofeus ?? []).slice(0, 5).join(' · ') }) : ''),
       }
     }
@@ -1708,8 +1784,9 @@ export const register: Register = on => {
     let nova: Luta | null = null
     const ch0 = await read($, chefao)
     const el0 = await read($, elite)
+    const daPagina = proximoChefao((await read($, hud)).jogo.paginas).nome
     await update($, lutas, s => {
-      const r = entrar(s, agora, e.tool, ch0, el0.proximo, el0.proximoTipo)
+      const r = entrar(s, agora, e.tool, ch0, el0.proximo, el0.proximoTipo, daPagina)
       n = r.n
       nova = r.nova
       return r.s
@@ -1777,6 +1854,7 @@ export const register: Register = on => {
     const ch = await read($, chefao)
     const ab = await read($, abertura)
     const ps = await read($, passagem)
+    const vis = await read($, visita)
     colunasPor[sup] = e.props.bodyColumns
     ultimaSup = sup
     const pxColuna = pxColunaDe(a, sup)
@@ -1797,7 +1875,7 @@ export const register: Register = on => {
       estandarte: bt.estandarte === 'nada' ? 'enrolado' : bt.estandarte,
       livro: bt.livro,
     }
-    const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }), ...(ab !== null && luta === undefined && ch === null ? { abertura: ab } : {}), ...(ps !== null && ab === null && luta === undefined && ch === null ? { passagem: ps } : {}) } as const
+    const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(vis === null ? {} : { bioma: vis }), ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }), ...(ab !== null && luta === undefined && ch === null ? { abertura: ab } : {}), ...(ps !== null && ab === null && luta === undefined && ch === null ? { passagem: ps } : {}) } as const
     // desktop (sem quadro, teste ou prova): cenário e frente em dois Svg sobrepostos
     const dividida = !remota && !a.quadro && !a.teste && a.prova !== true
     const tamanho = (m: ReturnType<typeof montar>): number => (dividida ? Math.max(tamanhoNoApp(m.fundo), tamanhoNoApp(m.frente)) : m.svg.length)

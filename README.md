@@ -69,7 +69,7 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 
 ![Boss fight against the Obsidian Golem in the Ruins](previa_chefao_golem.gif)
 
-Monsters by tool: reading files → Vespera · editing code → Clockmaker / Sir Solis · terminal → Ignis · web → Leviathan / Nébula · integrations (MCP) → Mirror King · subagents → clones of Lady Penumbra. The bosses come in order, one page of the Chronicles each, up to Malakor, then New Game+.
+Monsters by tool: reading files → Vespera · editing code → Clockmaker / Sir Solis · terminal → Ignis · web → Leviathan / Nébula · integrations (MCP) → Mirror King · subagents → clones of Lady Penumbra. The bosses come in order, one page of the Chronicles each, up to Malakor, then New Game+. Now and then (about 1 regular fight in 4) the boss of the current page steps in instead, a preview of what is coming.
 
 ## The biomes
 Lunária has 9 biomes, one for each stretch of the journey, each at its own time of day and with its own animations: Forest (Vespera and Lady Penumbra), Ruins (Obsidian Golem), Sea (Leviathan), Volcano (Ignis), Clock Tower (Clockmaker), Dawn (Sir Solis), Glass Castle (Mirror King), Starry Sky (Nébula) and Eclipse (Malakor). Waves and a turning lighthouse, pulsing lava, spinning gears, sunbeams, reflections running across mirrors, shooting stars, and particles of their own in every place.
@@ -95,6 +95,8 @@ Type them in Claude's message box, like a normal message. The answer shows up on
 | <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Calls the next boss of the journey, or a chosen one (`vespera`, `ignis`, `malakor`…), and the scene moves to its biome. `/cronicas boss list` calls a task-list boss with a shield. |
 | <code>/cronicas&nbsp;hit</code> | Hits the boss on stage; against a task-list boss it completes a task. The last hit is the critical one. |
 | <code>/cronicas&nbsp;elite</code> | The next regular fight becomes the elite (Obsidian Golem) carrying a trophy. |
+| <code>/cronicas&nbsp;walk&nbsp;[seconds]</code> | Lua walks through the current biome for a few seconds (8 by default, up to 120) so you can watch the layers scroll in a loop, then stops and breathes. |
+| <code>/cronicas&nbsp;stage&nbsp;[biome]</code> | A stage change just for sightseeing: Lua walks off, the next biome (or the one you name: `sea`, `volcano`, `eclipse`…) fades in with its title and she walks back in. No page is counted. |
 | <code>/cronicas&nbsp;vigil</code> | Brings the moonlight close to its end so you can watch the Vigil work (with the lantern lit it sends a real, tiny message). |
 | <code>/cronicas&nbsp;new-moon</code> | Simulates the new moon (cold cache) until Claude's next reply. |
 

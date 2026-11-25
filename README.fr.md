@@ -69,7 +69,7 @@ Le mod lance seulement deux commandes en lecture seule sur votre machine : `ps` 
 
 ![Combat contre le Golem d'Obsidienne dans les Ruines](previa_chefao_golem.gif)
 
-Monstres par outil : lire des fichiers → Vespera · modifier du code → Horloger / Sir Solis · terminal → Ignis · web → Léviathan / Nébula · intégrations (MCP) → Roi Miroir · sous-agents → clones de la Dame Pénombre. Les boss arrivent dans l'ordre, une page des Chroniques chacun, jusqu'à Malakor, puis Nouvelle partie+.
+Monstres par outil : lire des fichiers → Vespera · modifier du code → Horloger / Sir Solis · terminal → Ignis · web → Léviathan / Nébula · intégrations (MCP) → Roi Miroir · sous-agents → clones de la Dame Pénombre. Les boss arrivent dans l'ordre, une page des Chroniques chacun, jusqu'à Malakor, puis Nouvelle partie+. De temps en temps (environ 1 combat ordinaire sur 4), c'est le boss de la page en cours qui entre, un avant-goût de la suite.
 
 ## Les biomes
 Lunária compte 9 biomes, un par étape du voyage, chacun à son heure de la journée et avec ses propres animations : Forêt (Vespera et Dame Pénombre), Ruines (Golem d'Obsidienne), Mer (Léviathan), Volcan (Ignis), Tour de l'Horloge (Horloger), Aurore (Sir Solis), Château de Verre (Roi Miroir), Ciel Étoilé (Nébula) et Éclipse (Malakor). Des vagues et un phare qui tourne, de la lave qui palpite, des engrenages, des rayons de soleil, des reflets qui filent sur les miroirs, des étoiles filantes et des particules propres à chaque lieu.
@@ -95,6 +95,8 @@ Tape-les dans la zone de message de Claude, comme un message normal. La réponse
 | <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Appelle le prochain boss du voyage, ou celui de ton choix (`vespera`, `ignis`, `malakor`…), et la scène passe dans son biome. `/cronicas boss list` appelle un boss à liste de tâches, avec bouclier. |
 | <code>/cronicas&nbsp;hit</code> | Frappe le boss en scène ; contre un boss à liste, termine une tâche. Le dernier coup est le critique. |
 | <code>/cronicas&nbsp;elite</code> | Le prochain combat ordinaire sera l’élite (Golem d’Obsidienne) avec un trophée. |
+| <code>/cronicas&nbsp;walk&nbsp;[secondes]</code> | Lua marche quelques secondes dans le biome actuel (8 par défaut, jusqu’à 120) pour voir les couches défiler en boucle, puis s’arrête en respirant. |
+| <code>/cronicas&nbsp;stage&nbsp;[biome]</code> | Un changement de niveau juste pour le décor : Lua sort en marchant, le biome suivant (ou celui demandé : `mer`, `volcan`, `eclipse`…) apparaît avec son titre et elle revient. Aucune page n’est comptée. |
 | <code>/cronicas&nbsp;vigil</code> | Amène le clair de lune presque à sa fin pour voir la Veille à l’œuvre (lanterne allumée, elle envoie un vrai petit message). |
 | <code>/cronicas&nbsp;new-moon</code> | Simule la nouvelle lune (cache froid) jusqu’à la prochaine réponse de Claude. |
 

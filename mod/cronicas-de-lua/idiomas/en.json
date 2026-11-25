@@ -202,12 +202,30 @@
     "grimorio": {
       "titulo": "Grimoire",
       "subtitulo": "Claude's tools are Lua's spells.",
-      "ler": { "nome": "Lumen's Gaze", "desc": "Read and search files. Awakens Vespera." },
-      "editar": { "nome": "Rune of Rewriting", "desc": "Edit and write code. Summons the Clockmaker and Sir Solis." },
-      "terminal": { "nome": "Flame of Command", "desc": "Terminal commands. Wakes Ignis." },
-      "web": { "nome": "Starlight Tide", "desc": "Search and read the web. Brings the Leviathan and Nébula." },
-      "integracao": { "nome": "Mirror Pact", "desc": "External integrations (MCP). Calls the Mirror King." },
-      "subagente": { "nome": "Penumbra's Echo", "desc": "Call helpers (subagents). Clones of Lady Penumbra." },
+      "ler": {
+        "nome": "Lumen's Gaze",
+        "desc": "Read and search files. Awakens Vespera."
+      },
+      "editar": {
+        "nome": "Rune of Rewriting",
+        "desc": "Edit and write code. Summons the Clockmaker and Sir Solis."
+      },
+      "terminal": {
+        "nome": "Flame of Command",
+        "desc": "Terminal commands. Wakes Ignis."
+      },
+      "web": {
+        "nome": "Starlight Tide",
+        "desc": "Search and read the web. Brings the Leviathan and Nébula."
+      },
+      "integracao": {
+        "nome": "Mirror Pact",
+        "desc": "External integrations (MCP). Calls the Mirror King."
+      },
+      "subagente": {
+        "nome": "Penumbra's Echo",
+        "desc": "Call helpers (subagents). Clones of Lady Penumbra."
+      },
       "total": {
         "um": "{n} spell cast in all.",
         "outros": "{n} spells cast in all."
@@ -362,7 +380,8 @@
     "ajuda": {
       "estado": "As Crônicas de Lua: scale {escala}x, {px} px per column, {modo} mode. Level {nivel}, {xp} XP, {paginas}/10 pages.",
       "uso": "Use /cronicas scale 1|2|3, /cronicas ruler and /cronicas width <px> (calibrate the width), /cronicas image|frame, /cronicas test (compare both), /cronicas new-moon (simulate a cold cache), /cronicas vigil (moonlight near its end, to see the Vigil), /cronicas boss [name] and /cronicas hit (try the boss), /cronicas elite (the next fight is the elite) or /cronicas language (game language).",
-      "trofeus": "Trophies: {lista}"
+      "trofeus": "Trophies: {lista}",
+      "uso_cenario": "To see the scenery: /cronicas walk [seconds] (Lua walks, then stops and breathes) and /cronicas stage [biome] (stage change to the next biome or the one you name; no page is counted)."
     },
     "linha": "Line height: {n} px. The mouse areas were recalculated.",
     "teste": "Test on: the band shows twice, A (interactive frame) and B (image). /cronicas test again turns it off.",
@@ -377,6 +396,15 @@
       "auto": "System language: {nome}.",
       "sem_traducao": "{nome} isn't translated yet; the game stays in {atual} for now.",
       "desconhecido": "I don't know the language \"{pedido}\"."
+    },
+    "passear": {
+      "anda": "Lua strolls for {s} s, then stops and breathes. The ground loops in about 21 s; the islands, much slower, in almost 2 min. To walk longer: /cronicas walk 120.",
+      "ocupada": "Not now: Lua is in the middle of a fight or a stage change. Try again in a moment."
+    },
+    "fase": {
+      "vai": "Stage change: {de} → {para}. Just for sightseeing: no page is counted. She stays there until the next boss, who brings their own biome.",
+      "chefao": "Not now: a boss is on stage. Defeat it with /cronicas hit.",
+      "desconhecido": "I don't know the biome \"{pedido}\". Biomes: {lista}."
     }
   }
 }

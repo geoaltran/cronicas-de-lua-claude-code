@@ -69,7 +69,7 @@ El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuán
 
 ![Combate contra el Gólem de Obsidiana en las Ruinas](previa_chefao_golem.gif)
 
-Monstruos por herramienta: leer archivos → Vespera · editar código → Relojero / Sir Solis · terminal → Ignis · web → Leviatán / Nébula · integraciones (MCP) → Rey Espejo · subagentes → clones de Dama Penumbra. Los jefes llegan en orden, una página de las Crónicas cada uno, hasta Malakor, y luego Nueva Partida+.
+Monstruos por herramienta: leer archivos → Vespera · editar código → Relojero / Sir Solis · terminal → Ignis · web → Leviatán / Nébula · integraciones (MCP) → Rey Espejo · subagentes → clones de Dama Penumbra. Los jefes llegan en orden, una página de las Crónicas cada uno, hasta Malakor, y luego Nueva Partida+. De vez en cuando (más o menos 1 combate normal de cada 4) entra el jefe de la página actual, un adelanto de lo que viene.
 
 ## Los biomas
 Lunária tiene 9 biomas, uno por cada tramo del viaje, cada uno a su hora del día y con sus propias animaciones: Bosque (Vespera y Dama Penumbra), Ruinas (Gólem de Obsidiana), Mar (Leviatán), Volcán (Ignis), Torre del Reloj (Relojero), Aurora (Sir Solis), Castillo de Cristal (Rey Espejo), Cielo Estrellado (Nébula) y Eclipse (Malakor). Olas y un faro que gira, lava que palpita, engranajes, rayos de sol, reflejos que corren por los espejos, estrellas fugaces y partículas propias en cada lugar.
@@ -95,6 +95,8 @@ Escríbelos en la caja de mensajes de Claude, como un mensaje normal. La respues
 | <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Llama al próximo jefe del viaje, o a uno elegido (`vespera`, `ignis`, `malakor`…), y la escena pasa a su bioma. `/cronicas boss list` llama a un jefe de lista de tareas, con escudo. |
 | <code>/cronicas&nbsp;hit</code> | Golpea al jefe en escena; contra un jefe de lista, completa una tarea. El último golpe es el crítico. |
 | <code>/cronicas&nbsp;elite</code> | El próximo combate normal será la élite (Gólem de Obsidiana) con un trofeo. |
+| <code>/cronicas&nbsp;walk&nbsp;[segundos]</code> | Lua camina unos segundos por el bioma actual (8 por defecto, hasta 120) para ver cómo ruedan las capas en bucle, y luego se detiene respirando. |
+| <code>/cronicas&nbsp;stage&nbsp;[bioma]</code> | Un cambio de fase solo para mirar: Lua sale caminando, el siguiente bioma (o el que pidas: `mar`, `volcan`, `eclipse`…) aparece con su título y ella vuelve a entrar. No cuenta página. |
 | <code>/cronicas&nbsp;vigil</code> | Deja la luz de luna casi al final para ver la Vigilia en acción (con el farol encendido, envía un mensajito de verdad). |
 | <code>/cronicas&nbsp;new-moon</code> | Simula la luna nueva (caché fría) hasta la próxima respuesta de Claude. |
 

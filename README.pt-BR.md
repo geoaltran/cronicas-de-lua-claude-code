@@ -69,7 +69,7 @@ O mod roda só dois comandos de leitura na sua máquina: `ps` (para saber quando
 
 ![Luta contra o Golem de Obsidiana nas Ruínas](previa_chefao_golem.gif)
 
-Monstros por ferramenta: ler arquivos → Vespera · editar código → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · integrações (MCP) → Rei Espelho · subagentes → clones da Dama Penumbra. Os chefões vêm em ordem, uma página das Crônicas cada, até o Malakor; depois, Novo Jogo+.
+Monstros por ferramenta: ler arquivos → Vespera · editar código → Relojoeiro / Sir Solis · terminal → Ignis · web → Leviatã / Nébula · integrações (MCP) → Rei Espelho · subagentes → clones da Dama Penumbra. Os chefões vêm em ordem, uma página das Crônicas cada, até o Malakor; depois, Novo Jogo+. De vez em quando (mais ou menos 1 luta comum em 4), quem entra é o chefão da página atual, uma prévia do que vem.
 
 ## Os biomas
 Lunária tem 9 biomas, um para cada parte da jornada, cada um num horário do dia e com animações próprias: Floresta (Vespera e Dama Penumbra), Ruínas (Golem), Mar (Leviatã), Vulcão (Ignis), Torre do Relógio (Relojoeiro), Aurora (Sir Solis), Castelo de Vidro (Rei Espelho), Céu Estelar (Nébula) e Eclipse (Malakor). Ondas e um farol girando, lava pulsando, engrenagens, raios de sol, reflexos nos espelhos, estrelas cadentes, partículas próprias de cada lugar.
@@ -95,6 +95,8 @@ Digite na caixa de mensagem do Claude, como uma mensagem normal. A resposta apar
 | <code>/cronicas&nbsp;chefao&nbsp;[nome]</code> | Chama o próximo chefão da jornada, ou um escolhido (`vespera`, `dama`, `relojoeiro`…), e a cena vai para o bioma dele. `/cronicas chefao lista` chama um chefão de lista de tarefas, com escudo. |
 | <code>/cronicas&nbsp;golpe</code> | Golpeia o chefão em cena; no chefão de lista, conclui uma tarefa. O último golpe é o crítico. |
 | <code>/cronicas&nbsp;elite</code> | A próxima luta comum vira o elite (Golem de Obsidiana) com um troféu. |
+| <code>/cronicas&nbsp;passear&nbsp;[segundos]</code> | A Lua anda uns segundos pelo bioma em que está (8 por padrão, até 120), para ver as camadas rolando em laço, e depois para respirando. Também `walk`. |
+| <code>/cronicas&nbsp;fase&nbsp;[bioma]</code> | Passagem de fase só para ver: a Lua sai andando, o próximo bioma (ou o pedido: `mar`, `vulcao`, `eclipse`…) clareia com o título e ela entra de novo. Não conta página. Também `stage`. |
 | <code>/cronicas&nbsp;vigilia</code> | Deixa o luar perto do fim para ver a Vigília funcionando (com a lanterna acesa, ela manda uma mensagem curtinha de verdade). |
 | <code>/cronicas&nbsp;lua-nova</code> | Simula a lua nova (cache frio) até a próxima resposta do Claude. |
 

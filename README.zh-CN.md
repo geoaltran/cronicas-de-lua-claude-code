@@ -69,7 +69,7 @@
 
 ![在遗迹与黑曜石魔像的 Boss 战](previa_chefao_golem.gif)
 
-各工具对应的怪物：读取文件 → Vespera · 编辑代码 → 钟表匠 / Sir Solis · 终端 → Ignis · 网页 → 利维坦 / Nébula · 外部集成（MCP）→ 镜之王 · 子代理 → 半影夫人的分身。Boss 按顺序登场，每个对应编年史中的一页，直到 Malakor，之后进入"新游戏+"。
+各工具对应的怪物：读取文件 → Vespera · 编辑代码 → 钟表匠 / Sir Solis · 终端 → Ignis · 网页 → 利维坦 / Nébula · 外部集成（MCP）→ 镜之王 · 子代理 → 半影夫人的分身。Boss 按顺序登场，每个对应编年史中的一页，直到 Malakor，之后进入"新游戏+"。偶尔（大约每 4 场普通战斗有 1 场），登场的会是当前这一页的 Boss，提前预告接下来的对手。
 
 ## 生物群系
 Lunária 有 9 个生物群系，旅程的每一段各有一个，每个都处在一天中的不同时刻，也各有自己的动画：森林（Vespera 和半影夫人）、遗迹（黑曜石魔像）、大海（利维坦）、火山（Ignis）、钟楼（钟表匠）、黎明（Sir Solis）、玻璃城堡（镜之王）、星空（Nébula）和日食（Malakor）。海浪与旋转的灯塔、脉动的熔岩、转动的齿轮、阳光、在镜面上流动的反光、流星，还有每个地方独有的粒子。
@@ -95,6 +95,8 @@ Lunária 有 9 个生物群系，旅程的每一段各有一个，每个都处�
 | <code>/cronicas&nbsp;boss&nbsp;[name]</code> | 召唤旅程中的下一个 Boss，或指定的 Boss（`vespera`、`ignis`、`malakor`…），场景会切换到它的生物群系。`/cronicas boss list` 召唤带护盾的任务清单 Boss。 |
 | <code>/cronicas&nbsp;hit</code> | 攻击场上的 Boss；面对任务清单 Boss 时完成一个任务。最后一击是暴击。 |
 | <code>/cronicas&nbsp;elite</code> | 下一场普通战斗变成带着奖杯的精英（黑曜石魔像）。 |
+| <code>/cronicas&nbsp;walk&nbsp;[秒数]</code> | 露娜在当前的生物群系里走几秒（默认 8 秒，最多 120 秒），可以看各层画面循环滚动，然后停下来呼吸。 |
+| <code>/cronicas&nbsp;stage&nbsp;[群系]</code> | 只为看风景的换关：露娜走出画面，下一个生物群系（或指定的 `sea`、`volcano`、`eclipse`…）带着标题亮起，她再走进来。不计页数。 |
 | <code>/cronicas&nbsp;vigil</code> | 让月光快要耗尽，好看看守夜如何工作（灯笼点亮时，它会真的发出一条很短的消息）。 |
 | <code>/cronicas&nbsp;new-moon</code> | 模拟新月（缓存变冷），直到 Claude 下一次回复。 |
 

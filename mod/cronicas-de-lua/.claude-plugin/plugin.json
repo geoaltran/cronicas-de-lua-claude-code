@@ -1,6 +1,6 @@
 {
   "name": "cronicas-de-lua",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "🌙 A pixel-art RPG mod for Claude Code. Every tool call is a monster, your context window is a backpack, your rate limit is mana, and Lua, a tiny moon mage, fights them all while Claude works.",
   "types": "./types/index.d.ts",
   "license": "MIT AND CC-BY-NC-4.0",

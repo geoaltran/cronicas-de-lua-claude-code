@@ -166,6 +166,8 @@ declare module 'claude-code' {
       abertura: number | null
       /** A passagem de fase em andamento; null fora dela. */
       passagem: Shaped<Passagem | null>
+      /** Bioma visitado com /cronicas fase (só para ver o cenário); null = o da página da jornada. */
+      visita: string | null
     }
   }
 }

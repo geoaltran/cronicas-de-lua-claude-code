@@ -202,12 +202,30 @@
     "grimorio": {
       "titulo": "Grimorio",
       "subtitulo": "Las herramientas de Claude son los hechizos de Lua.",
-      "ler": { "nome": "Mirada de Lumen", "desc": "Leer y buscar archivos. Despierta a Vespera." },
-      "editar": { "nome": "Runa de la Reescritura", "desc": "Editar y escribir código. Invoca al Relojero y a Sir Solis." },
-      "terminal": { "nome": "Llama del Mando", "desc": "Comandos en la terminal. Despierta a Ignis." },
-      "web": { "nome": "Marea Estelar", "desc": "Buscar y leer en la web. Trae al Leviatán y a Nébula." },
-      "integracao": { "nome": "Pacto del Espejo", "desc": "Integraciones externas (MCP). Llama al Rey Espejo." },
-      "subagente": { "nome": "Eco de Penumbra", "desc": "Llamar ayudantes (subagentes). Clones de la Dama Penumbra." },
+      "ler": {
+        "nome": "Mirada de Lumen",
+        "desc": "Leer y buscar archivos. Despierta a Vespera."
+      },
+      "editar": {
+        "nome": "Runa de la Reescritura",
+        "desc": "Editar y escribir código. Invoca al Relojero y a Sir Solis."
+      },
+      "terminal": {
+        "nome": "Llama del Mando",
+        "desc": "Comandos en la terminal. Despierta a Ignis."
+      },
+      "web": {
+        "nome": "Marea Estelar",
+        "desc": "Buscar y leer en la web. Trae al Leviatán y a Nébula."
+      },
+      "integracao": {
+        "nome": "Pacto del Espejo",
+        "desc": "Integraciones externas (MCP). Llama al Rey Espejo."
+      },
+      "subagente": {
+        "nome": "Eco de Penumbra",
+        "desc": "Llamar ayudantes (subagentes). Clones de la Dama Penumbra."
+      },
       "total": {
         "um": "{n} hechizo lanzado en total.",
         "outros": "{n} hechizos lanzados en total."
@@ -362,7 +380,8 @@
     "ajuda": {
       "estado": "As Crônicas de Lua: escala {escala}x, {px} px por columna, modo {modo}. Nivel {nivel}, {xp} XP, {paginas}/10 páginas.",
       "uso": "Usa /cronicas scale 1|2|3, /cronicas ruler y /cronicas width <px> (calibrar el ancho), /cronicas image|frame, /cronicas test (comparar los dos), /cronicas new-moon (simular caché fría), /cronicas vigil (luz de luna casi al final, para ver la Vigilia), /cronicas boss [nombre] y /cronicas hit (probar el jefe), /cronicas elite (la próxima pelea es el élite) o /cronicas language (idioma del juego).",
-      "trofeus": "Trofeos: {lista}"
+      "trofeus": "Trofeos: {lista}",
+      "uso_cenario": "Para ver el escenario: /cronicas walk [segundos] (Lua camina y se detiene respirando) y /cronicas stage [bioma] (cambio de fase al siguiente bioma o al que pidas; no cuenta página)."
     },
     "linha": "Altura de línea: {n} px. Las áreas del ratón se recalcularon.",
     "teste": "Prueba activada: la franja aparece dos veces, A (marco interactivo) y B (imagen). /cronicas test otra vez la desactiva.",
@@ -377,6 +396,15 @@
       "auto": "Idioma del sistema: {nome}.",
       "sem_traducao": "{nome} todavía no está traducido; por ahora el juego sigue en {atual}.",
       "desconhecido": "No conozco el idioma \"{pedido}\"."
+    },
+    "passear": {
+      "anda": "Lua pasea {s} s y luego se detiene, respirando. El suelo da la vuelta en unos 21 s; las islas, mucho más lentas, en casi 2 min. Para caminar más: /cronicas walk 120.",
+      "ocupada": "Ahora no: Lua está en medio de una pelea o de un cambio de fase. Inténtalo en un momento."
+    },
+    "fase": {
+      "vai": "Cambio de fase: {de} → {para}. Solo para ver el escenario: no cuenta página. Se queda allí hasta el próximo jefe, que trae su propio bioma.",
+      "chefao": "Ahora no: hay un jefe en escena. Derrótalo con /cronicas hit.",
+      "desconhecido": "No conozco el bioma \"{pedido}\". Los biomas: {lista}."
     }
   }
 }

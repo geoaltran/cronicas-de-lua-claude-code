@@ -202,12 +202,30 @@
     "grimorio": {
       "titulo": "魔导书",
       "subtitulo": "Claude 的工具就是 Lua 的咒语。",
-      "ler": { "nome": "流明之眼", "desc": "读取和搜索文件。唤醒 Vespera。" },
-      "editar": { "nome": "改写符文", "desc": "编辑和编写代码。召唤钟表匠和 Sir Solis。" },
-      "terminal": { "nome": "命令之焰", "desc": "终端命令。唤醒 Ignis。" },
-      "web": { "nome": "星光潮汐", "desc": "搜索和阅读网页。引来利维坦和 Nébula。" },
-      "integracao": { "nome": "镜之契约", "desc": "外部集成（MCP）。召唤镜之王。" },
-      "subagente": { "nome": "半影回响", "desc": "呼叫帮手（子代理）。半影夫人的分身。" },
+      "ler": {
+        "nome": "流明之眼",
+        "desc": "读取和搜索文件。唤醒 Vespera。"
+      },
+      "editar": {
+        "nome": "改写符文",
+        "desc": "编辑和编写代码。召唤钟表匠和 Sir Solis。"
+      },
+      "terminal": {
+        "nome": "命令之焰",
+        "desc": "终端命令。唤醒 Ignis。"
+      },
+      "web": {
+        "nome": "星光潮汐",
+        "desc": "搜索和阅读网页。引来利维坦和 Nébula。"
+      },
+      "integracao": {
+        "nome": "镜之契约",
+        "desc": "外部集成（MCP）。召唤镜之王。"
+      },
+      "subagente": {
+        "nome": "半影回响",
+        "desc": "呼叫帮手（子代理）。半影夫人的分身。"
+      },
       "total": {
         "um": "共施放了 {n} 次咒语。",
         "outros": "共施放了 {n} 次咒语。"
@@ -362,7 +380,8 @@
     "ajuda": {
       "estado": "As Crônicas de Lua：缩放 {escala}x，每列 {px} px，{modo}模式。{nivel} 级，{xp} XP，书页 {paginas}/10。",
       "uso": "用法：/cronicas scale 1|2|3、/cronicas ruler 和 /cronicas width <px>（校准宽度）、/cronicas image|frame、/cronicas test（对比两种）、/cronicas new-moon（模拟缓存变冷）、/cronicas vigil（让月光快耗尽，看看守夜）、/cronicas boss [名字] 和 /cronicas hit（试玩 Boss 战）、/cronicas elite（下一场是精英）或 /cronicas language（游戏语言）。",
-      "trofeus": "奖杯：{lista}"
+      "trofeus": "奖杯：{lista}",
+      "uso_cenario": "想看场景：/cronicas walk [秒数]（露娜走一会儿，然后停下来呼吸）和 /cronicas stage [地区]（换关到下一个或指定的地区；不计页数）。"
     },
     "linha": "行高：{n} px。鼠标区域已重新计算。",
     "teste": "测试已打开：横幅显示两次，A（可交互的框架）和 B（图片）。再次输入 /cronicas test 关闭。",
@@ -377,6 +396,15 @@
       "auto": "系统语言：{nome}。",
       "sem_traducao": "{nome} 还没有翻译；游戏暂时保持 {atual}。",
       "desconhecido": "我不认识“{pedido}”这种语言。"
+    },
+    "passear": {
+      "anda": "露娜散步 {s} 秒，然后停下来呼吸。地面大约 21 秒转一圈；浮岛慢得多，要将近 2 分钟。想走更久：/cronicas walk 120。",
+      "ocupada": "现在不行：露娜正在战斗或换关中。请稍后再试。"
+    },
+    "fase": {
+      "vai": "换关：{de} → {para}。只是看看风景：不计页数。她会一直待在那里，直到下一个首领带来自己的地区。",
+      "chefao": "现在不行：场上有首领。用 /cronicas hit 打败它。",
+      "desconhecido": "我不认识地区“{pedido}”。地区有：{lista}。"
     }
   }
 }

@@ -249,6 +249,7 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.ajuda.estado": "As Crônicas de Lua: Maßstab {escala}x, {px} px pro Spalte, Modus {modo}. Stufe {nivel}, {xp} XP, {paginas}/10 Seiten.",
   "comando.ajuda.uso": "Nutze /cronicas scale 1|2|3, /cronicas ruler und /cronicas width <px> (Breite kalibrieren), /cronicas image|frame, /cronicas test (beides vergleichen), /cronicas new-moon (kalten Cache simulieren), /cronicas vigil (Mondlicht fast zu Ende, um die Nachtwache zu sehen), /cronicas boss [Name] und /cronicas hit (den Boss ausprobieren), /cronicas elite (der nächste Kampf ist die Elite) oder /cronicas language (Spielsprache).",
   "comando.ajuda.trofeus": "Trophäen: {lista}",
+  "comando.ajuda.uso_cenario": "Um die Kulisse anzusehen: /cronicas walk [Sekunden] (Lua läuft und bleibt dann atmend stehen) und /cronicas stage [Biom] (Levelwechsel zum nächsten oder genannten Biom; zählt keine Seite).",
   "comando.linha": "Zeilenhöhe: {n} px. Die Mausbereiche wurden neu berechnet.",
   "comando.teste": "Test an: Das Band erscheint zweimal, A (interaktiver Rahmen) und B (Bild). /cronicas test noch einmal schaltet ihn aus.",
   "comando.teste_a": "A: interaktiver Rahmen (Sprechblasen beim Drüberfahren)",
@@ -260,7 +261,12 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.idioma.trocado": "Sprache gewechselt zu {nome}.",
   "comando.idioma.auto": "Systemsprache: {nome}.",
   "comando.idioma.sem_traducao": "{nome} ist noch nicht übersetzt; das Spiel bleibt vorerst auf {atual}.",
-  "comando.idioma.desconhecido": "Die Sprache \"{pedido}\" kenne ich nicht."
+  "comando.idioma.desconhecido": "Die Sprache \"{pedido}\" kenne ich nicht.",
+  "comando.passear.anda": "Lua spaziert {s} s und bleibt dann atmend stehen. Der Boden läuft in etwa 21 s einmal durch, die Inseln, viel langsamer, in fast 2 min. Länger laufen: /cronicas walk 120.",
+  "comando.passear.ocupada": "Gerade nicht: Lua steckt mitten in einem Kampf oder einem Levelwechsel. Versuch es gleich noch einmal.",
+  "comando.fase.vai": "Levelwechsel: {de} → {para}. Nur zum Anschauen: Es zählt keine Seite. Sie bleibt dort bis zum nächsten Boss, der sein eigenes Biom mitbringt.",
+  "comando.fase.chefao": "Gerade nicht: Ein Boss ist auf der Bühne. Besiege ihn mit /cronicas hit.",
+  "comando.fase.desconhecido": "Das Biom „{pedido}“ kenne ich nicht. Biome: {lista}."
  },
  "en": {
   "chefoes.vespera": "Vespera",
@@ -510,6 +516,7 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.ajuda.estado": "As Crônicas de Lua: scale {escala}x, {px} px per column, {modo} mode. Level {nivel}, {xp} XP, {paginas}/10 pages.",
   "comando.ajuda.uso": "Use /cronicas scale 1|2|3, /cronicas ruler and /cronicas width <px> (calibrate the width), /cronicas image|frame, /cronicas test (compare both), /cronicas new-moon (simulate a cold cache), /cronicas vigil (moonlight near its end, to see the Vigil), /cronicas boss [name] and /cronicas hit (try the boss), /cronicas elite (the next fight is the elite) or /cronicas language (game language).",
   "comando.ajuda.trofeus": "Trophies: {lista}",
+  "comando.ajuda.uso_cenario": "To see the scenery: /cronicas walk [seconds] (Lua walks, then stops and breathes) and /cronicas stage [biome] (stage change to the next biome or the one you name; no page is counted).",
   "comando.linha": "Line height: {n} px. The mouse areas were recalculated.",
   "comando.teste": "Test on: the band shows twice, A (interactive frame) and B (image). /cronicas test again turns it off.",
   "comando.teste_a": "A: interactive frame (hover balloons)",
@@ -521,7 +528,12 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.idioma.trocado": "Language changed to {nome}.",
   "comando.idioma.auto": "System language: {nome}.",
   "comando.idioma.sem_traducao": "{nome} isn't translated yet; the game stays in {atual} for now.",
-  "comando.idioma.desconhecido": "I don't know the language \"{pedido}\"."
+  "comando.idioma.desconhecido": "I don't know the language \"{pedido}\".",
+  "comando.passear.anda": "Lua strolls for {s} s, then stops and breathes. The ground loops in about 21 s; the islands, much slower, in almost 2 min. To walk longer: /cronicas walk 120.",
+  "comando.passear.ocupada": "Not now: Lua is in the middle of a fight or a stage change. Try again in a moment.",
+  "comando.fase.vai": "Stage change: {de} → {para}. Just for sightseeing: no page is counted. She stays there until the next boss, who brings their own biome.",
+  "comando.fase.chefao": "Not now: a boss is on stage. Defeat it with /cronicas hit.",
+  "comando.fase.desconhecido": "I don't know the biome \"{pedido}\". Biomes: {lista}."
  },
  "es": {
   "chefoes.vespera": "Vespera",
@@ -771,6 +783,7 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.ajuda.estado": "As Crônicas de Lua: escala {escala}x, {px} px por columna, modo {modo}. Nivel {nivel}, {xp} XP, {paginas}/10 páginas.",
   "comando.ajuda.uso": "Usa /cronicas scale 1|2|3, /cronicas ruler y /cronicas width <px> (calibrar el ancho), /cronicas image|frame, /cronicas test (comparar los dos), /cronicas new-moon (simular caché fría), /cronicas vigil (luz de luna casi al final, para ver la Vigilia), /cronicas boss [nombre] y /cronicas hit (probar el jefe), /cronicas elite (la próxima pelea es el élite) o /cronicas language (idioma del juego).",
   "comando.ajuda.trofeus": "Trofeos: {lista}",
+  "comando.ajuda.uso_cenario": "Para ver el escenario: /cronicas walk [segundos] (Lua camina y se detiene respirando) y /cronicas stage [bioma] (cambio de fase al siguiente bioma o al que pidas; no cuenta página).",
   "comando.linha": "Altura de línea: {n} px. Las áreas del ratón se recalcularon.",
   "comando.teste": "Prueba activada: la franja aparece dos veces, A (marco interactivo) y B (imagen). /cronicas test otra vez la desactiva.",
   "comando.teste_a": "A: marco interactivo (globos al pasar el ratón)",
@@ -782,7 +795,12 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.idioma.trocado": "Idioma cambiado a {nome}.",
   "comando.idioma.auto": "Idioma del sistema: {nome}.",
   "comando.idioma.sem_traducao": "{nome} todavía no está traducido; por ahora el juego sigue en {atual}.",
-  "comando.idioma.desconhecido": "No conozco el idioma \"{pedido}\"."
+  "comando.idioma.desconhecido": "No conozco el idioma \"{pedido}\".",
+  "comando.passear.anda": "Lua pasea {s} s y luego se detiene, respirando. El suelo da la vuelta en unos 21 s; las islas, mucho más lentas, en casi 2 min. Para caminar más: /cronicas walk 120.",
+  "comando.passear.ocupada": "Ahora no: Lua está en medio de una pelea o de un cambio de fase. Inténtalo en un momento.",
+  "comando.fase.vai": "Cambio de fase: {de} → {para}. Solo para ver el escenario: no cuenta página. Se queda allí hasta el próximo jefe, que trae su propio bioma.",
+  "comando.fase.chefao": "Ahora no: hay un jefe en escena. Derrótalo con /cronicas hit.",
+  "comando.fase.desconhecido": "No conozco el bioma \"{pedido}\". Los biomas: {lista}."
  },
  "fr": {
   "chefoes.vespera": "Vespera",
@@ -1032,6 +1050,7 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.ajuda.estado": "As Crônicas de Lua : échelle {escala}x, {px} px par colonne, mode {modo}. Niveau {nivel}, {xp} XP, {paginas}/10 pages.",
   "comando.ajuda.uso": "Utilisez /cronicas scale 1|2|3, /cronicas ruler et /cronicas width <px> (calibrer la largeur), /cronicas image|frame, /cronicas test (comparer les deux), /cronicas new-moon (simuler un cache froid), /cronicas vigil (clair de lune presque fini, pour voir la Veille), /cronicas boss [nom] et /cronicas hit (essayer le boss), /cronicas elite (le prochain combat est l'élite) ou /cronicas language (langue du jeu).",
   "comando.ajuda.trofeus": "Trophées : {lista}",
+  "comando.ajuda.uso_cenario": "Pour voir le décor : /cronicas walk [secondes] (Lua marche puis s'arrête en respirant) et /cronicas stage [biome] (changement de niveau vers le biome suivant ou celui demandé ; aucune page n'est comptée).",
   "comando.linha": "Hauteur de ligne : {n} px. Les zones de la souris ont été recalculées.",
   "comando.teste": "Test activé : le bandeau s'affiche deux fois, A (cadre interactif) et B (image). /cronicas test à nouveau le désactive.",
   "comando.teste_a": "A : cadre interactif (bulles au survol)",
@@ -1043,7 +1062,12 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.idioma.trocado": "Langue changée : {nome}.",
   "comando.idioma.auto": "Langue du système : {nome}.",
   "comando.idioma.sem_traducao": "{nome} n'est pas encore traduit ; le jeu reste en {atual} pour l'instant.",
-  "comando.idioma.desconhecido": "Je ne connais pas la langue \"{pedido}\"."
+  "comando.idioma.desconhecido": "Je ne connais pas la langue \"{pedido}\".",
+  "comando.passear.anda": "Lua se promène {s} s, puis s'arrête en respirant. Le sol fait le tour en 21 s environ ; les îles, bien plus lentes, en presque 2 min. Pour marcher plus longtemps : /cronicas walk 120.",
+  "comando.passear.ocupada": "Pas maintenant : Lua est en plein combat ou en changement de niveau. Réessaie dans un instant.",
+  "comando.fase.vai": "Changement de niveau : {de} → {para}. Juste pour le décor : aucune page n'est comptée. Elle y reste jusqu'au prochain boss, qui apporte son propre biome.",
+  "comando.fase.chefao": "Pas maintenant : un boss est en scène. Bats-le avec /cronicas hit.",
+  "comando.fase.desconhecido": "Je ne connais pas le biome « {pedido} ». Les biomes : {lista}."
  },
  "ja": {
   "chefoes.vespera": "Vespera",
@@ -1293,6 +1317,7 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.ajuda.estado": "As Crônicas de Lua：倍率 {escala}x、1 列 {px} px、{modo}モード。レベル {nivel}、{xp} XP、ページ {paginas}/10。",
   "comando.ajuda.uso": "使い方：/cronicas scale 1|2|3、/cronicas ruler と /cronicas width <px>（幅の調整）、/cronicas image|frame、/cronicas test（両方を比べる）、/cronicas new-moon（冷えたキャッシュを再現）、/cronicas vigil（月明かりを残りわずかにして夜番を見る）、/cronicas boss [名前] と /cronicas hit（ボス戦を試す）、/cronicas elite（次の戦いがエリートに）、/cronicas language（ゲームの言語）。",
   "comando.ajuda.trofeus": "トロフィー：{lista}",
+  "comando.ajuda.uso_cenario": "景色を見るには：/cronicas walk [秒]（ルナが歩いて、止まって息をする）と /cronicas stage [ステージ]（次のステージか指定したステージへ移動。ページは数えません）。",
   "comando.linha": "行の高さ：{n} px。マウスの反応範囲を計算し直しました。",
   "comando.teste": "テストをオンにしました：帯が 2 つ出ます。A（操作できるフレーム）と B（画像）。もう一度 /cronicas test でオフ。",
   "comando.teste_a": "A：操作できるフレーム（ホバーの吹き出しあり）",
@@ -1304,7 +1329,12 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.idioma.trocado": "言語を {nome} に変えました。",
   "comando.idioma.auto": "システムの言語：{nome}。",
   "comando.idioma.sem_traducao": "{nome} はまだ翻訳されていません。いまはゲームを {atual} のままにします。",
-  "comando.idioma.desconhecido": "「{pedido}」という言語は知りません。"
+  "comando.idioma.desconhecido": "「{pedido}」という言語は知りません。",
+  "comando.passear.anda": "ルナが {s} 秒散歩して、止まって息をします。地面は約 21 秒で一周、浮島はずっとゆっくりで約 2 分。もっと歩くなら：/cronicas walk 120。",
+  "comando.passear.ocupada": "今はできません：ルナは戦闘中かステージ移動中です。少しあとでもう一度どうぞ。",
+  "comando.fase.vai": "ステージ移動：{de} → {para}。景色を見るだけなので、ページは数えません。次のボスが自分のステージを連れてくるまで、そこにいます。",
+  "comando.fase.chefao": "今はできません：ボスがいます。/cronicas hit で倒してください。",
+  "comando.fase.desconhecido": "ステージ「{pedido}」はわかりません。ステージ：{lista}。"
  },
  "ko": {
   "chefoes.vespera": "Vespera",
@@ -1554,6 +1584,7 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.ajuda.estado": "As Crônicas de Lua: 배율 {escala}x, 칸당 {px} px, {modo} 모드. 레벨 {nivel}, {xp} XP, 페이지 {paginas}/10.",
   "comando.ajuda.uso": "사용법: /cronicas scale 1|2|3, /cronicas ruler와 /cronicas width <px>(너비 보정), /cronicas image|frame, /cronicas test(둘 다 비교), /cronicas new-moon(식은 캐시 시뮬레이션), /cronicas vigil(달빛을 거의 끝으로, 불침번 보기), /cronicas boss [이름]과 /cronicas hit(보스전 체험), /cronicas elite(다음 전투는 엘리트), /cronicas language(게임 언어).",
   "comando.ajuda.trofeus": "트로피: {lista}",
+  "comando.ajuda.uso_cenario": "배경을 보려면: /cronicas walk [초] (루아가 걷다가 멈춰서 숨을 쉬어요)와 /cronicas stage [지역] (다음 지역이나 고른 지역으로 스테이지 이동, 페이지는 세지 않아요).",
   "comando.linha": "줄 높이: {n} px. 마우스 영역을 다시 계산했어요.",
   "comando.teste": "테스트 켜짐: 띠가 두 번 나와요. A(조작 가능한 프레임)와 B(이미지). /cronicas test를 다시 입력하면 꺼져요.",
   "comando.teste_a": "A: 조작 가능한 프레임(마우스 말풍선)",
@@ -1565,7 +1596,12 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.idioma.trocado": "언어를 {nome}(으)로 바꿨어요.",
   "comando.idioma.auto": "시스템 언어: {nome}.",
   "comando.idioma.sem_traducao": "{nome}은(는) 아직 번역되지 않았어요. 지금은 게임이 {atual}(으)로 계속돼요.",
-  "comando.idioma.desconhecido": "\"{pedido}\"라는 언어는 몰라요."
+  "comando.idioma.desconhecido": "\"{pedido}\"라는 언어는 몰라요.",
+  "comando.passear.anda": "루아가 {s}초 동안 산책하고 멈춰서 숨을 쉬어요. 땅은 약 21초에 한 바퀴, 떠 있는 섬은 훨씬 느려서 거의 2분이 걸려요. 더 걸으려면: /cronicas walk 120.",
+  "comando.passear.ocupada": "지금은 안 돼요: 루아가 전투 중이거나 스테이지를 이동하는 중이에요. 잠시 후 다시 해 보세요.",
+  "comando.fase.vai": "스테이지 이동: {de} → {para}. 구경만 하는 거라 페이지는 세지 않아요. 다음 보스가 자기 지역을 데려올 때까지 그곳에 있어요.",
+  "comando.fase.chefao": "지금은 안 돼요: 보스가 있어요. /cronicas hit 로 쓰러뜨리세요.",
+  "comando.fase.desconhecido": "\"{pedido}\" 지역은 몰라요. 지역: {lista}."
  },
  "pt-BR": {
   "chefoes.vespera": "Vespera",
@@ -1815,6 +1851,7 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.ajuda.estado": "As Crônicas de Lua: escala {escala}x, {px} px por coluna, modo {modo}. Nível {nivel}, {xp} XP, {paginas}/10 páginas.",
   "comando.ajuda.uso": "Use /cronicas escala 1|2|3, /cronicas regua e /cronicas largura <px> (calibra a largura), /cronicas quadro|imagem, /cronicas teste (compara os dois) /cronicas lua-nova (simula o cache frio), /cronicas vigilia (o luar perto do fim, para ver a Vigília) ou /cronicas chefao [nome] e /cronicas golpe (testa o chefão) ou /cronicas elite (a próxima luta é o elite).",
   "comando.ajuda.trofeus": "Troféus: {lista}",
+  "comando.ajuda.uso_cenario": "Para ver o cenário: /cronicas passear [segundos] (a Lua anda e para respirando) e /cronicas fase [bioma] (passagem de fase para o próximo bioma ou o pedido; não conta página).",
   "comando.linha": "Altura da linha: {n} px. As áreas de mouse foram recalculadas.",
   "comando.teste": "Teste ligado: a faixa aparece duas vezes, A (quadro interativo) e B (imagem). /cronicas teste de novo desliga.",
   "comando.teste_a": "A: quadro interativo (balões no hover)",
@@ -1826,7 +1863,12 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.idioma.trocado": "Idioma trocado para {nome}.",
   "comando.idioma.auto": "Idioma do sistema: {nome}.",
   "comando.idioma.sem_traducao": "{nome} ainda não tem tradução; o jogo continua em {atual} por enquanto.",
-  "comando.idioma.desconhecido": "Não conheço o idioma \"{pedido}\"."
+  "comando.idioma.desconhecido": "Não conheço o idioma \"{pedido}\".",
+  "comando.passear.anda": "A Lua passeia por {s} s e depois para, respirando. O chão dá a volta em uns 21 s; as ilhas, bem mais lentas, em quase 2 min. Para andar mais: /cronicas passear 120.",
+  "comando.passear.ocupada": "Agora não: a Lua está no meio de uma luta ou de uma passagem de fase. Tente de novo daqui a pouco.",
+  "comando.fase.vai": "Passagem de fase: {de} → {para}. É só para ver o cenário: não conta página. Ela fica lá até o próximo chefão, que traz o bioma dele.",
+  "comando.fase.chefao": "Agora não: há um chefão em cena. Derrote ele com /cronicas golpe.",
+  "comando.fase.desconhecido": "Não conheço o bioma \"{pedido}\". Os biomas: {lista}."
  },
  "zh-CN": {
   "chefoes.vespera": "Vespera",
@@ -2076,6 +2118,7 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.ajuda.estado": "As Crônicas de Lua：缩放 {escala}x，每列 {px} px，{modo}模式。{nivel} 级，{xp} XP，书页 {paginas}/10。",
   "comando.ajuda.uso": "用法：/cronicas scale 1|2|3、/cronicas ruler 和 /cronicas width <px>（校准宽度）、/cronicas image|frame、/cronicas test（对比两种）、/cronicas new-moon（模拟缓存变冷）、/cronicas vigil（让月光快耗尽，看看守夜）、/cronicas boss [名字] 和 /cronicas hit（试玩 Boss 战）、/cronicas elite（下一场是精英）或 /cronicas language（游戏语言）。",
   "comando.ajuda.trofeus": "奖杯：{lista}",
+  "comando.ajuda.uso_cenario": "想看场景：/cronicas walk [秒数]（露娜走一会儿，然后停下来呼吸）和 /cronicas stage [地区]（换关到下一个或指定的地区；不计页数）。",
   "comando.linha": "行高：{n} px。鼠标区域已重新计算。",
   "comando.teste": "测试已打开：横幅显示两次，A（可交互的框架）和 B（图片）。再次输入 /cronicas test 关闭。",
   "comando.teste_a": "A：可交互的框架（悬停气泡）",
@@ -2087,6 +2130,11 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.idioma.trocado": "语言已切换为 {nome}。",
   "comando.idioma.auto": "系统语言：{nome}。",
   "comando.idioma.sem_traducao": "{nome} 还没有翻译；游戏暂时保持 {atual}。",
-  "comando.idioma.desconhecido": "我不认识“{pedido}”这种语言。"
+  "comando.idioma.desconhecido": "我不认识“{pedido}”这种语言。",
+  "comando.passear.anda": "露娜散步 {s} 秒，然后停下来呼吸。地面大约 21 秒转一圈；浮岛慢得多，要将近 2 分钟。想走更久：/cronicas walk 120。",
+  "comando.passear.ocupada": "现在不行：露娜正在战斗或换关中。请稍后再试。",
+  "comando.fase.vai": "换关：{de} → {para}。只是看看风景：不计页数。她会一直待在那里，直到下一个首领带来自己的地区。",
+  "comando.fase.chefao": "现在不行：场上有首领。用 /cronicas hit 打败它。",
+  "comando.fase.desconhecido": "我不认识地区“{pedido}”。地区有：{lista}。"
  }
 }

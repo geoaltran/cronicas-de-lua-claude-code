@@ -395,7 +395,8 @@
     "ajuda": {
       "estado": "As Crônicas de Lua: escala {escala}x, {px} px por coluna, modo {modo}. Nível {nivel}, {xp} XP, {paginas}/10 páginas.",
       "uso": "Use /cronicas escala 1|2|3, /cronicas regua e /cronicas largura <px> (calibra a largura), /cronicas quadro|imagem, /cronicas teste (compara os dois) /cronicas lua-nova (simula o cache frio), /cronicas vigilia (o luar perto do fim, para ver a Vigília) ou /cronicas chefao [nome] e /cronicas golpe (testa o chefão) ou /cronicas elite (a próxima luta é o elite).",
-      "trofeus": "Troféus: {lista}"
+      "trofeus": "Troféus: {lista}",
+      "uso_cenario": "Para ver o cenário: /cronicas passear [segundos] (a Lua anda e para respirando) e /cronicas fase [bioma] (passagem de fase para o próximo bioma ou o pedido; não conta página)."
     },
     "linha": "Altura da linha: {n} px. As áreas de mouse foram recalculadas.",
     "teste": "Teste ligado: a faixa aparece duas vezes, A (quadro interativo) e B (imagem). /cronicas teste de novo desliga.",
@@ -411,6 +412,15 @@
       "auto": "Idioma do sistema: {nome}.",
       "sem_traducao": "{nome} ainda não tem tradução; o jogo continua em {atual} por enquanto.",
       "desconhecido": "Não conheço o idioma \"{pedido}\"."
+    },
+    "passear": {
+      "anda": "A Lua passeia por {s} s e depois para, respirando. O chão dá a volta em uns 21 s; as ilhas, bem mais lentas, em quase 2 min. Para andar mais: /cronicas passear 120.",
+      "ocupada": "Agora não: a Lua está no meio de uma luta ou de uma passagem de fase. Tente de novo daqui a pouco."
+    },
+    "fase": {
+      "vai": "Passagem de fase: {de} → {para}. É só para ver o cenário: não conta página. Ela fica lá até o próximo chefão, que traz o bioma dele.",
+      "chefao": "Agora não: há um chefão em cena. Derrote ele com /cronicas golpe.",
+      "desconhecido": "Não conheço o bioma \"{pedido}\". Os biomas: {lista}."
     }
   }
 }

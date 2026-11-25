@@ -202,12 +202,30 @@
     "grimorio": {
       "titulo": "마법서",
       "subtitulo": "Claude의 도구는 Lua의 주문.",
-      "ler": { "nome": "루멘의 눈길", "desc": "파일을 읽고 찾아요. Vespera를 깨워요." },
-      "editar": { "nome": "재작성의 룬", "desc": "코드를 고치고 써요. 시계공과 Sir Solis를 불러요." },
-      "terminal": { "nome": "명령의 불꽃", "desc": "터미널 명령. Ignis를 깨워요." },
-      "web": { "nome": "별빛 물결", "desc": "웹을 검색하고 읽어요. 리바이어던과 Nébula를 데려와요." },
-      "integracao": { "nome": "거울의 서약", "desc": "외부 연동(MCP). 거울 왕을 불러요." },
-      "subagente": { "nome": "그림자 메아리", "desc": "도우미 부르기(서브에이전트). 반그림자 부인의 분신." },
+      "ler": {
+        "nome": "루멘의 눈길",
+        "desc": "파일을 읽고 찾아요. Vespera를 깨워요."
+      },
+      "editar": {
+        "nome": "재작성의 룬",
+        "desc": "코드를 고치고 써요. 시계공과 Sir Solis를 불러요."
+      },
+      "terminal": {
+        "nome": "명령의 불꽃",
+        "desc": "터미널 명령. Ignis를 깨워요."
+      },
+      "web": {
+        "nome": "별빛 물결",
+        "desc": "웹을 검색하고 읽어요. 리바이어던과 Nébula를 데려와요."
+      },
+      "integracao": {
+        "nome": "거울의 서약",
+        "desc": "외부 연동(MCP). 거울 왕을 불러요."
+      },
+      "subagente": {
+        "nome": "그림자 메아리",
+        "desc": "도우미 부르기(서브에이전트). 반그림자 부인의 분신."
+      },
       "total": {
         "um": "지금까지 주문 {n}번.",
         "outros": "지금까지 주문 {n}번."
@@ -362,7 +380,8 @@
     "ajuda": {
       "estado": "As Crônicas de Lua: 배율 {escala}x, 칸당 {px} px, {modo} 모드. 레벨 {nivel}, {xp} XP, 페이지 {paginas}/10.",
       "uso": "사용법: /cronicas scale 1|2|3, /cronicas ruler와 /cronicas width <px>(너비 보정), /cronicas image|frame, /cronicas test(둘 다 비교), /cronicas new-moon(식은 캐시 시뮬레이션), /cronicas vigil(달빛을 거의 끝으로, 불침번 보기), /cronicas boss [이름]과 /cronicas hit(보스전 체험), /cronicas elite(다음 전투는 엘리트), /cronicas language(게임 언어).",
-      "trofeus": "트로피: {lista}"
+      "trofeus": "트로피: {lista}",
+      "uso_cenario": "배경을 보려면: /cronicas walk [초] (루아가 걷다가 멈춰서 숨을 쉬어요)와 /cronicas stage [지역] (다음 지역이나 고른 지역으로 스테이지 이동, 페이지는 세지 않아요)."
     },
     "linha": "줄 높이: {n} px. 마우스 영역을 다시 계산했어요.",
     "teste": "테스트 켜짐: 띠가 두 번 나와요. A(조작 가능한 프레임)와 B(이미지). /cronicas test를 다시 입력하면 꺼져요.",
@@ -377,6 +396,15 @@
       "auto": "시스템 언어: {nome}.",
       "sem_traducao": "{nome}은(는) 아직 번역되지 않았어요. 지금은 게임이 {atual}(으)로 계속돼요.",
       "desconhecido": "\"{pedido}\"라는 언어는 몰라요."
+    },
+    "passear": {
+      "anda": "루아가 {s}초 동안 산책하고 멈춰서 숨을 쉬어요. 땅은 약 21초에 한 바퀴, 떠 있는 섬은 훨씬 느려서 거의 2분이 걸려요. 더 걸으려면: /cronicas walk 120.",
+      "ocupada": "지금은 안 돼요: 루아가 전투 중이거나 스테이지를 이동하는 중이에요. 잠시 후 다시 해 보세요."
+    },
+    "fase": {
+      "vai": "스테이지 이동: {de} → {para}. 구경만 하는 거라 페이지는 세지 않아요. 다음 보스가 자기 지역을 데려올 때까지 그곳에 있어요.",
+      "chefao": "지금은 안 돼요: 보스가 있어요. /cronicas hit 로 쓰러뜨리세요.",
+      "desconhecido": "\"{pedido}\" 지역은 몰라요. 지역: {lista}."
     }
   }
 }

@@ -20,6 +20,8 @@ Nas lutas do dia a dia, aparecem as próprias criaturas de Lunária. Quando duas
 - 🎭 **Clones da Dama Penumbra:** o Claude chamou **subagentes**. Cada subagente é um clone que a Lua enfrenta.
 - 🪨 **Golem de Obsidiana (elite):** um **erro que o Claude conseguiu consertar**. Quando ele cai, deixa um **troféu** 🏆 no lugar dele: 🔥 taça (erro num comando), ⚙️ engrenagem (numa edição), 🌙 lua (numa leitura) ou 🪐 orbe (na web). O troféu vai para a estante do Livro, com o nome do erro.
 
+👀 **Prévia do chefão:** de vez em quando (mais ou menos 1 luta em 4, nunca duas seguidas), quem entra numa luta comum é o **chefão da página atual**, o dono do bioma em que a Lua está, como um aviso do que vem pela frente. No Mar, o Leviatã aparece até numa leitura de arquivo.
+
 A faixa tem sempre a mesma altura, então os gigantes (como a Nébula, o Golem e o Leviatã) lutam um pouco menores pra caber. 🌑 Só o **Malakor** nunca aparece numa luta comum: ele é o chefe final.
 
 ### 👑 Os chefões

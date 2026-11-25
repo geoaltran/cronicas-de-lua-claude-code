@@ -22,6 +22,8 @@ Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idi
 | `probe` | `prova` |
 | `boss` (`boss list`) | `chefao` (`chefao lista`) |
 | `hit` | `golpe` |
+| `walk` | `passear` |
+| `stage` | `fase` |
 | `elite` | `elite` |
 | `vigil` | `vigilia` |
 | `new-moon` | `lua-nova` |
@@ -62,6 +64,17 @@ Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idi
 1. `/cronicas regua`
 2. Veja qual é o último número que aparece **inteiro** na borda direita da régua.
 3. `/cronicas largura <esse número>`
+
+## 🏞️ Ver o cenário
+
+Para quem quer ver como o cenário funciona. Estes **não contam** nada: não recuperam página nem dão XP.
+
+| Comando | O que faz |
+|---|---|
+| `/cronicas passear` | A Lua **anda uns 8 s** pelo bioma em que está, com as camadas rolando em laço (parallax), e depois **para respirando**. O chão dá a volta em uns 21 s; as ilhas no céu, bem mais lentas, em quase 2 min (elas voltam a aparecer, só demora). Também funciona como `/cronicas walk`. |
+| `/cronicas passear <segundos>` | O mesmo, andando o tempo que você quiser (até 120 s): `/cronicas passear 120` mostra uma volta inteira do chão e boa parte da volta das ilhas. |
+| `/cronicas fase` | **Passagem de fase** igual à de quando um chefão cai: a Lua sai andando pela direita, a tela escurece, o **próximo bioma** da jornada clareia com o título "PÁGINA N · BIOMA" e ela entra pela esquerda. Repetindo, passa por todos os 9 biomas e volta à Floresta. A Lua fica no bioma visitado até o próximo chefão aparecer (ele traz o bioma dele). Não funciona com chefão em cena. Também funciona como `/cronicas stage`. |
+| `/cronicas fase <bioma>` | Vai direto para um bioma: `floresta`, `ruinas`, `mar`, `vulcao`, `torre`, `aurora`, `castelo`, `ceu`, `eclipse` (com ou sem acento, só o começo, o nome no idioma do jogo ou em inglês: `forest`, `sea`, `volcano`, `tower`, `dawn`, `castle`, `sky`, `eclipse`). |
 
 ## 🧪 Testar o jogo
 
@@ -104,4 +117,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 25/11/2026 (`/cronicas chefao` leva a cena ao bioma do chefão; acha o chefão por qualquer palavra do nome).*
+*Última atualização: 25/11/2026 (`/cronicas passear` e `/cronicas fase` para ver o cenário).*

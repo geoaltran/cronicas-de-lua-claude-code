@@ -104,7 +104,7 @@ test('subcomandos em inglês funcionam igual aos portugueses', async ($, on) => 
   expect(await rodar('new-moon')).toBe(await rodar('lua-nova'))
   // todo nome em inglês aponta para um subcomando que existe
   for (const pt of Object.values(SUBCOMANDOS)) {
-    expect(['superficies', 'escala', 'coluna', 'largura', 'quadro', 'imagem', 'teste', 'prova', 'linha', 'regua', 'chefao', 'golpe', 'vigilia', 'lua-nova']).toContain(pt)
+    expect(['superficies', 'escala', 'coluna', 'largura', 'quadro', 'imagem', 'teste', 'prova', 'linha', 'regua', 'chefao', 'golpe', 'passear', 'fase', 'vigilia', 'lua-nova']).toContain(pt)
   }
 })
 

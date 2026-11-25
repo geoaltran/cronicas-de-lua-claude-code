@@ -69,7 +69,7 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 
 ![Kampf gegen den Obsidiangolem in den Ruinen](previa_chefao_golem.gif)
 
-Monster nach Tool: Dateien lesen → Vespera · Code bearbeiten → Uhrmacher / Sir Solis · Terminal → Ignis · Web → Leviathan / Nébula · Integrationen (MCP) → Spiegelkönig · Subagenten → Klone der Dame Penumbra. Die Bosse kommen der Reihe nach, jeder mit einer Seite der Chroniken, bis zu Malakor, danach Neues Spiel+.
+Monster nach Tool: Dateien lesen → Vespera · Code bearbeiten → Uhrmacher / Sir Solis · Terminal → Ignis · Web → Leviathan / Nébula · Integrationen (MCP) → Spiegelkönig · Subagenten → Klone der Dame Penumbra. Die Bosse kommen der Reihe nach, jeder mit einer Seite der Chroniken, bis zu Malakor, danach Neues Spiel+. Ab und zu (etwa jeder 4. normale Kampf) tritt stattdessen der Boss der aktuellen Seite auf, als Vorgeschmack auf das, was kommt.
 
 ## Die Biome
 Lunária hat 9 Biome, eins für jeden Abschnitt der Reise, jedes zu seiner eigenen Tageszeit und mit eigenen Animationen: Wald (Vespera und Dame Penumbra), Ruinen (Obsidiangolem), Meer (Leviathan), Vulkan (Ignis), Uhrturm (Uhrmacher), Morgenrot (Sir Solis), Glasschloss (Spiegelkönig), Sternenhimmel (Nébula) und Finsternis (Malakor). Wellen und ein kreisender Leuchtturm, pulsierende Lava, Zahnräder, Sonnenstrahlen, Spiegelungen, die über die Spiegel huschen, Sternschnuppen und eigene Partikel an jedem Ort.
@@ -95,6 +95,8 @@ Tipp sie wie eine normale Nachricht in Claudes Eingabefeld. Die Antwort siehst n
 | <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Ruft den nächsten Boss der Reise oder einen bestimmten (`vespera`, `ignis`, `malakor`…); die Szene wechselt in sein Biom. `/cronicas boss list` ruft einen Aufgabenlisten-Boss mit Schild. |
 | <code>/cronicas&nbsp;hit</code> | Trifft den Boss auf der Bühne; beim Aufgabenlisten-Boss erledigt er eine Aufgabe. Der letzte Treffer ist der kritische. |
 | <code>/cronicas&nbsp;elite</code> | Der nächste normale Kampf wird zum Elite-Gegner (Obsidiangolem) mit einer Trophäe. |
+| <code>/cronicas&nbsp;walk&nbsp;[Sekunden]</code> | Lua läuft ein paar Sekunden durch das aktuelle Biom (standardmäßig 8, bis 120), damit du die Ebenen in der Schleife scrollen siehst, und bleibt dann atmend stehen. |
+| <code>/cronicas&nbsp;stage&nbsp;[Biom]</code> | Ein Levelwechsel nur zum Anschauen: Lua läuft hinaus, das nächste Biom (oder das genannte: `meer`, `vulkan`, `finsternis`…) blendet mit seinem Titel ein und sie läuft wieder herein. Es zählt keine Seite. |
 | <code>/cronicas&nbsp;vigil</code> | Bringt das Mondlicht fast ans Ende, damit du die Nachtwache arbeiten siehst (mit brennender Laterne schickt sie eine echte, winzige Nachricht). |
 | <code>/cronicas&nbsp;new-moon</code> | Simuliert den Neumond (kalter Cache) bis zu Claudes nächster Antwort. |
 
