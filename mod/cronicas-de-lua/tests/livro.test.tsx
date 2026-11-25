@@ -38,13 +38,24 @@ async function preparar($: Dolar, on: On, jogo: Jogo) {
 const fonte = async (ui: { find: (q: { type: 'Svg' }) => Promise<unknown> }) => String(((await ui.find({ type: 'Svg' })) as { props?: { source?: string } })?.props?.source ?? '')
 
 test('cada aba do Livro cabe no limite do app, larga ou estreita, com o jogo cheio', () => {
-  for (const aba of ['ficha', 'bestiario', 'trofeus', 'grimorio'] as AbaDoLivro[]) {
+  for (const aba of ['ficha', 'mapa', 'bestiario', 'trofeus', 'grimorio'] as AbaDoLivro[]) {
     for (const [W, escala] of [[200, 1], [300, 2], [700, 1]] as const) {
       const p = paginaDoLivro(aba, CHEIO, W, escala)
       expect(p.svg.length).toBeLessThan(131072)
+      expect(encodeURIComponent(p.svg).length).toBeLessThan(124000)
       expect(p.altura).toBeGreaterThan(0)
     }
   }
+  // o mapa: os 9 biomas; no começo da jornada só a floresta em cor, e a Lua nela
+  const comeco = paginaDoLivro('mapa', { xp: 0, paginas: 0, lutas: 0 }, 460, 1)
+  expect(comeco.svg).toContain('Floresta')
+  expect(comeco.svg).not.toContain('Torre do Relógio')
+  expect(comeco.alt).toContain('1 de 9')
+  const meio = paginaDoLivro('mapa', { xp: 0, paginas: 5, lutas: 0 }, 460, 1)
+  expect(meio.svg).toContain('Torre do Relógio')
+  expect(meio.svg).toContain('Página 6 de 10 · Torre do Relógio')
+  expect(meio.svg).not.toContain('Céu Estelar')
+  expect(paginaDoLivro('mapa', CHEIO, 460, 1).svg).toContain('Eclipse')
   // a estante mostra os 15 mais novos, cada um com balão
   expect(paginaDoLivro('trofeus', CHEIO, 300, 2).alvos.length).toBe(15)
 })

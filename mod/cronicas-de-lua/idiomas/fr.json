@@ -140,6 +140,7 @@
     "alt": "Livre de Lua. {alt}",
     "abas": {
       "ficha": "Fiche",
+      "mapa": "Carte",
       "bestiario": "Bestiaire",
       "trofeus": "Trophées",
       "grimorio": "Grimoire"
@@ -162,6 +163,13 @@
       "paginas": "Pages des Chroniques : {ciclo}/10",
       "paginas_novo_jogo": "Pages des Chroniques : {ciclo}/10 (Nouvelle partie+)",
       "alt": "Fiche de Lua : niveau {nivel}, {xp} XP, combats gagnés : {lutas}, boss vaincus : {chefoes}, trophées : {trofeus}, pages {ciclo}/10."
+    },
+    "mapa": {
+      "titulo": "Carte du voyage",
+      "sub": "Page {pagina} sur 10 · {bioma}",
+      "sub_todos": "Tous les biomes visités · page {pagina} · {bioma}",
+      "paginas": "Pages {de}–{ate}",
+      "alt": "Carte du voyage : {visitados} biomes visités sur 9 ; Lua est ici : {bioma}."
     },
     "bestiario": {
       "titulo": "Bestiaire",

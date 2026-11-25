@@ -140,6 +140,7 @@
     "alt": "Lua's Book. {alt}",
     "abas": {
       "ficha": "Stats",
+      "mapa": "Map",
       "bestiario": "Bestiary",
       "trofeus": "Trophies",
       "grimorio": "Grimoire"
@@ -162,6 +163,13 @@
       "paginas": "Pages of the Chronicles: {ciclo}/10",
       "paginas_novo_jogo": "Pages of the Chronicles: {ciclo}/10 (New Game+)",
       "alt": "Lua's stats: level {nivel}, {xp} XP, fights won: {lutas}, bosses defeated: {chefoes}, trophies: {trofeus}, pages {ciclo}/10."
+    },
+    "mapa": {
+      "titulo": "Journey Map",
+      "sub": "Page {pagina} of 10 · {bioma}",
+      "sub_todos": "Every biome visited · page {pagina} · {bioma}",
+      "paginas": "Pages {de}–{ate}",
+      "alt": "Journey map: {visitados} of 9 biomes visited; Lua is at: {bioma}."
     },
     "bestiario": {
       "titulo": "Bestiary",

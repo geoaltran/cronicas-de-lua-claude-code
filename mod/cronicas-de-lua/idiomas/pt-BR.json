@@ -148,6 +148,7 @@
     "alt": "O Livro da Lua. {alt}",
     "abas": {
       "ficha": "Ficha",
+      "mapa": "Mapa",
       "bestiario": "Bestiário",
       "trofeus": "Troféus",
       "grimorio": "Grimório"
@@ -170,6 +171,13 @@
       "paginas": "Páginas das Crônicas: {ciclo}/10",
       "paginas_novo_jogo": "Páginas das Crônicas: {ciclo}/10 (Novo Jogo+)",
       "alt": "Ficha da Lua: nível {nivel}, {xp} XP, {lutas} lutas vencidas, {chefoes} chefões derrotados, {trofeus} troféus, páginas {ciclo}/10."
+    },
+    "mapa": {
+      "titulo": "Mapa da jornada",
+      "sub": "Página {pagina} de 10 · {bioma}",
+      "sub_todos": "Todos os biomas visitados · página {pagina} · {bioma}",
+      "paginas": "Páginas {de}–{ate}",
+      "alt": "Mapa da jornada: {visitados} de 9 biomas visitados; a Lua está em: {bioma}."
     },
     "bestiario": {
       "titulo": "Bestiário",

@@ -5,10 +5,11 @@
 // caíram aparecem em silhueta), Troféus (a estante com os troféus dos elites;
 // o nome do erro sai no balão do hover, com as áreas do app por cima) e
 // Grimório (as ferramentas do Claude como feitiços, com quantas vezes saíram).
+// Mapa da jornada (25/11/2026): os 9 biomas num caminho, os visitados em cor.
 import { META } from './arte'
 import { Doc, PARADA, art, esc, r } from './base'
 import type { AbaDoLivro, Jogo, TipoTrofeu } from '../types'
-import { type Alvo, nivelDe, selo } from './cena'
+import { type Alvo, biomaDaPagina, nivelDe, selo } from './cena'
 import { cssFonteLivro, cssTexto, ehCJK, larguraCurta, quebrarPorLargura } from './fontes'
 import { JORNADA, NOME_CHEFAO, chefaoEm, paginasNoCiclo, proximoChefao } from './chefao'
 import { monstroInfo } from './luta'
@@ -16,6 +17,7 @@ import { t as tx, tp } from './t'
 
 export const ABAS: readonly { id: AbaDoLivro; nome: string }[] = [
   { id: 'ficha', get nome() { return tx('livro.abas.ficha') } },
+  { id: 'mapa', get nome() { return tx('livro.abas.mapa') } },
   { id: 'bestiario', get nome() { return tx('livro.abas.bestiario') } },
   { id: 'trofeus', get nome() { return tx('livro.abas.trofeus') } },
   { id: 'grimorio', get nome() { return tx('livro.abas.grimorio') } },
@@ -242,6 +244,173 @@ function bestiario(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt:
   return { corpo: s, H, alt: tx(nomes.length > 0 ? 'livro.bestiario.alt_nomes' : 'livro.bestiario.alt', { vistos, nomes: nomes.join(', ') }) }
 }
 
+// ---------------------------------------------------------------- Mapa da jornada
+
+/**
+ * Os ícones dos biomas, 12 x 12 em pixel (2 px de arte cada), feitos no código:
+ * sem imagem nova (o Svg do Livro tem teto). Cada letra é uma cor; "." é vazio.
+ */
+const ICONES: Record<string, { c: Record<string, string>; g: readonly string[] }> = {
+  floresta: {
+    c: { G: '#4caf50', g: '#2e7d32', T: '#7a4a2a' },
+    g: ['....GGGG....', '..GGGGGGGG..', '.GGgGGGGgGG.', 'GGGGGGgGGGGG', 'GGgGGGGGGgGG', '.GGGGgGGGGG.', '..GGGGGGGG..', '.....TT.....', '.....TT.....', '.....TT.....', '....TTTT....', '............'],
+  },
+  ruinas: {
+    c: { S: '#a8a29e', s: '#78716c', c: '#b388ff', C: '#efe0ff' },
+    g: ['............', '.SSS....SSS.', '.SsS....SsS.', '.SsS....SsS.', '.SsS..c.SsS.', '.SsS.ccc.sS.', '.SsS.cCc.SS.', '.SsS.ccc....', '.SsS..c..SS.', '.SsS....SsS.', 'SSSSSSSSSSSS', '............'],
+  },
+  mar: {
+    c: { W: '#e3f2fd', b: '#64b5f6', B: '#1e5aa8', Y: '#fff3b0' },
+    g: ['.........YY.', '........YYYY', '........YYYY', '.........YY.', '............', '..WW....WW..', '.WbbW..WbbW.', 'WbBBbWWbBBbW', 'BBBBBBBBBBBB', 'bBBBbBBBBbBB', 'BBbBBBBbBBBB', '............'],
+  },
+  vulcao: {
+    c: { R: '#ff7043', r: '#ffab40', o: '#ffcc80', d: '#5d4037' },
+    g: ['.....oo.....', '....o..o....', '.....RR.....', '....rRRr....', '....dRRd....', '...ddrrdd...', '...dddddd...', '..dddrdddd..', '..ddddddrd..', '.dddddddddd.', 'dddrdddddddd', '............'],
+  },
+  torre: {
+    c: { A: '#a1887f', T: '#6d4c41', w: '#fff3cd', k: '#3e2723', t: '#4e342e' },
+    g: ['.....AA.....', '....AAAA....', '....TTTT....', '...TwwwwT...', '...TwkwwT...', '...TwwkwT...', '...TwwwwT...', '....TTTT....', '....TtTT....', '....TTtT....', '...TTTTTT...', '............'],
+  },
+  aurora: {
+    c: { S: '#ffd54f', y: '#ffe082', h: '#c58b3a', H: '#e6b35a' },
+    g: ['............', '..y..y..y...', '...y.y.y....', '....SSS.....', '.y.SSSSS.y..', '..SSSSSSS...', 'hhhhhhhhhhhh', 'HHHHHHHHHHHH', 'hHHHHhHHHHHh', 'HHHhHHHHHhHH', '............', '............'],
+  },
+  castelo_vidro: {
+    c: { c: '#4fc3f7', C: '#b3e5fc', w: '#ffffff', d: '#0277bd' },
+    g: ['.c........c.', '.cc..cc..cc.', '.cC..CC..Cc.', '.cC.cCCc.Cc.', '.cCccCCccCc.', '.cCCCCCCCCc.', '.cCCwCCwCCc.', '.cCCCCCCCCc.', '.cCCCddCCCc.', '.cCCCddCCCc.', 'cccccccccccc', '............'],
+  },
+  ceu_estelar: {
+    c: { S: '#fff59d', s: '#b39ddb' },
+    g: ['.s.......s..', '....S.......', '...SSS...s..', '....S.......', '.s......S...', '.......SSS..', '..s.....S...', '.....s......', '.S.........s', 'SSS..s......', '.S......s...', '............'],
+  },
+  eclipse: {
+    c: { o: '#ffb74d', K: '#120c26' },
+    g: ['....oooo....', '..oo....oo..', '.o..KKKK..o.', '.o.KKKKKK.o.', 'o.KKKKKKKK.o', 'o.KKKKKKKK.o', 'o.KKKKKKKK.o', 'o.KKKKKKKK.o', '.o.KKKKKK.o.', '.o..KKKK..o.', '..oo....oo..', '....oooo....'],
+  },
+}
+
+/** Um ícone de bioma em (x, y), 24 x 24; `silhueta` pinta tudo de uma cor só. */
+function icone(nome: string, x: number, y: number, silhueta?: string): string {
+  const ic = ICONES[nome] ?? ICONES['floresta']
+  if (ic === undefined) {
+    return ''
+  }
+  let s = ''
+  ic.g.forEach((linha, j) => {
+    // pedaços seguidos da mesma cor viram um retângulo só
+    let i = 0
+    while (i < linha.length) {
+      const ch = linha[i] as string
+      let k = i
+      while (k < linha.length && linha[k] === ch) {
+        k++
+      }
+      if (ch !== '.') {
+        s += ret(x + i * 2, y + j * 2, (k - i) * 2, 2, silhueta ?? ic.c[ch] ?? '#ffffff')
+      }
+      i = k
+    }
+  })
+  return s
+}
+
+/** Os biomas na ordem da jornada, com as páginas de cada um (0 a 9). */
+function biomasDaJornada(): { nome: string; paginas: number[] }[] {
+  const lista: { nome: string; paginas: number[] }[] = []
+  for (let i = 0; i < 10; i++) {
+    const b = biomaDaPagina(i)
+    const ultimo = lista[lista.length - 1]
+    if (ultimo !== undefined && ultimo.nome === b) {
+      ultimo.paginas.push(i)
+    } else {
+      lista.push({ nome: b, paginas: [i] })
+    }
+  }
+  return lista
+}
+
+const MAPA_CW = 92
+const MAPA_PLACA = 32
+
+function mapa(j: Jogo, W: number): { corpo: string; H: number; alt: string } {
+  const biomas = biomasDaJornada()
+  // a página da vez (0 a 9) e se a jornada já deu a volta (Novo Jogo+: tudo visitado)
+  const agora = ((j.paginas % 10) + 10) % 10
+  const volta = j.paginas >= 10
+  const atual = biomas.findIndex(b => b.paginas.includes(agora))
+  const nomeB = (b: string) => tx(`chefao.biomas.${b}`)
+  const aqui = nomeB(biomas[atual]?.nome ?? 'floresta')
+  const cab = cabecalho(W, tx('livro.mapa.titulo'), tx(volta ? 'livro.mapa.sub_todos' : 'livro.mapa.sub', { pagina: agora + 1, bioma: aqui }))
+  let s = cab.svg
+  const cols = Math.max(1, Math.min(5, Math.floor((W - 16) / MAPA_CW)))
+  const x0 = Math.floor((W - cols * MAPA_CW) / 2)
+  const nomes = biomas.map(b => quebrar(nomeB(b.nome), MAPA_CW - 6))
+  const linhasNome = Math.max(1, ...nomes.map(n => n.length))
+  const CH = MAPA_PLACA + 14 + LH() * (linhasNome + 1) + 12
+  // centro da placa de cada bioma: as linhas vão e voltam (zigue-zague)
+  const centro = (k: number) => {
+    const lin = Math.floor(k / cols)
+    const col = lin % 2 === 0 ? k % cols : cols - 1 - (k % cols)
+    return { x: x0 + col * MAPA_CW + MAPA_CW / 2, y: cab.y + 10 + lin * CH + MAPA_PLACA / 2 }
+  }
+  const visitado = (k: number) => volta || k <= atual
+  // o caminho: tracinhos entre as placas, dourados até onde a Lua chegou
+  for (let k = 0; k + 1 < biomas.length; k++) {
+    const a = centro(k)
+    const b = centro(k + 1)
+    const cor = visitado(k + 1) ? '#c9a46a' : LINHA
+    if (a.y === b.y) {
+      const de = Math.min(a.x, b.x) + MAPA_PLACA / 2 + 4
+      const ate = Math.max(a.x, b.x) - MAPA_PLACA / 2 - 4
+      for (let x = de; x + 4 <= ate; x += 8) {
+        s += ret(x, a.y - 1, 4, 2, cor)
+      }
+    } else {
+      // na ponta da linha: desce pela lateral da placa
+      const lado = a.x + (a.x > W / 2 ? MAPA_PLACA / 2 + 6 : -MAPA_PLACA / 2 - 8)
+      for (let y = a.y; y + 4 <= b.y; y += 8) {
+        s += ret(lado, y, 2, 4, cor)
+      }
+    }
+  }
+  biomas.forEach((b, k) => {
+    const c = centro(k)
+    const px = c.x - MAPA_PLACA / 2
+    const py = c.y - MAPA_PLACA / 2
+    const viu = visitado(k)
+    const borda = k === atual ? OURO : viu ? '#c9a46a' : LINHA
+    // a placa com os cantos cortados em pixel
+    s += ret(px + 2, py, MAPA_PLACA - 4, MAPA_PLACA, borda) + ret(px, py + 2, MAPA_PLACA, MAPA_PLACA - 4, borda) + ret(px + 2, py + 2, MAPA_PLACA - 4, MAPA_PLACA - 4, '#2a2050')
+    s += icone(b.nome, px + 4, py + 4, viu ? undefined : '#3a2f63')
+    if (!viu) {
+      s += titulo(c.x, c.y + 6, '?', 16, ' m')
+    }
+    if (k === atual) {
+      // a Lua está aqui: uma luazinha dourada sobre a placa
+      // (crescente de 9 x 9, com a ponta de cima e a de baixo afinando)
+      const lua = ['..ooo....', '.oooo....', 'oooo.....', 'ooo......', 'ooo......', 'ooo......', 'oooo.....', '.oooo....', '..ooo....']
+      lua.forEach((l, jj) => {
+        const a = l.indexOf('o')
+        const b = l.lastIndexOf('o')
+        s += ret(c.x - 4 + a, py - 13 + jj, b - a + 1, 1, jj === 0 || jj === 8 ? '#f2c14e' : OURO)
+      })
+    }
+    let y = py + MAPA_PLACA + 14
+    for (const l of viu ? (nomes[k] ?? []) : ['???']) {
+      s += texto(c.x, y, l, ' m', viu ? OURO : '#8f80b8')
+      y += LH()
+    }
+    const pg = b.paginas
+    const de = (pg[0] ?? 0) + 1
+    const ate = (pg[pg.length - 1] ?? 0) + 1
+    s += texto(c.x, y, de === ate ? tx('livro.bestiario.pagina', { n: de }) : tx('livro.mapa.paginas', { de, ate }), ' m', '#8f80b8')
+  })
+  const linhas = Math.ceil(biomas.length / cols)
+  const H = cab.y + 10 + linhas * CH
+  const vistos = biomas.filter((_, k) => visitado(k)).length
+  return { corpo: s, H, alt: tx('livro.mapa.alt', { visitados: vistos, bioma: aqui }) }
+}
+
 // ---------------------------------------------------------------- Troféus
 
 export const NOME_TROFEU = {} as Record<TipoTrofeu, string>
@@ -349,7 +518,9 @@ export function paginaDoLivro(aba: AbaDoLivro, j: Jogo, W0: number, escala: numb
   const W = Math.max(LARGURA_MIN, Math.floor(W0))
   const d = new Doc()
   let p: { corpo: string; H: number; alt: string; alvos?: Alvo[] }
-  if (aba === 'bestiario') {
+  if (aba === 'mapa') {
+    p = mapa(j, W)
+  } else if (aba === 'bestiario') {
     p = bestiario(d, j, W)
   } else if (aba === 'trofeus') {
     p = trofeus(d, j, W)

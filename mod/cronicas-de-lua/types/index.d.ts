@@ -120,7 +120,7 @@ export type Jogo = {
 }
 
 /** As abas do Livro da Lua. */
-export type AbaDoLivro = 'ficha' | 'bestiario' | 'trofeus' | 'grimorio'
+export type AbaDoLivro = 'ficha' | 'mapa' | 'bestiario' | 'trofeus' | 'grimorio'
 
 export type Hud = {
   luz: Luz | null

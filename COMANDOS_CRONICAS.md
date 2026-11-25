@@ -94,7 +94,7 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | 🏮 **Vigília** (🔥 acesa) | Começa **apagada**. Clicando, acende (a chama tremula, toca um som e aparece o aviso do custo). Acesa, quando o luar está pra acabar (5 min antes no cache de 1 h; 1 min antes no de 5 min) e o Claude está parado, a Lua manda uma mensagem curtinha pra manter o cache quente; a lanterna pisca e toca o som. **No máximo 6 mensagens** por vez que é acesa; depois ela apaga sozinha e avisa (com outro som). Clique de novo pra apagar. ⚠️ Cada mensagem gasta um pouco do limite do plano. Vale só pra conversa atual. |
 | 🎒 **Mochila** | Arruma a conversa (compacta o contexto, como o `/compact`). Pede confirmação embaixo da cena: **Arrumar a mochila** ou **Agora não**. Fica cheia (ícone e barra tremendo) acima de 80%. Só funciona com o Claude parado. |
 | 🚩 **Estandarte** | Pede ao Claude o **resumo da missão** pra continuar numa sessão nova (o `PROXIMA_SESSAO.md`). A bandeira ondula enquanto ele escreve; no fim, aparece **🌙 Nova conversa** (ou **Fechar**). Só funciona com o Claude parado. |
-| 📖 **Livro** | Abre e fecha o painel do Livro, ao lado da conversa, com 4 abas: **Ficha** (a Lua, nível, XP, lutas, chefões, troféus e as páginas das Crônicas), **Bestiário** (os 10 chefões; os que ainda não caíram ficam em silhueta), **Troféus** (a estante com os troféus dos elites; passe o mouse para ler o nome do erro) e **Grimório** (as ferramentas do Claude como feitiços, com quantas vezes cada uma foi usada). |
+| 📖 **Livro** | Abre e fecha o painel do Livro, ao lado da conversa, com 5 abas: **Ficha** (a Lua, nível, XP, lutas, chefões, troféus e as páginas das Crônicas), **Mapa** (o mapa da jornada: os 9 biomas num caminho, os visitados em cor, e uma lua onde a Lua está), **Bestiário** (os 10 chefões; os que ainda não caíram ficam em silhueta), **Troféus** (a estante com os troféus dos elites; passe o mouse para ler o nome do erro) e **Grimório** (as ferramentas do Claude como feitiços, com quantas vezes cada uma foi usada). |
 
 ## 🔘 Botões abaixo da cena
 
@@ -104,4 +104,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 25/11/2026 (`/cronicas golpe` agora mostra a luta inteira).*
+*Última atualização: 25/11/2026 (aba Mapa da jornada no Livro).*

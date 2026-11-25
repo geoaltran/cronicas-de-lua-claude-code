@@ -140,6 +140,7 @@
     "alt": "Luas Buch. {alt}",
     "abas": {
       "ficha": "Werte",
+      "mapa": "Karte",
       "bestiario": "Bestiarium",
       "trofeus": "Trophäen",
       "grimorio": "Grimoire"
@@ -162,6 +163,13 @@
       "paginas": "Seiten der Chroniken: {ciclo}/10",
       "paginas_novo_jogo": "Seiten der Chroniken: {ciclo}/10 (Neues Spiel+)",
       "alt": "Luas Werte: Stufe {nivel}, {xp} XP, gewonnene Kämpfe: {lutas}, besiegte Bosse: {chefoes}, Trophäen: {trofeus}, Seiten {ciclo}/10."
+    },
+    "mapa": {
+      "titulo": "Reisekarte",
+      "sub": "Seite {pagina} von 10 · {bioma}",
+      "sub_todos": "Alle Biome besucht · Seite {pagina} · {bioma}",
+      "paginas": "Seiten {de}–{ate}",
+      "alt": "Reisekarte: {visitados} von 9 Biomen besucht; Lua ist hier: {bioma}."
     },
     "bestiario": {
       "titulo": "Bestiarium",

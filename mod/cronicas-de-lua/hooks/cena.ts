@@ -259,6 +259,11 @@ export function biomaDe(v: Pick<Vista, 'bioma' | 'chefao' | 'agora' | 'hud'>): s
   return BIOMAS.do_chefao[nome] ?? 'floresta'
 }
 
+/** O bioma de uma página da jornada (0 = a primeira, Vespera). */
+export function biomaDaPagina(i: number): string {
+  return BIOMAS.do_chefao[proximoChefao(i).nome] ?? 'floresta'
+}
+
 /** Se o alto da cena é escuro (noite): textos por cima dele vão claros. */
 export function ceuEscuro(bioma: string): boolean {
   return BIOMAS.biomas[bioma]?.ceu_escuro ?? false

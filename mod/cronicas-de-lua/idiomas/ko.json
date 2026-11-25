@@ -140,6 +140,7 @@
     "alt": "Lua의 책. {alt}",
     "abas": {
       "ficha": "능력치",
+      "mapa": "지도",
       "bestiario": "도감",
       "trofeus": "트로피",
       "grimorio": "마법서"
@@ -162,6 +163,13 @@
       "paginas": "연대기 페이지: {ciclo}/10",
       "paginas_novo_jogo": "연대기 페이지: {ciclo}/10 (뉴 게임+)",
       "alt": "Lua의 능력치: 레벨 {nivel}, {xp} XP, 승리 {lutas}번, 물리친 보스 {chefoes}, 트로피 {trofeus}, 페이지 {ciclo}/10."
+    },
+    "mapa": {
+      "titulo": "여정 지도",
+      "sub": "10페이지 중 {pagina}페이지 · {bioma}",
+      "sub_todos": "모든 지역 방문 완료 · {pagina}페이지 · {bioma}",
+      "paginas": "{de}–{ate}페이지",
+      "alt": "여정 지도: 9곳 중 {visitados}곳 방문; Lua의 현재 위치: {bioma}."
     },
     "bestiario": {
       "titulo": "도감",

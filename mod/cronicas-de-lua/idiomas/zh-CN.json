@@ -140,6 +140,7 @@
     "alt": "Lua 之书。{alt}",
     "abas": {
       "ficha": "角色卡",
+      "mapa": "地图",
       "bestiario": "图鉴",
       "trofeus": "奖杯",
       "grimorio": "魔导书"
@@ -162,6 +163,13 @@
       "paginas": "编年史书页：{ciclo}/10",
       "paginas_novo_jogo": "编年史书页：{ciclo}/10（新游戏+）",
       "alt": "Lua 的角色卡：{nivel} 级，{xp} XP，胜利 {lutas} 场，击败 Boss {chefoes} 个，奖杯 {trofeus} 个，书页 {ciclo}/10。"
+    },
+    "mapa": {
+      "titulo": "旅程地图",
+      "sub": "第{pagina}页（共10页）· {bioma}",
+      "sub_todos": "所有地域都已到访 · 第{pagina}页 · {bioma}",
+      "paginas": "第{de}–{ate}页",
+      "alt": "旅程地图：已到访{visitados}/9个地域；Lua现在在：{bioma}。"
     },
     "bestiario": {
       "titulo": "图鉴",

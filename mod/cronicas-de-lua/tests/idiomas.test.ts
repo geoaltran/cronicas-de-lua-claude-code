@@ -28,7 +28,7 @@ test('todo texto do padrão existe e os nomes montados por código têm chave', 
     expect(f.nome.startsWith('livro.')).toBe(false)
     expect(f.desc.startsWith('livro.')).toBe(false)
   }
-  expect(ABAS.map(a => a.nome)).toEqual(['Ficha', 'Bestiário', 'Troféus', 'Grimório'])
+  expect(ABAS.map(a => a.nome)).toEqual(['Ficha', 'Mapa', 'Bestiário', 'Troféus', 'Grimório'])
 })
 
 const CMD = { origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } } as const

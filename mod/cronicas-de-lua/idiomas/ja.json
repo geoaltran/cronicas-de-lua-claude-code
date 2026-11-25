@@ -140,6 +140,7 @@
     "alt": "Lua の本。{alt}",
     "abas": {
       "ficha": "ステータス",
+      "mapa": "地図",
       "bestiario": "図鑑",
       "trofeus": "トロフィー",
       "grimorio": "魔導書"
@@ -162,6 +163,13 @@
       "paginas": "クロニクルのページ：{ciclo}/10",
       "paginas_novo_jogo": "クロニクルのページ：{ciclo}/10（強くてニューゲーム）",
       "alt": "Lua のステータス：レベル {nivel}、{xp} XP、勝利 {lutas} 回、倒したボス {chefoes}、トロフィー {trofeus}、ページ {ciclo}/10。"
+    },
+    "mapa": {
+      "titulo": "旅の地図",
+      "sub": "10ページ中{pagina}ページ目 · {bioma}",
+      "sub_todos": "すべての地方を訪れた · {pagina}ページ目 · {bioma}",
+      "paginas": "{de}–{ate}ページ",
+      "alt": "旅の地図：9か所中{visitados}か所を訪問。Luaの現在地：{bioma}。"
     },
     "bestiario": {
       "titulo": "図鑑",

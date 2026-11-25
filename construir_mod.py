@@ -444,7 +444,7 @@ FUSION = {"zh-CN": "zh_hans", "ja": "ja", "ko": "ko"}
 ASCII = LETRAS  # ASCII e os acentos latinos (nomes de erro no troféu, Nébula)
 CENA_CHAVES = re.compile(r"^(chefoes|chefao|luta)\.|^barras\.[a-z]+\.(nome|nome_cheia|curto|minutos|lua_nova)$")
 BALOES_CHAVES = re.compile(r"^(barras|botoes|lua_nova|chefoes)\.")
-LIVRO_CHAVES = re.compile(r"^(livro|chefoes|luta)\.")
+LIVRO_CHAVES = re.compile(r"^(livro|chefoes|luta)\.|^chefao\.biomas\.")
 
 
 def _achatar(obj, prefixo=""):
