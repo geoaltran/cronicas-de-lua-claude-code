@@ -799,6 +799,81 @@ function brasasNasPontas(d: Doc, pontas: readonly (readonly [number, number])[],
   return s
 }
 
+/**
+ * Castelo de Vidro (fase B, prévia `estrelinhas` de `vidro_brilho`): brilhos
+ * de 4 pontas acendendo de vez em quando nos cristais, em pixels claros do
+ * próprio cristal (sorteados na prévia: 2 por cristal). Cruz que cresce e
+ * volta (braço 0, 1, 3, 1, um quadro a cada 110 ms) e some até o próximo
+ * ciclo de ~4 s; miolo branco, braços azul-claro e contorno azul para
+ * aparecer no vidro. Pontos no meio.png (já com o descer_cena) e nas ilhas.
+ */
+const ESTRELINHAS: Record<string, { meio: readonly (readonly [number, number])[]; ilhas: readonly (readonly (readonly [number, number])[])[] }> = {
+  castelo_vidro: {
+    meio: [[64, 111], [410, 122], [410, 110], [183, 148], [292, 167], [299, 165], [194, 167], [279, 169]],
+    ilhas: [[[7, 6], [11, 26]], [[6, 12], [11, 4]]],
+  },
+}
+const estrelinhaDefs = new WeakMap<Doc, string[]>()
+
+/** As 3 cruzes (braço 0, 1 e 3) desenhadas uma vez, centradas no pixel (0, 0). */
+function cruzesDeBrilho(d: Doc): string[] {
+  let ids = estrelinhaDefs.get(d)
+  if (ids !== undefined) {
+    return ids
+  }
+  ids = []
+  for (const braco of [0, 1, 3]) {
+    const cel = new Map<string, number>() // 1 contorno, 2 braço, 3 miolo
+    for (let k = -braco; k <= braco; k++) {
+      cel.set(`${k},0`, 2)
+      cel.set(`0,${k}`, 2)
+    }
+    cel.set('0,0', 3)
+    if (braco >= 2) {
+      for (const c of ['1,0', '-1,0', '0,1', '0,-1']) {
+        cel.set(c, 3)
+      }
+    }
+    for (const c of [...cel.keys()]) {
+      const [x, y] = c.split(',').map(Number) as [number, number]
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const v = `${x + dx},${y + dy}`
+        if (!cel.has(v)) {
+          cel.set(v, 1)
+        }
+      }
+    }
+    const cor = ['', '#6096dc', '#c8ebff', '#ffffff']
+    let g = ''
+    for (const nivel of [1, 2, 3]) {
+      let dd = ''
+      for (const [c, v] of cel) {
+        if (v === nivel) {
+          const [x, y] = c.split(',').map(Number) as [number, number]
+          dd += `M${x} ${y}h1v1h-1z`
+        }
+      }
+      g += `<path d='${dd}' fill='${cor[nivel]}'/>`
+    }
+    const id = d.id('eb')
+    d.defs.push(`<g id='${id}'>${g}</g>`)
+    ids.push(id)
+  }
+  estrelinhaDefs.set(d, ids)
+  return ids
+}
+
+function estrelinha(d: Doc, x: number, y: number, agora: number, fase: number): string {
+  const [b0, b1, b3] = cruzesDeBrilho(d)
+  const ms = 36 * 110
+  const p = (n: number) => ((n * 100) / 36).toFixed(2)
+  const atraso = -mod(agora + fase * 110, ms)
+  const k0 = d.anim(`0%{opacity:1}${p(1)}%{opacity:0}100%{opacity:0}`, ms, 'step-end', atraso, 'infinite')
+  const k1 = d.anim(`0%{opacity:0}${p(1)}%{opacity:1}${p(2)}%{opacity:0}${p(3)}%{opacity:1}${p(4)}%{opacity:0}100%{opacity:0}`, ms, 'step-end', atraso, 'infinite')
+  const k3 = d.anim(`0%{opacity:0}${p(2)}%{opacity:1}${p(3)}%{opacity:0}100%{opacity:0}`, ms, 'step-end', atraso, 'infinite')
+  return `<g transform='translate(${x},${y})'><use href='#${b0}' class='${k0}' opacity='0'/><use href='#${b1}' class='${k1}' opacity='0'/><use href='#${b3}' class='${k3}' opacity='0'/></g>`
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -1029,7 +1104,12 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
     const lt = LANTERNAS[nome]?.[k]
     for (const dx of [0, P]) {
       const halo = lt === undefined || v.economia === true ? '' : haloDaLanterna(d, base + dx + lt[0], ilha.y - fT + lt[1], k, agora)
-      ilhas += d.balanco(`<use href="${u}" x="${base + dx}" y="${ilha.y - fT}"/>${halo}`, b.balanco, 3100, k * 1400, agora)
+      // estrelinhas nos cristais flutuando (Castelo): balançam com a ilha
+      const brilhos =
+        v.economia === true
+          ? ''
+          : (ESTRELINHAS[nome]?.ilhas[k] ?? []).map(([ex, ey], j) => estrelinha(d, base + dx + ex, ilha.y - fT + ey, agora, 7 + k * 13 + j * 17)).join('')
+      ilhas += d.balanco(`<use href="${u}" x="${base + dx}" y="${ilha.y - fT}"/>${halo}${brilhos}`, b.balanco, 3100, k * 1400, agora)
     }
   })
   const camIlhas = d.rolo(ilhas, dist * b.ilhas_vel, andando ? VEL * b.ilhas_vel : 0, para)
@@ -1086,6 +1166,12 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // reflexo correndo no vidro (Castelo), rola com o meio; nada na economia
   if (md !== undefined && VIDRO[nome] !== undefined && v.economia !== true) {
     partes.push(rolo(reflexoNoVidro(d, nome, topo, agora), md.vel))
+  }
+  // estrelinhas nos cristais do meio (Castelo), rolam com ele; nada na economia
+  const est = ESTRELINHAS[nome]
+  if (md !== undefined && est !== undefined && v.economia !== true) {
+    const rnd = sorteio(47)
+    partes.push(rolo(metadeEspelhada(d, est.meio.map(([x, y]) => estrelinha(d, x, y - topo, agora, Math.floor(rnd() * 36))).join('')), md.vel))
   }
   // vapor nas chaminés (rola com o meio; menos na luta, nenhum na economia)
   if (md !== undefined && CHAMINES[nome] !== undefined && v.economia !== true) {
