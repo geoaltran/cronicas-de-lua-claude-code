@@ -49,14 +49,23 @@ test('todo bioma cabe no limite do app nas cenas mais pesadas', () => {
       for (const e of estados) {
         const vista = { agora: T, W, escala: 2, modo: 'compacto', caminho: parada, hud: hud(2), botoes: true, bioma, ...e } as Parameters<typeof montar>[0]
         const { svg, fundo, frente } = montar(vista)
-        // o Svg único (editor, celular, modo quadro): se passar, o mod refaz em
-        // economia (sem partículas), como no register; esse tem de caber
-        const unico = svg.length < 129000 ? svg : montar({ ...vista, economia: true }).svg
+        // o Svg único (editor, celular, modo quadro): se passar, o mod refaz com
+        // os mesmos cortes do register (economia, sem assinatura, leve); algum cabe
+        const cortes = [{ economia: true }, { economia: true, semAssinatura: true }, { economia: true, semAssinatura: true, textoLongo: false, semBaloes: true, semFonteLonga: true }]
+        let unico = svg
+        for (const c of cortes) {
+          if (unico.length < 129000) {
+            break
+          }
+          unico = montar({ ...vista, ...c } as Parameters<typeof montar>[0]).svg
+        }
         expect(unico.length).toBeLessThan(129000)
         expect(svg).toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
-        // desktop: cenário e frente em dois Svg, cada um bem abaixo do teto codificado (~124 mil)
-        expect(tamanhoNoApp(fundo)).toBeLessThan(99000)
-        expect(tamanhoNoApp(frente)).toBeLessThan(99000)
+        // desktop: cenário e frente em dois Svg, cada um abaixo do teto codificado
+        // (~124 mil; recusa de ~127 mil para cima), com 14 mil de folga. A Torre
+        // é a mais pesada (~100 mil com vapor, ponteiros e lanternas)
+        expect(tamanhoNoApp(fundo)).toBeLessThan(110000)
+        expect(tamanhoNoApp(frente)).toBeLessThan(110000)
         expect(fundo).toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
         expect(frente).not.toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
       }

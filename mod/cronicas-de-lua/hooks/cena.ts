@@ -260,13 +260,21 @@ const PARTICULAS_BIOMA: Record<string, ParticulaBioma> = {
  * dourado cruza o alto da cena, descendo para a esquerda, e some. Parado na
  * tela (o céu não rola). Cada uma tem o seu ciclo; o resto do tempo, nada.
  */
-function estrelasCadentes(d: Doc, W: number, agora: number, quantas: number): string {
+function estrelasCadentes(d: Doc, W: number, agora: number, quantas: number, lua?: readonly [number, number, number, number]): string {
   const rnd = sorteio(29)
   let s = ''
   for (let i = 0; i < quantas; i++) {
     const dur = 7000 + Math.floor(rnd() * 6000)
-    const x = 60 + Math.floor(rnd() * Math.max(40, W - 120))
+    let x = 60 + Math.floor(rnd() * Math.max(40, W - 120))
     const y = 4 + Math.floor(rnd() * 22)
+    // o risco vai de (x, y) até (x - 56, y + 28), com o rastro 10 px à direita:
+    // se passar pela lua (com 4 px de folga), nasce do lado dela
+    if (lua !== undefined) {
+      const [lx0, ly0, lx1, ly1] = lua
+      if (x + 10 >= lx0 - 4 && x - 56 <= lx1 + 4 && y + 28 >= ly0 - 4 && y - 4 <= ly1 + 4) {
+        x = lx1 + 64 <= W - 10 ? lx1 + 64 : Math.max(60, lx0 - 18)
+      }
+    }
     const fase = Math.floor(rnd() * dur)
     const voa = 0.09 // fração do ciclo em que ela cruza (~0,6 a 1,2 s)
     // cabeça branca e o rastro subindo para a direita, cada vez mais apagado
@@ -283,6 +291,21 @@ function estrelasCadentes(d: Doc, W: number, agora: number, quantas: number): st
     s += `<g class="${k}" opacity="0">${rastro}</g>`
   }
   return s
+}
+
+/**
+ * A caixa da lua no fundo.png de cada bioma (x, y, largura, altura; do
+ * `lua_ceu` dos cenario.json): as estrelas cadentes não passam por cima dela.
+ */
+const LUA_CEU: Record<string, readonly [number, number, number, number]> = {
+  aurora: [461, 24, 38, 36],
+  castelo_vidro: [455, 8, 50, 48],
+  ceu_estelar: [453, 22, 56, 56],
+  eclipse: [451, 18, 62, 64],
+  mar: [437, 18, 88, 84],
+  ruinas: [455, 18, 52, 52],
+  torre: [347, 20, 38, 38],
+  vulcao: [455, 26, 50, 48],
 }
 
 /**
@@ -303,8 +326,9 @@ function coroaDoEclipse(d: Doc, cx: number, cy: number, raio: number, agora: num
  * que sobem com o vento e somem; rolam junto com o meio.
  */
 const CHAMINES: Record<string, readonly (readonly [number, number])[]> = {
-  // (as grandes dos prédios com relógio e as menores das casas; conferidas sobre o meio.png)
-  torre: [[47, 86], [440, 78], [516, 81], [910, 86], [141, 154], [331, 138], [381, 147], [575, 148], [625, 138], [816, 153]],
+  // 6 chaminés (usuário, 25/11/2026): as 3 da prévia (46,86), (331,139), (440,78)
+  // e mais 3 que equilibram a outra metade; conferidas sobre o meio.png
+  torre: [[47, 86], [331, 138], [440, 78], [516, 81], [625, 138], [910, 86]],
 }
 
 function vapor(d: Doc, nome: string, dy: number, agora: number, porChamine: number): string {
@@ -333,10 +357,56 @@ function vapor(d: Doc, nome: string, dy: number, agora: number, porChamine: numb
       }
       const id = d.id('vp')
       const k = d.anim(quadros, ms, 'steps(17)', -mod(agora + (g * ms) / TURMAS / porChamine + (j * ms) / porChamine, ms), 'infinite')
-      s += `<g class="${k}" opacity="0" fill="#b8c0d4"><g id="${id}">${tufos}</g><use href="#${id}" x="${P}"/></g>`
+      // os dois tons da fumaça da prévia (199,207,234) e (143,162,192), uma turma de cada
+      s += `<g class="${k}" opacity="0" fill="${g % 2 === 0 ? '#c7cfea' : '#8fa2c0'}"><g id="${id}">${tufos}</g><use href="#${id}" x="${P}"/></g>`
     }
   }
   return s
+}
+
+/**
+ * Halo do sol pulsando (fase B, como na prévia do cenario_bioma.py, "sol_brilho"):
+ * centro (x no fundo.png largo, y da arte) e raio do disco. Três anéis de luz
+ * por cima do sol, cada um no seu ritmo.
+ */
+const SOL: Record<string, readonly [number, number, number]> = {
+  // (382, 140, 38) na arte de 479 px + a margem do fundo largo (241)
+  aurora: [623, 140, 38],
+}
+
+function haloDoSol(d: Doc, nome: string, x0: number, topo: number, agora: number): string {
+  const sol = SOL[nome]
+  if (sol === undefined) {
+    return ''
+  }
+  const [sx, sy, sr] = sol
+  const cx = sx - x0
+  const cy = sy - topo
+  return (
+    // (mais forte que na prévia: no app, no céu amarelo, a luz fraca sumia; usuário, 25/11/2026)
+    [[24, 0.22, 4200], [15, 0.3, 5300], [7, 0.4, 6100]] as const
+  )
+    .map(([dr, a, ms], i) => {
+      const k = d.anim(`0%{opacity:${(a * 0.25).toFixed(3)}}50%{opacity:${a.toFixed(3)}}100%{opacity:${(a * 0.25).toFixed(3)}}`, ms, 'ease-in-out', -mod(agora + i * 1400, ms), 'infinite')
+      return `<circle class="${k}" cx="${cx}" cy="${cy}" r="${sr + dr}" fill="#fffbe6" opacity="${a}"/>`
+    })
+    .join('')
+}
+
+/**
+ * A lanterna de cada ilha flutuante com halo pulsando (fase B, prévia
+ * "lanternas_ilhas"): onde ela fica no sprite da ilha (os pixels da cor
+ * 249,222,171). O halo vai dentro do balanço da ilha.
+ */
+const LANTERNAS: Record<string, readonly (readonly [number, number])[]> = {
+  torre: [[62, 11], [61, 11]],
+}
+
+function haloDaLanterna(d: Doc, x: number, y: number, k: number, agora: number): string {
+  const ms = 3300
+  // (mais forte que na prévia: luz fraca some na faixa do app)
+  const c = d.anim('0%{opacity:0.3}50%{opacity:1}100%{opacity:0.3}', ms, 'ease-in-out', -mod(agora + k * 1100, ms), 'infinite')
+  return `<g class="${c}">${([[9, 0.16], [6, 0.26], [4, 0.4]] as const).map(([rr, a]) => `<circle cx="${x}" cy="${y}" r="${rr}" fill="#ffd68c" opacity="${a}"/>`).join('')}</g>`
 }
 
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
@@ -491,6 +561,7 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // 1. fundo parado (céu, lua, o que fica longe de verdade): o centro e, dos
   // lados, tiras do próprio centro (o vai-e-volta do fundo largo)
   partes.push(fundoBioma(d, b, pre, x0, W, b.fundo_oy - fT))
+  partes.push(haloDoSol(d, nome, x0, topo, agora))
   if (b.lua !== undefined) {
     const ec = b.lua.eclipse
     if (ec !== undefined) {
@@ -511,7 +582,9 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   }
   // estrelas cadentes nos céus escuros (menos na luta, nenhuma na economia)
   if (b.ceu_escuro && v.economia !== true) {
-    partes.push(estrelasCadentes(d, W, agora, v.luta !== undefined ? 1 : 2))
+    const lc = LUA_CEU[nome]
+    const caixa = lc === undefined ? undefined : ([lc[0] - x0, lc[1] - fT, lc[0] + lc[2] - x0, lc[1] + lc[3] - fT] as const)
+    partes.push(estrelasCadentes(d, W, agora, v.luta !== undefined ? 1 : 2, caixa))
   }
   // marco: parado, de pé no horizonte (farol, vulcão)
   if (b.marco !== undefined) {
@@ -529,15 +602,17 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
     partes.push(`<use href="${d.img(pre + 'torre')}" x="${b.torre.x - x0}" y="${b.torre.y - fT}"/>`)
   }
   if (b.relogio !== undefined) {
-    partes.push(ponteiros(b.relogio, b.relogio.centro[0] - x0, b.relogio.centro[1] - fT))
+    partes.push(ponteiros(d, b.relogio, b.relogio.centro[0] - x0, b.relogio.centro[1] - fT, agora))
   }
   // 3. ilhas flutuantes: parallax + balanço
   let ilhas = ''
   b.ilhas.forEach((ilha, k) => {
     const base = mod(ilha.x - x0, P)
     const u = d.img(`${pre}ilha_${k + 1}`)
+    const lt = LANTERNAS[nome]?.[k]
     for (const dx of [0, P]) {
-      ilhas += d.balanco(`<use href="${u}" x="${base + dx}" y="${ilha.y - fT}"/>`, b.balanco, 3100, k * 1400, agora)
+      const halo = lt === undefined || v.economia === true ? '' : haloDaLanterna(d, base + dx + lt[0], ilha.y - fT + lt[1], k, agora)
+      ilhas += d.balanco(`<use href="${u}" x="${base + dx}" y="${ilha.y - fT}"/>${halo}`, b.balanco, 3100, k * 1400, agora)
     }
   })
   const camIlhas = d.rolo(ilhas, dist * b.ilhas_vel, andando ? VEL * b.ilhas_vel : 0, para)
@@ -619,13 +694,22 @@ function fundoBioma(d: Doc, b: Bioma, pre: string, x0: number, W: number, y: num
 }
 
 /** Ponteiros do relógio da torre (10h10 por enquanto; girar fica para as animações de detalhe). */
-function ponteiros(rel: NonNullable<Bioma['relogio']>, cx: number, cy: number): string {
+/**
+ * Os ponteiros do relógio da torre andando (fase B, como na prévia: "relógio
+ * mágico do Relojoeiro", o tempo corre rápido): o minuto anda um tique de 6°
+ * a cada 330 ms (uma volta em ~20 s); a hora, 1/12 disso.
+ */
+const TIQUE_MS = 330
+
+function ponteiros(d: Doc, rel: NonNullable<Bioma['relogio']>, cx: number, cy: number, agora: number): string {
   const cor = `rgb(${rel.cor.join(',')})`
-  const linha = (graus: number, comp: number) => {
-    const a = (graus * Math.PI) / 180
-    return `<line x1="${cx + 0.5}" y1="${cy + 0.5}" x2="${(cx + 0.5 + Math.sin(a) * comp).toFixed(1)}" y2="${(cy + 0.5 - Math.cos(a) * comp).toFixed(1)}" stroke="${cor}" stroke-width="1"/>`
+  const ox = cx + 0.5
+  const oy = cy + 0.5
+  const ponteiro = (de: number, comp: number, volta: number, passos: number) => {
+    const k = d.anim(`from{transform:rotate(${de}deg)}to{transform:rotate(${de + 360}deg)}`, volta, `steps(${passos})`, -mod(agora, volta), 'infinite')
+    return `<line class="${k}" style="transform-origin:${ox}px ${oy}px" x1="${ox}" y1="${oy}" x2="${ox}" y2="${oy - comp}" stroke="${cor}" stroke-width="1"/>`
   }
-  return linha(300, rel.hora) + linha(60, rel.minuto) + `<rect x="${cx}" y="${cy}" width="1" height="1" fill="${cor}"/>`
+  return ponteiro(300, rel.hora, TIQUE_MS * 720, 720) + ponteiro(0, rel.minuto, TIQUE_MS * 60, 60) + `<rect x="${cx}" y="${cy}" width="1" height="1" fill="${cor}"/>`
 }
 
 function cenario(d: Doc, v: Vista, dist: number, soCeu = false): string {
