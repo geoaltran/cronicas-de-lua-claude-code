@@ -83,7 +83,13 @@ export function chefaoPeloNome(texto: string): string | undefined {
   if (q === '') {
     return undefined
   }
-  return JORNADA.find(n => limpa(n).startsWith(q) || limpa(NOME_CHEFAO[n] ?? '').startsWith(q))
+  // o começo do nome inteiro; senão, o começo de qualquer palavra dele com 3
+  // letras ou mais ("solis" acha o Sir Solis, "espelho" o Rei Espelho)
+  const palavras = (n: string) => [...n.split('_'), ...(NOME_CHEFAO[n] ?? '').split(/[\s-]+/)].map(limpa).filter(p => p.length >= 3)
+  return (
+    JORNADA.find(n => limpa(n).startsWith(q) || limpa(NOME_CHEFAO[n] ?? '').startsWith(q)) ??
+    (q.length >= 3 ? JORNADA.find(n => palavras(n).some(p => p.startsWith(q))) : undefined)
+  )
 }
 
 /** Páginas no ciclo atual (10/10 fica até a primeira página do Novo Jogo+). */

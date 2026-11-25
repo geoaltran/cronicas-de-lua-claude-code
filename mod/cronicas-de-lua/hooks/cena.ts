@@ -297,6 +297,48 @@ function coroaDoEclipse(d: Doc, cx: number, cy: number, raio: number, agora: num
   return anel(raio + 2, 2, '#ffd08a', 0.25, 0.75, 2600, 0) + anel(raio + 5, 2, '#ff9e57', 0.1, 0.45, 3400, 900)
 }
 
+/**
+ * Vapor nas chaminés (fase B): o topo de cada chaminé no meio.png do bioma
+ * (x, y; medidos pelos picos estreitos da silhueta). Cada uma solta baforadas
+ * que sobem com o vento e somem; rolam junto com o meio.
+ */
+const CHAMINES: Record<string, readonly (readonly [number, number])[]> = {
+  // (as grandes dos prédios com relógio e as menores das casas; conferidas sobre o meio.png)
+  torre: [[47, 86], [440, 78], [516, 81], [910, 86], [141, 154], [331, 138], [381, 147], [575, 148], [625, 138], [816, 153]],
+}
+
+function vapor(d: Doc, nome: string, dy: number, agora: number, porChamine: number): string {
+  const lista = CHAMINES[nome]
+  if (lista === undefined || porChamine <= 0) {
+    return ''
+  }
+  const ms = 2600
+  const quadros = '0%{transform:translate(0px,0px);opacity:0}15%{opacity:0.7}55%{transform:translate(3px,-9px);opacity:0.5}100%{transform:translate(7px,-17px);opacity:0}'
+  // (as chaminés se dividem em 3 turmas, cada turma com a sua fase: poucas
+  // animações e o tufo escrito uma vez, com a cópia da volta num <use>)
+  const TURMAS = 3
+  let s = ''
+  for (let j = 0; j < porChamine; j++) {
+    for (let g = 0; g < TURMAS; g++) {
+      let tufos = ''
+      lista.forEach(([cx, top], i) => {
+        if (i % TURMAS === g) {
+          const y = top + dy - 3
+          // um tufo de 4 x 4 com os cantos cortados, cinza-azulado
+          tufos += `<path d="M${cx - 1} ${y - 2}h2v1h1v2h-1v1h-2v-1h-1v-2h1z"/>`
+        }
+      })
+      if (tufos === '') {
+        continue
+      }
+      const id = d.id('vp')
+      const k = d.anim(quadros, ms, 'steps(17)', -mod(agora + (g * ms) / TURMAS / porChamine + (j * ms) / porChamine, ms), 'infinite')
+      s += `<g class="${k}" opacity="0" fill="#b8c0d4"><g id="${id}">${tufos}</g><use href="#${id}" x="${P}"/></g>`
+    }
+  }
+  return s
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -527,6 +569,11 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   const md = b.camadas.meio
   if (md !== undefined) {
     partes.push(rolo(camadaBioma(d, pre + 'meio', md, md.oy - topo, 2), md.vel))
+  }
+  // vapor nas chaminés (rola com o meio; menos na luta, nenhum na economia)
+  if (md !== undefined && CHAMINES[nome] !== undefined && v.economia !== true) {
+    // (as chaminés estão em y do meio.png inteiro, como o chão em 209: só tirar o topo da janela)
+    partes.push(rolo(vapor(d, nome, -topo, agora, v.luta !== undefined ? 1 : 2), md.vel))
   }
   // partículas do bioma: no ar, na altura do meio (rolam com ele); menos na luta
   const nPart = PARTICULAS_BIOMA[nome]?.n ?? 0
