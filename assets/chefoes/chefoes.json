@@ -117,17 +117,15 @@
   ]
  },
  "nebula": {
-  "arena": "nebula_05.png",
-  "espelhar": false,
+  "arena": "nebula_02.png",
+  "espelhar": true,
   "frente": "nebula_01.png",
-  "w": 158,
-  "h": 184,
+  "w": 114,
+  "h": 144,
   "vistas": [
    "nebula_01.png",
    "nebula_02.png",
-   "nebula_03.png",
-   "nebula_04.png",
-   "nebula_05.png"
+   "nebula_03.png"
   ]
  },
  "malakor": {

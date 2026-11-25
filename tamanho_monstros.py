@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 
 RAIZ = Path(__file__).parent
 A = RAIZ / "assets"
-AMPLIAR = {"vespera": 2, "ignis": 2, "leviata": 2, "golem_obsidiana": 2, "nebula": 2}  # malakor v3 e relojoeiro v4: sem ampliação
+AMPLIAR = {"vespera": 2, "ignis": 2, "leviata": 2, "golem_obsidiana": 2}  # malakor v3, relojoeiro v4 e nebula v2: sem ampliação
 
 
 def original(nome: str, im: Image.Image) -> Image.Image:
@@ -50,7 +50,7 @@ ALTURA_LUTA = {"golem_obsidiana": 110, "nebula": 126, "relojoeiro": 126, "leviat
 
 # Malakor v3 (25/11/2026): 169 -> 126 px. O "vizinho" descarta 1 de cada 4 linhas
 # e quebra o fio dos anéis; esta redução guarda as linhas finas.
-REDUZIR_CONTRASTE = {"malakor", "relojoeiro"}  # v3 e v4: desenhos grandes no pixel da Lua, reduzidos guardando as linhas finas
+REDUZIR_CONTRASTE = {"malakor", "relojoeiro", "nebula"}  # v3 e v4: desenhos grandes no pixel da Lua, reduzidos guardando as linhas finas
 
 
 def reduzir_contraste(im, alvo_h):

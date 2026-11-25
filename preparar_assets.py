@@ -68,7 +68,7 @@ CHEFOES = {
     "relojoeiro": "relojoeiro_v4.jpeg",  # v4 (25/11/2026): no tamanho de pixel da Lua, sem ampliar
     "sir_solis": "sir_solis.jpg",
     "rei_espelho": "rei_espelho.jpg",
-    "nebula": "nebula.jpg",
+    "nebula": "nebula_v2.jpeg",  # v2 (25/11/2026): mais detalhe, no pixel da Lua, sem ampliar
     "malakor": "malakor_v3.jpeg",  # v3 (25/11/2026): fundo escuro, já no porte final
 }
 # Ampliação de pixel art (Scale2x/Scale3x) por chefão, para o porte combinar com
@@ -81,7 +81,7 @@ AMPLIAR = {
     "ignis": 2,            # 56 -> 112 px: ave gigante
     "leviata": 2,          # 69 -> 138 px: serpente gigante
     "golem_obsidiana": 2,  # 82 -> 164 px: colosso
-    "nebula": 2,           # 92 -> 184 px: dragão ancestral
+    # nebula: 1 (o v2 já vem no porte final; o v1 era 92 -> 184 com Scale2x)
     # malakor: 1 (o v3 já vem com ~169 px; o original era 90 -> 180 com Scale2x)
 }
 # Como ampliar: "pixelart" (Scale2x/3x, arredonda diagonais) ou "vizinho"
@@ -89,7 +89,7 @@ AMPLIAR = {
 # ficaram deformados, e o desenho dele fica melhor com os pixels exatos.
 METODO_AMPLIAR = {}  # (o Relojoeiro v3 usava "vizinho"; o v4 não amplia)
 # Folhas de fundo escuro liso (#2b2233, pedidas assim nos prompts v2/v3)
-FUNDO_ESCURO = {"malakor", "relojoeiro"}
+FUNDO_ESCURO = {"malakor", "relojoeiro", "nebula"}
 for _nome, _arquivo in CHEFOES.items():
     FOLHAS[f"chefao_{_nome}"] = {
         "arquivo": f"chefoes/{_arquivo}", "auto": True, "pasta": f"chefoes/{_nome}",
@@ -99,7 +99,7 @@ for _nome, _arquivo in CHEFOES.items():
         "fundo_escuro": _nome in FUNDO_ESCURO,
         # vãos fechados da cor do fundo também são fundo (anéis do Malakor); no
         # Relojoeiro a calça escura tem quase a cor do fundo e sumia
-        "vaos": True if _nome == "malakor" else "cor" if _nome == "relojoeiro" else False,
+        "vaos": True if _nome == "malakor" else "cor" if _nome in ("relojoeiro", "nebula") else False,
         "teia_redesenhada": _nome == "vespera",
         "ampliar": AMPLIAR.get(_nome, 1),
         "metodo_ampliar": METODO_AMPLIAR.get(_nome, "pixelart"),
@@ -620,7 +620,7 @@ ARENA = {
     "relojoeiro": (2, True),
     "sir_solis": (2, True),
     "rei_espelho": (2, True),
-    "nebula": (5, False),
+    "nebula": (2, True),  # v2: 3/4 como os outros (o v1 usava a vista 5)
     "malakor": (2, True),  # v3: 3/4 como os outros (era de frente)
 }
 
