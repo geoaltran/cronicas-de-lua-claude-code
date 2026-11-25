@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 
 RAIZ = Path(__file__).parent
 A = RAIZ / "assets"
-AMPLIAR = {"relojoeiro": 3, "vespera": 2, "ignis": 2, "leviata": 2, "golem_obsidiana": 2, "nebula": 2}  # malakor v3: sem ampliação
+AMPLIAR = {"vespera": 2, "ignis": 2, "leviata": 2, "golem_obsidiana": 2, "nebula": 2}  # malakor v3 e relojoeiro v4: sem ampliação
 
 
 def original(nome: str, im: Image.Image) -> Image.Image:
@@ -45,12 +45,12 @@ def no_tamanho(nome: str, fator: int) -> Image.Image:
 # Lutas comuns (pedido do usuário, 22/11/2026): a faixa tem altura fixa e o
 # chão fica a 139 px do topo, então ninguém pode encostar a cabeça lá em cima.
 # Malakor (chefe final, Fase 3): 126 px, opção A aprovada pelo usuário em 22/11/2026.
-ALTURA_LUTA = {"golem_obsidiana": 110, "nebula": 126, "relojoeiro": 110, "leviata": 126, "malakor": 126}
+ALTURA_LUTA = {"golem_obsidiana": 110, "nebula": 126, "relojoeiro": 126, "leviata": 126, "malakor": 126}
 
 
 # Malakor v3 (25/11/2026): 169 -> 126 px. O "vizinho" descarta 1 de cada 4 linhas
 # e quebra o fio dos anéis; esta redução guarda as linhas finas.
-REDUZIR_CONTRASTE = {"malakor"}
+REDUZIR_CONTRASTE = {"malakor", "relojoeiro"}  # v3 e v4: desenhos grandes no pixel da Lua, reduzidos guardando as linhas finas
 
 
 def reduzir_contraste(im, alvo_h):
@@ -89,10 +89,6 @@ def para_altura(nome: str, im: Image.Image, alvo: int) -> Image.Image:
         return g.resize((g.width // 2, g.height // 2), Image.NEAREST)
     if nome in REDUZIR_CONTRASTE:
         return reduzir_contraste(o, alvo)
-    if nome == "relojoeiro":
-        # desenho pequeno, ampliado em blocos exatos: blocos de 3 ou 4 px
-        w = round(o.width * alvo / o.height)
-        return o.resize((w, alvo), Image.NEAREST)
     # o resto: reduz a versão aprovada (já ampliada) para a altura pedida
     w = round(im.width * alvo / im.height)
     return im.resize((w, alvo), Image.NEAREST)

@@ -77,15 +77,12 @@
   "arena": "relojoeiro_02.png",
   "espelhar": true,
   "frente": "relojoeiro_01.png",
-  "w": 114,
-  "h": 123,
+  "w": 137,
+  "h": 187,
   "vistas": [
    "relojoeiro_01.png",
    "relojoeiro_02.png",
-   "relojoeiro_03.png",
-   "relojoeiro_04.png",
-   "relojoeiro_05.png",
-   "relojoeiro_06.png"
+   "relojoeiro_03.png"
   ]
  },
  "sir_solis": {

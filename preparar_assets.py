@@ -65,7 +65,7 @@ CHEFOES = {
     "golem_obsidiana": "golem_obsidiana.jpg",
     "leviata": "leviata.jpg",
     "ignis": "ignis.jpg",
-    "relojoeiro": "relojoeiro_v3.webp",
+    "relojoeiro": "relojoeiro_v4.jpeg",  # v4 (25/11/2026): no tamanho de pixel da Lua, sem ampliar
     "sir_solis": "sir_solis.jpg",
     "rei_espelho": "rei_espelho.jpg",
     "nebula": "nebula.jpg",
@@ -76,7 +76,7 @@ CHEFOES = {
 AMPLIAR = {
     # mesmo porte da Lua (tamanho nativo): sir_solis (rival), rei_espelho (cópia
     # da Lua), dama_penumbra (feiticeira humana)
-    "relojoeiro": 3,       # 41 -> 123 px: o desenho é pequeno demais para um chefão
+    # relojoeiro: 1 (o v4 já vem no porte final; o v3 era 41 -> 123 px com "vizinho")
     "vespera": 2,          # 46 -> 92 px: aranha-espectral
     "ignis": 2,            # 56 -> 112 px: ave gigante
     "leviata": 2,          # 69 -> 138 px: serpente gigante
@@ -87,21 +87,26 @@ AMPLIAR = {
 # Como ampliar: "pixelart" (Scale2x/3x, arredonda diagonais) ou "vizinho"
 # (bloco exato). O Relojoeiro usa "vizinho": no Scale3x o óculos e o rosto
 # ficaram deformados, e o desenho dele fica melhor com os pixels exatos.
-METODO_AMPLIAR = {"relojoeiro": "vizinho"}
+METODO_AMPLIAR = {}  # (o Relojoeiro v3 usava "vizinho"; o v4 não amplia)
+# Folhas de fundo escuro liso (#2b2233, pedidas assim nos prompts v2/v3)
+FUNDO_ESCURO = {"malakor", "relojoeiro"}
 for _nome, _arquivo in CHEFOES.items():
     FOLHAS[f"chefao_{_nome}"] = {
         "arquivo": f"chefoes/{_arquivo}", "auto": True, "pasta": f"chefoes/{_nome}",
         "nome": _nome, "cores": 32, "limpar_halo": _nome != "malakor",
         # Malakor v3: folha de fundo escuro (#2b2233), pedida assim para o contraste
         # com o Eclipse. limpar_halo tiraria as pedrinhas cinzas (cinza neutro).
-        "fundo_escuro": _nome == "malakor",
+        "fundo_escuro": _nome in FUNDO_ESCURO,
+        # vãos fechados da cor do fundo também são fundo (anéis do Malakor); no
+        # Relojoeiro a calça escura tem quase a cor do fundo e sumia
+        "vaos": True if _nome == "malakor" else "cor" if _nome == "relojoeiro" else False,
         "teia_redesenhada": _nome == "vespera",
         "ampliar": AMPLIAR.get(_nome, 1),
         "metodo_ampliar": METODO_AMPLIAR.get(_nome, "pixelart"),
     }
 
 
-def mascara_fundo_escuro(rgb):
+def mascara_fundo_escuro(rgb, vaos=True):
     """Fundo liso e escuro (cor do canto): o que tem essa cor e toca a borda da
     imagem, mais os vãos fechados grandes da mesma cor (entre os anéis e o corpo).
     Os tons escuros do corpo ficam presos pelo contorno, e diferem do fundo."""
@@ -112,7 +117,15 @@ def mascara_fundo_escuro(rgb):
     borda = np.unique(np.r_[rot[0], rot[-1], rot[:, 0], rot[:, -1]])
     tam = np.bincount(rot.ravel())
     media = np.bincount(rot.ravel(), weights=dif.ravel()) / np.maximum(tam, 1)
-    vaos = np.where((tam >= 400) & (media < 10))[0]
+    if vaos == "cor":
+        # vão = área fechada no tom exato do fundo (puxado para o vermelho); a calça
+        # do Relojoeiro é quase do mesmo escuro, mas azul-esverdeada (G > R)
+        n_ = rot.max() + 1
+        med = np.stack([np.bincount(rot.ravel(), weights=a[..., c].ravel(), minlength=n_) for c in range(3)], 1) / np.maximum(tam, 1)[:, None]
+        perto = (np.abs(med - cor).sum(1) < 8) & (med[:, 0] >= med[:, 1])
+        vaos = np.where((tam >= 400) & (media < 10) & perto)[0]
+    else:
+        vaos = np.where((tam >= 400) & (media < 10))[0] if vaos else np.array([], int)
     ids = np.r_[borda, vaos]
     return np.isin(rot, ids[ids > 0])
 
@@ -275,7 +288,7 @@ def processar_auto(folha):
     ordem de leitura, e gruda nelas as partes soltas (chamas, brasas, respingos,
     anéis) da vista mais próxima."""
     rgb = np.asarray(Image.open(BRUTOS / folha["arquivo"]).convert("RGB"))
-    fundo = mascara_fundo_escuro(rgb) if folha.get("fundo_escuro") else mascara_fundo(rgb)
+    fundo = mascara_fundo_escuro(rgb, folha.get("vaos", True)) if folha.get("fundo_escuro") else mascara_fundo(rgb)
     if folha.get("buracos_brancos"):
         # branco preso dentro da figura (ex.: entre os anéis do Malakor e o corpo)
         # também é fundo. Só liga por folha: em outros chefões o branco preso é
