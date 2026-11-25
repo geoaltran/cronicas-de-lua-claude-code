@@ -34,6 +34,8 @@ export type Luta = {
   fixo?: boolean
   /** O chefão cai nesta luta: na vitória ele se desfaz em pixels. */
   final?: boolean
+  /** Aberta pelo `/cronicas golpe`: a vida já caiu no golpe, a vitória não tira de novo. */
+  comando?: boolean
   /** Elite (erro consertado): o nome do erro, guardado como troféu (vai para o Livro). */
   trofeu?: string
   /** Que troféu o Golem traz (pelo tipo da ação que errou e foi consertada). */

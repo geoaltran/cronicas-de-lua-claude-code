@@ -13,6 +13,7 @@ Uso: python preparar_assets.py
 """
 from pathlib import Path
 import json
+import sys
 import numpy as np
 from PIL import Image
 from scipy import ndimage as nd
@@ -68,7 +69,7 @@ CHEFOES = {
     "sir_solis": "sir_solis.jpg",
     "rei_espelho": "rei_espelho.jpg",
     "nebula": "nebula.jpg",
-    "malakor": "malakor.jpg",
+    "malakor": "malakor_v3.jpeg",  # v3 (25/11/2026): fundo escuro, já no porte final
 }
 # Ampliação de pixel art (Scale2x/Scale3x) por chefão, para o porte combinar com
 # a história. 1 = tamanho nativo. A Lua tem 84 px.
@@ -81,7 +82,7 @@ AMPLIAR = {
     "leviata": 2,          # 69 -> 138 px: serpente gigante
     "golem_obsidiana": 2,  # 82 -> 164 px: colosso
     "nebula": 2,           # 92 -> 184 px: dragão ancestral
-    "malakor": 2,          # 90 -> 180 px: chefe final
+    # malakor: 1 (o v3 já vem com ~169 px; o original era 90 -> 180 com Scale2x)
 }
 # Como ampliar: "pixelart" (Scale2x/3x, arredonda diagonais) ou "vizinho"
 # (bloco exato). O Relojoeiro usa "vizinho": no Scale3x o óculos e o rosto
@@ -90,12 +91,30 @@ METODO_AMPLIAR = {"relojoeiro": "vizinho"}
 for _nome, _arquivo in CHEFOES.items():
     FOLHAS[f"chefao_{_nome}"] = {
         "arquivo": f"chefoes/{_arquivo}", "auto": True, "pasta": f"chefoes/{_nome}",
-        "nome": _nome, "cores": 32, "limpar_halo": True,
-        "buracos_brancos": _nome == "malakor",
+        "nome": _nome, "cores": 32, "limpar_halo": _nome != "malakor",
+        # Malakor v3: folha de fundo escuro (#2b2233), pedida assim para o contraste
+        # com o Eclipse. limpar_halo tiraria as pedrinhas cinzas (cinza neutro).
+        "fundo_escuro": _nome == "malakor",
         "teia_redesenhada": _nome == "vespera",
         "ampliar": AMPLIAR.get(_nome, 1),
         "metodo_ampliar": METODO_AMPLIAR.get(_nome, "pixelart"),
     }
+
+
+def mascara_fundo_escuro(rgb):
+    """Fundo liso e escuro (cor do canto): o que tem essa cor e toca a borda da
+    imagem, mais os vãos fechados grandes da mesma cor (entre os anéis e o corpo).
+    Os tons escuros do corpo ficam presos pelo contorno, e diferem do fundo."""
+    a = rgb.astype(int)
+    cor = np.median(np.r_[a[:8, :8].reshape(-1, 3), a[-8:, -8:].reshape(-1, 3)], axis=0)
+    dif = np.abs(a - cor).sum(2)
+    rot, _ = nd.label(dif < 24)
+    borda = np.unique(np.r_[rot[0], rot[-1], rot[:, 0], rot[:, -1]])
+    tam = np.bincount(rot.ravel())
+    media = np.bincount(rot.ravel(), weights=dif.ravel()) / np.maximum(tam, 1)
+    vaos = np.where((tam >= 400) & (media < 10))[0]
+    ids = np.r_[borda, vaos]
+    return np.isin(rot, ids[ids > 0])
 
 
 def mascara_fundo(rgb):
@@ -256,7 +275,7 @@ def processar_auto(folha):
     ordem de leitura, e gruda nelas as partes soltas (chamas, brasas, respingos,
     anéis) da vista mais próxima."""
     rgb = np.asarray(Image.open(BRUTOS / folha["arquivo"]).convert("RGB"))
-    fundo = mascara_fundo(rgb)
+    fundo = mascara_fundo_escuro(rgb) if folha.get("fundo_escuro") else mascara_fundo(rgb)
     if folha.get("buracos_brancos"):
         # branco preso dentro da figura (ex.: entre os anéis do Malakor e o corpo)
         # também é fundo. Só liga por folha: em outros chefões o branco preso é
@@ -589,7 +608,7 @@ ARENA = {
     "sir_solis": (2, True),
     "rei_espelho": (2, True),
     "nebula": (5, False),
-    "malakor": (1, False),
+    "malakor": (2, True),  # v3: 3/4 como os outros (era de frente)
 }
 
 
@@ -695,7 +714,38 @@ def previa(todas, caminho, escala=4):
     return posicoes
 
 
+def so_um_chefao(nome):
+    """Refaz só um chefão (`--so <nome>`), sem tocar no resto de assets/ (que tem
+    arte aprovada e editada à mão). Guarda as vistas antigas em
+    previa_faixa/backup_chefoes/<nome>_<data>/ e atualiza só a entrada dele no
+    chefoes.json."""
+    import shutil
+    import time
+    folha = FOLHAS[f"chefao_{nome}"]
+    pasta = SAIDA / folha["pasta"]
+    if pasta.exists():
+        backup = RAIZ / "previa_faixa" / "backup_chefoes" / f"{nome}_{time.strftime('%Y%m%d_%H%M%S')}"
+        shutil.copytree(pasta, backup)
+        for velho in pasta.glob(f"{nome}_*.png"):
+            velho.unlink()
+        print(f"  vistas antigas guardadas em {backup.relative_to(RAIZ)}")
+    imagens, paleta, grids = processar_auto(folha)
+    for k, im in imagens.items():
+        (SAIDA / k).parent.mkdir(parents=True, exist_ok=True)
+        im.save(SAIDA / k)
+        print(f"{k:34} {im.width:>4}x{im.height:<4} (pixel original ≈ {grids.get(k, 'gerado')} px)")
+    (SAIDA / f"paleta_chefao_{nome}.json").write_text(
+        json.dumps(["#%02x%02x%02x" % tuple(c) for c in paleta], indent=1))
+    arq_info = SAIDA / "chefoes" / "chefoes.json"
+    info = json.loads(arq_info.read_text())
+    info.update(info_chefoes(imagens))
+    arq_info.write_text(json.dumps(info, indent=1, ensure_ascii=False))
+
+
 def main():
+    if "--so" in sys.argv:
+        so_um_chefao(sys.argv[sys.argv.index("--so") + 1])
+        return
     todas, relatorio, extras = {}, {}, {}
     for chave, folha in FOLHAS.items():
         imagens, paleta, grids = (processar_auto if folha.get("auto") else processar)(folha)

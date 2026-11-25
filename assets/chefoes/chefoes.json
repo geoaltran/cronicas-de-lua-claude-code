@@ -134,11 +134,11 @@
   ]
  },
  "malakor": {
-  "arena": "malakor_01.png",
-  "espelhar": false,
+  "arena": "malakor_02.png",
+  "espelhar": true,
   "frente": "malakor_01.png",
-  "w": 184,
-  "h": 180,
+  "w": 109,
+  "h": 169,
   "vistas": [
    "malakor_01.png",
    "malakor_02.png",

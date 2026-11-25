@@ -324,3 +324,35 @@ test('modo quadro (balões e fonte longa no SVG): Relojoeiro e Ignis trocam o bi
   }
   await ui.unmount()
 })
+
+test('/cronicas golpe é uma luta de verdade: a Lua ataca, o chefão leva o impacto, e o que derruba é crítico', async ($, on) => {
+  const { clock, ui, svg } = await comecar($, on, [], { xp: 0, paginas: 9, lutas: 0 })
+  const cmd = (args: string) => $.command.run({ command: 'cronicas', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } })
+  await cmd('chefao malakor')
+  await clock.advance(3000)
+  const textos: string[] = []
+  let ataques = 0
+  let impactos = 0
+  let viuCritico = false
+  for (let i = 0; i < 3; i++) {
+    textos.push(JSON.stringify(await cmd('golpe')))
+    let atacou = false
+    let impacto = false
+    for (let t = 0; t < 6000; t += 70) {
+      await clock.advance(70)
+      const s = await svg()
+      atacou = atacou || s.includes('id="lua_ataque"')
+      impacto = impacto || s.includes('impacto')
+      viuCritico = viuCritico || s.includes('CRÍTICO!')
+    }
+    ataques += atacou ? 1 : 0
+    impactos += impacto ? 1 : 0
+  }
+  expect(textos[0]).toContain('Vida 2/3')
+  expect(textos[1]).toContain('Vida 1/3')
+  expect(textos[2]).toContain('Malakor caiu')
+  expect(ataques).toBe(3)
+  expect(impactos).toBe(3)
+  expect(viuCritico).toBe(true)
+  await ui.unmount()
+})

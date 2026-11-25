@@ -412,7 +412,7 @@ async function revisar($: $, turnoAcabou = false): Promise<void> {
       return { ...j, trofeus, trofeusTipos, xp: j.xp + ELITE_XP * elites.length }
     })
   }
-  for (const l of ganhas.filter(g => g.fixo === true)) {
+  for (const l of ganhas.filter(g => g.fixo === true && g.comando !== true)) {
     const ch = await read($, chefao)
     if (dePe(ch) && ch.origem === 'lutas') {
       await ferirChefao($, c => c.vida - 1, l.n)
@@ -573,6 +573,61 @@ async function golpeNoChefao($: $, tool: string, input: unknown, n: number, at: 
     await update($, lutas, s => ({ ...s, lista: s.lista.map(x => (x.n === n ? { ...x, golpes: x.golpes.map(g => (g.at === at ? { ...g, ...m } : g)) } : x)) }))
   }
 }
+
+/**
+ * `/cronicas golpe`: uma luta de verdade contra o chefão, como se uma ferramenta
+ * rápida tivesse voltado bem agora. A Lua ataca, o chefão pisca branco, recua e
+ * treme, sai o número de dano; a vida cai quando o feitiço acerta. No chefão de
+ * lista, o golpe conclui uma tarefa (a vida desce até o fim do bloco). O que
+ * derruba é crítico.
+ */
+async function golpeDeComando($: $, ch: Chefao): Promise<void> {
+  if (!dePe(ch)) {
+    return
+  }
+  const agora = await $.clock.now()
+  let n = 0
+  let nova: Luta | null = null
+  await update($, lutas, s => {
+    // cada golpe é uma luta: fecha a que já levou golpe (a nova vem logo depois dela)
+    const r = entrar(decidir(s, agora, true), agora, 'Read', ch)
+    n = r.n
+    nova = r.nova
+    return r.nova === null ? r.s : { ...r.s, lista: r.s.lista.map(l => (l.n === r.n ? { ...l, comando: true } : l)) }
+  })
+  if (nova === null) {
+    // uma ferramenta de verdade está lutando agora: o golpe entra nela e a vitória dela conta
+    await update($, lutas, s => golpear(s, n, { at: agora + 1, ok: true, dano: DANO_COMANDO }))
+    await revisar($)
+    return
+  }
+  const comeco = nova as Luta | null
+  if (comeco !== null && comeco.t0 <= agora) {
+    await update($, caminho, c => (c.andando ? { ...c, ate: comeco.t0 + ENTRA } : c))
+  }
+  const fim = agora + 1
+  const dano = DANO_COMANDO
+  await update($, lutas, s => golpear(s, n, { at: fim, ok: true, dano }))
+  const l = (await read($, lutas)).lista.find(x => x.n === n)
+  const acerto = l === undefined ? fim : quandoAcerta(l, fim)
+  let f: Ferida | null
+  if (ch.origem === 'lista') {
+    const t = { total: ch.tarefas.total, feitas: Math.min(ch.tarefas.total, ch.tarefas.feitas + 1) }
+    await update($, chefao, c => (dePe(c) ? { ...c, tarefas: t } : c))
+    f = await ferirChefao($, c => (t.total - t.feitas) * c.bloco, n, acerto)
+  } else {
+    f = await ferirChefao($, c => c.vida - 1, n, acerto)
+  }
+  const marca: Partial<Golpe> | null =
+    f === null ? null : f.caiu ? { critico: critico(f.antes, dano) } : ch.origem === 'lista' ? { tarefa: f.antes - f.depois } : null
+  if (marca !== null) {
+    await update($, lutas, s => ({ ...s, lista: s.lista.map(x => (x.n === n ? { ...x, golpes: x.golpes.map(g => (g.at === fim ? { ...g, ...marca } : g)) } : x)) }))
+  }
+  await revisar($)
+}
+
+/** Dano do golpe do comando: o de uma leitura média (o número branco na cena). */
+const DANO_COMANDO = 17
 
 /**
  * Elite: guarda o erro de cada ação (ferramenta + alvo); quando a mesma ação
@@ -1428,15 +1483,7 @@ export const register: Register = on => {
       if (!dePe(ch)) {
         return { text: tx('comando.golpe.sem_chefao') }
       }
-      if (ch.origem === 'lista') {
-        // conclui uma tarefa da lista: a vida desce até o fim do bloco
-        const t = { total: ch.tarefas.total, feitas: Math.min(ch.tarefas.total, ch.tarefas.feitas + 1) }
-        await update($, chefao, c => (dePe(c) ? { ...c, tarefas: t } : c))
-        await ferirChefao($, c => (t.total - t.feitas) * c.bloco)
-      } else {
-        await ferirChefao($, c => c.vida - 1)
-      }
-      await revisar($)
+      await golpeDeComando($, ch)
       const depois = await read($, chefao)
       const v = depois === null ? { resta: 0, total: 0 } : vidaEmTarefas(depois)
       return {

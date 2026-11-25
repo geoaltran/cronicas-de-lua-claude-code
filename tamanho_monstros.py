@@ -16,7 +16,7 @@ from PIL import Image, ImageDraw
 
 RAIZ = Path(__file__).parent
 A = RAIZ / "assets"
-AMPLIAR = {"relojoeiro": 3, "vespera": 2, "ignis": 2, "leviata": 2, "golem_obsidiana": 2, "nebula": 2, "malakor": 2}
+AMPLIAR = {"relojoeiro": 3, "vespera": 2, "ignis": 2, "leviata": 2, "golem_obsidiana": 2, "nebula": 2}  # malakor v3: sem ampliação
 
 
 def original(nome: str, im: Image.Image) -> Image.Image:
@@ -48,6 +48,36 @@ def no_tamanho(nome: str, fator: int) -> Image.Image:
 ALTURA_LUTA = {"golem_obsidiana": 110, "nebula": 126, "relojoeiro": 110, "leviata": 126, "malakor": 126}
 
 
+# Malakor v3 (25/11/2026): 169 -> 126 px. O "vizinho" descarta 1 de cada 4 linhas
+# e quebra o fio dos anéis; esta redução guarda as linhas finas.
+REDUZIR_CONTRASTE = {"malakor"}
+
+
+def reduzir_contraste(im, alvo_h):
+    """Reduz pixel art preservando linhas finas: cada pixel novo cobre um bloco do
+    original; o alfa vai pela maioria, e a cor é a do pixel opaco do bloco que
+    mais se afasta da mediana do bloco (a linha fina ganha do miolo liso)."""
+    a = np.array(im.convert("RGBA")).astype(int)
+    H, W = a.shape[:2]
+    s = H / alvo_h
+    w = round(W / s)
+    out = np.zeros((alvo_h, w, 4), np.uint8)
+    for i in range(alvo_h):
+        y0, y1 = int(i * s), max(int(i * s) + 1, int((i + 1) * s))
+        for j in range(w):
+            x0, x1 = int(j * s), max(int(j * s) + 1, int((j + 1) * s))
+            b = a[y0:y1, x0:x1].reshape(-1, 4)
+            op = b[b[:, 3] > 127]
+            if len(op) * 2 < len(b) and len(op) < 2:
+                continue
+            if len(op) == 0:
+                continue
+            med = np.median(op[:, :3], axis=0)
+            k = np.abs(op[:, :3] - med).sum(1).argmax()
+            out[i, j] = op[k]
+    return Image.fromarray(out)
+
+
 def para_altura(nome: str, im: Image.Image, alvo: int) -> Image.Image:
     """O sprite de arena na altura `alvo`, pelo caminho mais limpo para o pixel art."""
     from preparar_assets import ampliar_pixelart
@@ -57,6 +87,8 @@ def para_altura(nome: str, im: Image.Image, alvo: int) -> Image.Image:
         # 1,5x exato: Scale3x e depois metade (cada pixel do original vira 1 ou 2, por igual)
         g = ampliar_pixelart(o, 3)
         return g.resize((g.width // 2, g.height // 2), Image.NEAREST)
+    if nome in REDUZIR_CONTRASTE:
+        return reduzir_contraste(o, alvo)
     if nome == "relojoeiro":
         # desenho pequeno, ampliado em blocos exatos: blocos de 3 ou 4 px
         w = round(o.width * alvo / o.height)
