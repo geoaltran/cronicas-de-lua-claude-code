@@ -66,7 +66,7 @@ Cada chefão mora num **bioma** (veja O cenário): quando ele aparece, a cena va
 - 🏮 **Vigília:** mantém a **luz acesa** (o cache quente). **Lanterna apagada** = desligada; **acesa** = ligada, com a chama tremulando. ⚠️ Gasta um pouquinho do limite, por isso começa desligada.
 - 🎒 **Mochila:** sugere **arrumar a conversa** (compactar) quando ela está cheia. Fica **estufada** com itens saindo quando precisa.
 - 🚩 **Estandarte:** **passa a missão para a próxima sessão** (escreve um resumo pra continuar depois). **Enrolado** = parado; **desfraldado** = pronto.
-- 📖 **Livro:** guarda a **ficha da Lua**, o **mapa da jornada** 🗺️ (os biomas por onde ela já passou e onde está agora), as **páginas recuperadas**, o **bestiário** dos chefões derrotados e o **grimório**, com as ferramentas do Claude viradas magias. **Fechado** = normal; **aberto e brilhando** = tem coisa nova.
+- 📖 **Livro:** guarda a **ficha da Lua**, o **mapa da jornada** 🗺️ (os biomas por onde ela já passou e onde está agora), as **páginas recuperadas**, o **bestiário** dos chefões derrotados, o **grimório**, com as ferramentas do Claude viradas magias, e a página de **comandos** (todos os `/cronicas`, com um link para a explicação no GitHub). **Fechado** = normal; **aberto e brilhando** = tem coisa nova. Quando sai uma **versão nova** do jogo, aparece uma **estrelinha dourada** ✨ no canto do Livro; passando o mouse, o balão conta; clicando, o Livro abre na página de comandos, que mostra como atualizar (`/cronicas updates`).
 
 ## 🗺️ O cenário
 
@@ -85,6 +85,10 @@ O reino de Lunária tem **9 biomas**, um para cada parte da jornada, cada um num
 Cada bioma tem suas **partículas** no ar (brasas, poeira dourada, pétalas, poeira de estrela, brilhos) e, nos céus escuros, passam **estrelas cadentes** 🌠.
 
 **Passagem de fase:** quando o chefão do bioma cai, a Lua sai andando pela borda da tela, tudo escurece e ela entra no bioma seguinte, com o título da página em pixel (por exemplo, **"PÁGINA 4 · MAR"**), como nos jogos antigos.
+
+## ✨ Versão nova
+
+Uma vez por dia, na primeira sessão, o jogo confere no GitHub **só o número da última versão** (um arquivo público). Se saiu uma nova, aparece a estrelinha no Livro e um aviso no canto. **Nada sobre você é enviado e nada é instalado sozinho**: você atualiza quando quiser, com os comandos que o `/cronicas updates` mostra. Não quer a conferência? `/cronicas updates off`.
 
 ---
 

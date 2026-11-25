@@ -26,6 +26,8 @@ Benötigt ein aktuelles Claude Code mit Mod-Unterstützung (gebaut und getestet 
 
 Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um zu merken, wann die App neu gestartet wurde, fürs Intro) und unter macOS `defaults read -g AppleLanguages` (die Systemsprache).
 
+**Updates.** Einmal am Tag, in der ersten Sitzung, liest der Mod außerdem die Versionsnummer, die in diesem Repository veröffentlicht ist (eine öffentliche Datei auf GitHub). Nichts über dich oder deine Gespräche wird gesendet, und nichts wird von selbst heruntergeladen oder installiert. Wenn eine neue Version da ist, bekommt der Buch-Knopf ein Sternchen und seine Sprechblase sagt es dir; zum Aktualisieren tippe `/plugin marketplace update cronicas-de-lua`, dann `/plugin update cronicas-de-lua@cronicas-de-lua`, und öffne eine neue Sitzung. `/cronicas updates off` schaltet die Prüfung aus (sie bleibt auch aus, wenn `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` gesetzt ist). Wenn Updates lieber von selbst kommen sollen: Claude Code hat eine eigene Option zum automatischen Aktualisieren von Marketplaces.
+
 ## Wo es läuft
 | Oberfläche | Was du bekommst |
 |---|---|
@@ -48,7 +50,7 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 | 🏮&nbsp;**Nachtwache** | Hält den Cache warm, indem sie kurz vor dem Erlöschen des Mondlichts eine winzige Nachricht schickt (höchstens 6-mal und nur, während du weg bist). **Standardmäßig aus: Sie verbraucht das Limit deines Plans.** |
 | 🎒&nbsp;**Rucksack** | Bietet an, das Gespräch zu komprimieren (wie `/compact`), mit Bestätigung. |
 | 🚩&nbsp;**Banner** | Bittet Claude um eine Zusammenfassung der Mission, damit du in einer neuen Sitzung weitermachen kannst. |
-| 📖&nbsp;**Buch** | Öffnet Luas Buch: ihr Charakterblatt, die Reisekarte (die Biome, die sie schon besucht hat), das Bestiarium der besiegten Bosse, das Trophäenregal und das Grimoire (Claudes Tools als Zauber). |
+| 📖&nbsp;**Buch** | Öffnet Luas Buch: ihr Charakterblatt, die Reisekarte (die Biome, die sie schon besucht hat), das Bestiarium der besiegten Bosse, das Trophäenregal und das Grimoire (Claudes Tools als Zauber), dazu eine Befehle-Seite mit allen `/cronicas`-Befehlen und einem Link zu ihrer Erklärung hier. Wenn eine neue Version da ist, funkelt ein Sternchen am Buch und die Befehle-Seite zeigt, wie du aktualisierst. |
 
 ![Luas Buch: Charakterblatt, Reisekarte, Bestiarium, Trophäen und Grimoire](previa_livro.gif)
 
@@ -87,6 +89,7 @@ Tipp sie wie eine normale Nachricht in Claudes Eingabefeld. Die Antwort siehst n
 |---|---|
 | <code>/cronicas</code> | Luas Übersicht: Level, XP, zurückgeholte Seiten (x/10), neueste Trophäen und die Einstellungen des Bands. Listet auch alle Befehle. |
 | <code>/cronicas&nbsp;language&nbsp;[code]</code> | Zeigt die Sprachen des Spiels oder wechselt zu einer: `en`, `pt-BR`, `es`, `fr`, `de`, `zh`, `ja`, `ko` (`auto` geht zurück zur Systemsprache). |
+| <code>/cronicas&nbsp;updates&nbsp;[check&#124;off&#124;on]</code> | Zeigt deine Version und ob es eine neue gibt, mit der Anleitung zum Aktualisieren. `check` prüft sofort; `off` / `on` schaltet die tägliche Prüfung aus oder ein. |
 | <code>/cronicas&nbsp;ruler</code> | Zeigt ein Lineal unter der Szene, um das Band zu messen. Nochmal tippen blendet es aus. |
 | <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | Kalibriert die Breite mit der letzten ganzen Zahl am rechten Rand des Lineals (z. B. `/cronicas width 752`). |
 | <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | Pixelgröße der Szene: 1x, 2x oder 3x. |

@@ -26,6 +26,8 @@
 
 本模组只会在你的电脑上运行两个只读命令：`ps`（用于判断应用是否重启，以显示开场动画），以及在 macOS 上运行 `defaults read -g AppleLanguages`（读取系统语言）。
 
+**更新。** 每天第一次会话时，模组还会读取本仓库公开的版本号（GitHub 上的一个公开文件）。不会发送任何关于你或你对话的信息，也不会自动下载或安装任何东西。有新版本时，“书”按钮上会出现一颗小星星，它的气泡会提醒你；要更新，请输入 `/plugin marketplace update cronicas-de-lua`，再输入 `/plugin update cronicas-de-lua@cronicas-de-lua`，然后打开一个新会话。`/cronicas updates off` 关闭检查（设置了 `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 时也不会检查）。如果你希望更新自动到来，Claude Code 本身也有市场（marketplace）自动更新的选项。
+
 ## 在哪里运行
 | 界面 | 效果 |
 |---|---|
@@ -48,7 +50,7 @@
 | 🏮&nbsp;**守夜** | 在月光熄灭前发送一条很短的消息，让缓存保持温热（最多 6 次，且只在你离开时进行）。**默认关闭：它会消耗你的套餐限额。** |
 | 🎒&nbsp;**背包** | 提议压缩对话（类似 `/compact`），需要确认。 |
 | 🚩&nbsp;**旗帜** | 请 Claude 写一份任务总结，方便你在新会话中继续。 |
-| 📖&nbsp;**书** | 打开 Lua 之书：她的角色卡、旅程地图（她去过的生物群系）、已击败 Boss 的图鉴、奖杯架，以及魔导书（把 Claude 的工具当作咒语）。 |
+| 📖&nbsp;**书** | 打开 Lua 之书：她的角色卡、旅程地图（她去过的生物群系）、已击败 Boss 的图鉴、奖杯架、魔导书（把 Claude 的工具当作咒语），还有一页列出全部 `/cronicas` 命令的“命令”页（附有到这里说明的链接）。有新版本时，书上会亮起一颗小星星，“命令”页会告诉你如何更新。 |
 
 ![Lua 之书：角色卡、旅程地图、图鉴、奖杯和魔导书](previa_livro.gif)
 
@@ -87,6 +89,7 @@ Lunária 有 9 个生物群系，旅程的每一段各有一个，每个都处�
 |---|---|
 | <code>/cronicas</code> | Lua 的概况：等级、经验值、找回的书页（x/10）、最新的奖杯和横幅设置。也会列出所有命令。 |
 | <code>/cronicas&nbsp;language&nbsp;[code]</code> | 列出游戏语言或切换到其中一种：`en`、`pt-BR`、`es`、`fr`、`de`、`zh`、`ja`、`ko`（`auto` 回到系统语言）。 |
+| <code>/cronicas&nbsp;updates&nbsp;[check&#124;off&#124;on]</code> | 显示你的版本以及是否有新版本，并说明如何更新。`check` 立即检查；`off` / `on` 关闭或打开每日检查。 |
 | <code>/cronicas&nbsp;ruler</code> | 在画面下方显示标尺，用来测量横幅。再输入一次即可隐藏。 |
 | <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | 用标尺右边缘最后一个完整的数字校准宽度（例如 `/cronicas width 752`）。 |
 | <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | 画面的像素大小：1x、2x 或 3x。 |

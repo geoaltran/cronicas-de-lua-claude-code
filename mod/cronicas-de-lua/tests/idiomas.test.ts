@@ -28,7 +28,7 @@ test('todo texto do padrão existe e os nomes montados por código têm chave', 
     expect(f.nome.startsWith('livro.')).toBe(false)
     expect(f.desc.startsWith('livro.')).toBe(false)
   }
-  expect(ABAS.map(a => a.nome)).toEqual(['Ficha', 'Mapa', 'Bestiário', 'Troféus', 'Grimório'])
+  expect(ABAS.map(a => a.nome)).toEqual(['Ficha', 'Mapa', 'Bestiário', 'Troféus', 'Grimório', 'Comandos'])
 })
 
 const CMD = { origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 90 } } as const
@@ -104,7 +104,7 @@ test('subcomandos em inglês funcionam igual aos portugueses', async ($, on) => 
   expect(await rodar('new-moon')).toBe(await rodar('lua-nova'))
   // todo nome em inglês aponta para um subcomando que existe
   for (const pt of Object.values(SUBCOMANDOS)) {
-    expect(['superficies', 'escala', 'coluna', 'largura', 'quadro', 'imagem', 'teste', 'prova', 'linha', 'regua', 'chefao', 'golpe', 'passear', 'fase', 'vigilia', 'lua-nova']).toContain(pt)
+    expect(['superficies', 'escala', 'coluna', 'largura', 'quadro', 'imagem', 'teste', 'prova', 'linha', 'regua', 'chefao', 'golpe', 'passear', 'fase', 'vigilia', 'lua-nova', 'atualizacao']).toContain(pt)
   }
 })
 

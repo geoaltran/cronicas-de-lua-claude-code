@@ -21,6 +21,7 @@ export const ABAS: readonly { id: AbaDoLivro; nome: string }[] = [
   { id: 'bestiario', get nome() { return tx('livro.abas.bestiario') } },
   { id: 'trofeus', get nome() { return tx('livro.abas.trofeus') } },
   { id: 'grimorio', get nome() { return tx('livro.abas.grimorio') } },
+  { id: 'comandos', get nome() { return tx('livro.abas.comandos') } },
 ]
 
 export type PaginaDoLivro = { svg: string; largura: number; altura: number; alvos: Alvo[]; alt: string }
@@ -508,13 +509,56 @@ function grimorio(d: Doc, j: Jogo, W: number): { corpo: string; H: number; alt: 
   return { corpo: s, H: y + 18, alt: tx('livro.grimorio.alt', { lista: FEITICOS.map(f => tp('livro.grimorio.alt_item', usos[f.papel] ?? 0, { nome: f.nome })).join(', ') }) }
 }
 
+// ---------------------------------------------------------------- Comandos
+
+/**
+ * Os subcomandos do /cronicas, só os nomes em inglês (valem em qualquer
+ * idioma; pedido do usuário: a explicação de cada um fica no README, com o
+ * link do app embaixo da página).
+ */
+export const COMANDOS_LIVRO = ['language', 'updates', 'walk', 'stage', 'boss', 'hit', 'elite', 'intro', 'scale', 'ruler', 'width', 'surfaces', 'vigil', 'new-moon'] as const
+
+/**
+ * Comandos: com uma versão nova publicada, uma faixa dourada no topo (a
+ * estrelinha do Livro leva até aqui); depois, os nomes em duas colunas.
+ */
+function comandos(W: number, novaVersao?: string): { corpo: string; H: number; alt: string } {
+  const cab = cabecalho(W, tx('livro.comandos.titulo'), tx('livro.comandos.subtitulo'))
+  let s = cab.svg
+  let y = cab.y
+  if (novaVersao !== undefined) {
+    const nTitulo = quebrar(tx('livro.comandos.nova', { versao: novaVersao }), W - 48, PX_LETRA_TITULO)
+    const linhas = [...nTitulo, ...quebrar(tx('livro.comandos.nova_como'), W - 48)]
+    const h = 14 + linhas.length * 13
+    s += ret(14, y - 2, W - 28, h, '#f7cf4a') + ret(16, y, W - 32, h - 4, '#3a2a12')
+    // a estrelinha da versão nova, a mesma do botão (parada aqui)
+    s += ret(26, y + 6, 1, 7, '#f2c14e') + ret(23, y + 9, 7, 1, '#f2c14e') + ret(25, y + 8, 3, 3, '#fff6d0')
+    let ly = y + 13
+    linhas.forEach((l, i) => {
+      const ehTitulo = i < nTitulo.length
+      s += ehTitulo && !ehCJK() ? titulo(36, ly, l) : texto(36, ly, l, '', ehTitulo ? OURO : '#f3e3b0')
+      ly += 13
+    })
+    y += h + 8
+  }
+  const col = Math.floor((W - 24) / 2)
+  const metade = Math.ceil(COMANDOS_LIVRO.length / 2)
+  COMANDOS_LIVRO.forEach((c, i) => {
+    const x = 22 + (i < metade ? 0 : col)
+    const ly = y + 8 + (i % metade) * 15
+    s += ret(x, ly - 5, 3, 3, OURO) + texto(x + 8, ly, c, '', '#e9d9ff')
+  })
+  y += 8 + metade * 15
+  return { corpo: s, H: y + 10, alt: tx('livro.comandos.alt', { lista: COMANDOS_LIVRO.join(', ') }) }
+}
+
 // ---------------------------------------------------------------- tudo junto
 
 /**
  * Uma página do Livro, `W` px de arte de largura, desenhada em `escala`.
  * As áreas de hover (troféus) vêm em px da arte, como os alvos da faixa.
  */
-export function paginaDoLivro(aba: AbaDoLivro, j: Jogo, W0: number, escala: number): PaginaDoLivro {
+export function paginaDoLivro(aba: AbaDoLivro, j: Jogo, W0: number, escala: number, novaVersao?: string): PaginaDoLivro {
   const W = Math.max(LARGURA_MIN, Math.floor(W0))
   const d = new Doc()
   let p: { corpo: string; H: number; alt: string; alvos?: Alvo[] }
@@ -526,6 +570,8 @@ export function paginaDoLivro(aba: AbaDoLivro, j: Jogo, W0: number, escala: numb
     p = trofeus(d, j, W)
   } else if (aba === 'grimorio') {
     p = grimorio(d, j, W)
+  } else if (aba === 'comandos') {
+    p = comandos(W, novaVersao)
   } else {
     p = ficha(d, j, W)
   }

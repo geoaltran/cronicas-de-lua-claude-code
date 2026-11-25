@@ -26,6 +26,8 @@ Claude Code 세션에서 다음을 입력하세요.
 
 이 모드는 컴퓨터에서 읽기 전용 명령 두 개만 실행합니다: `ps`(앱이 다시 시작됐는지 알아 오프닝을 보여 주기 위해)와 macOS에서 `defaults read -g AppleLanguages`(시스템 언어).
 
+**업데이트.** 하루에 한 번, 첫 세션에서 모드는 이 저장소에 공개된 버전 번호도 읽습니다 (GitHub의 공개 파일). 당신이나 대화에 관한 정보는 전혀 보내지 않으며, 저절로 내려받거나 설치하지도 않습니다. 새 버전이 나오면 책 버튼에 작은 별이 붙고 말풍선이 알려 줍니다. 업데이트하려면 `/plugin marketplace update cronicas-de-lua`, 이어서 `/plugin update cronicas-de-lua@cronicas-de-lua` 를 입력하고 새 세션을 여세요. `/cronicas updates off` 로 확인을 끌 수 있습니다 (`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 가 설정되어 있을 때도 꺼져 있습니다). 업데이트가 저절로 오기를 원한다면 Claude Code 자체에 마켓플레이스 자동 업데이트 옵션이 있습니다.
+
 ## 어디서 실행되나요
 | 화면 | 제공 기능 |
 |---|---|
@@ -48,7 +50,7 @@ Claude Code 세션에서 다음을 입력하세요.
 | 🏮&nbsp;**불침번** | 달빛이 꺼지기 직전에 아주 짧은 메시지를 보내 캐시를 따뜻하게 유지합니다(최대 6번, 자리를 비운 동안에만). **기본값은 꺼짐: 요금제 한도를 소모합니다.** |
 | 🎒&nbsp;**배낭** | 대화 압축(`/compact`와 같음)을 확인 절차와 함께 제안합니다. |
 | 🚩&nbsp;**깃발** | 새 세션에서 이어 갈 수 있도록 Claude에게 임무 요약을 부탁합니다. |
-| 📖&nbsp;**책** | Lua의 책을 엽니다. 캐릭터 시트, 여정 지도(가 본 바이옴), 물리친 보스 도감, 트로피 선반, 그리고 마법서(Claude의 도구를 주문으로). |
+| 📖&nbsp;**책** | Lua의 책을 엽니다. 캐릭터 시트, 여정 지도(가 본 바이옴), 물리친 보스 도감, 트로피 선반, 마법서(Claude의 도구를 주문으로), 그리고 `/cronicas` 의 모든 명령어를 모은 명령어 페이지(여기 설명으로 가는 링크 포함). 새 버전이 나오면 책에 작은 별이 반짝이고, 명령어 페이지에 업데이트 방법이 나와요. |
 
 ![Lua의 책: 능력치, 여정 지도, 도감, 트로피, 마법서](previa_livro.gif)
 
@@ -87,6 +89,7 @@ Lunária에는 여정의 구간마다 하나씩, 9개의 바이옴이 있습니�
 |---|---|
 | <code>/cronicas</code> | Lua의 요약: 레벨, 경험치, 되찾은 페이지(x/10), 최근 트로피와 띠 설정. 모든 명령어 목록도 보여 줍니다. |
 | <code>/cronicas&nbsp;language&nbsp;[code]</code> | 게임 언어 목록을 보여 주거나 바꿉니다: `en`, `pt-BR`, `es`, `fr`, `de`, `zh`, `ja`, `ko` (`auto`는 시스템 언어로 돌아가요). |
+| <code>/cronicas&nbsp;updates&nbsp;[check&#124;off&#124;on]</code> | 지금 버전과 새 버전이 있는지, 업데이트 방법을 보여 줍니다. `check` 는 지금 확인, `off` / `on` 은 매일 확인을 끄거나 켭니다. |
 | <code>/cronicas&nbsp;ruler</code> | 장면 아래에 자를 띄워 띠의 너비를 잽니다. 다시 입력하면 사라져요. |
 | <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | 자의 오른쪽 끝에서 온전히 보이는 마지막 숫자로 너비를 맞춥니다(예: `/cronicas width 752`). |
 | <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | 장면의 픽셀 크기: 1x, 2x, 3x. |

@@ -129,7 +129,9 @@
     "livro": {
       "nome": "书",
       "explica": "角色卡、书页、\n图鉴和奖杯。",
-      "aberto_explica": "点击合上。"
+      "aberto_explica": "点击合上。",
+      "nova_nome": "新版本 {versao}（可更新）",
+      "nova_explica": "编年史有更新了。\n如何更新：/cronicas updates"
     }
   },
   "lua_nova": {
@@ -143,7 +145,8 @@
       "mapa": "地图",
       "bestiario": "图鉴",
       "trofeus": "奖杯",
-      "grimorio": "魔导书"
+      "grimorio": "魔导书",
+      "comandos": "命令"
     },
     "ficha": {
       "titulo": "Lua 的角色卡",
@@ -246,6 +249,14 @@
         "outros": "胜利 {lutas} 场 · 再打 {n} 场遇到 Boss"
       },
       "trofeus": "奖杯：{n}"
+    },
+    "comandos": {
+      "titulo": "命令",
+      "subtitulo": "在消息框里输入 /cronicas 加命令。",
+      "nova": "新版本 {versao}（可更新）",
+      "nova_como": "如何更新：/cronicas updates",
+      "link": "全部命令说明（GitHub）",
+      "alt": "命令页：{lista}。"
     }
   },
   "superficies": {
@@ -276,7 +287,8 @@
     },
     "livro": {
       "nao_abriu": "📖 书还没有打开：{motivo}"
-    }
+    },
+    "atualizacao": "🌙 露娜编年史有新版本：{nova}。用 /cronicas updates 查看如何更新。"
   },
   "chips": {
     "vigilia": "守夜",
@@ -381,7 +393,8 @@
       "estado": "As Crônicas de Lua：缩放 {escala}x，每列 {px} px，{modo}模式。{nivel} 级，{xp} XP，书页 {paginas}/10。",
       "uso": "用法：/cronicas scale 1|2|3、/cronicas ruler 和 /cronicas width <px>（校准宽度）、/cronicas image|frame、/cronicas test（对比两种）、/cronicas new-moon（模拟缓存变冷）、/cronicas vigil（让月光快耗尽，看看守夜）、/cronicas boss [名字] 和 /cronicas hit（试玩 Boss 战）、/cronicas elite（下一场是精英）或 /cronicas language（游戏语言）。",
       "trofeus": "奖杯：{lista}",
-      "uso_cenario": "想看场景：/cronicas walk [秒数]（露娜走一会儿，然后停下来呼吸）和 /cronicas stage [地区]（换关到下一个或指定的地区；不计页数）。"
+      "uso_cenario": "想看场景：/cronicas walk [秒数]（露娜走一会儿，然后停下来呼吸）和 /cronicas stage [地区]（换关到下一个或指定的地区；不计页数）。",
+      "uso_atualizacao": "新版本：/cronicas updates（如何更新），updates check（立即检查），updates off|on（关闭或打开提醒）。"
     },
     "linha": "行高：{n} px。鼠标区域已重新计算。",
     "teste": "测试已打开：横幅显示两次，A（可交互的框架）和 B（图片）。再次输入 /cronicas test 关闭。",
@@ -405,6 +418,18 @@
       "vai": "换关：{de} → {para}。只是看看风景：不计页数。她会一直待在那里，直到下一个首领带来自己的地区。",
       "chefao": "现在不行：场上有首领。用 /cronicas hit 打败它。",
       "desconhecido": "我不认识地区“{pedido}”。地区有：{lista}。"
+    },
+    "atualizacao": {
+      "tem_nova": "露娜编年史有新版本：{nova}（你的是 {local}）。要更新，请在消息框里依次输入：\n{cmd1}\n{cmd2}\n然后打开一个新会话。有新版本时，“书”按钮上会显示一颗小星星。",
+      "em_dia": "你用的是露娜编年史的最新版本（{local}）。",
+      "sem_resposta": "现在无法检查（没有网络或访问被阻止）。已安装的版本是 {local}。",
+      "bloqueado": "这台电脑上的检查被阻止了（CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC）：模组不会访问 GitHub。已安装的版本是 {local}。",
+      "desligado": "新版本提醒已关闭（/cronicas updates on 可打开）。已安装的版本是 {local}。",
+      "ultima": "上次检查：{dia}。",
+      "como": "工作方式：每天第一次会话时，模组只读取 GitHub 上公开文件里的版本号。不会发送任何关于你或你对话的信息，也不会自动下载或安装任何东西：更新由你决定。/cronicas updates off 关闭；/cronicas updates check 立即检查。",
+      "ligada": "新版本提醒已打开：模组每天检查一次是否有新版本。/cronicas updates off 可关闭。",
+      "desligada": "新版本提醒已关闭：模组不再访问 GitHub。/cronicas updates on 可重新打开。",
+      "teste": "测试：在下次会话之前，“书”会显示一个假的新版本（{versao}）的小星星。把鼠标移到“书”上就能看到气泡。"
     }
   }
 }

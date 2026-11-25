@@ -120,7 +120,7 @@ export type Jogo = {
 }
 
 /** As abas do Livro da Lua. */
-export type AbaDoLivro = 'ficha' | 'mapa' | 'bestiario' | 'trofeus' | 'grimorio'
+export type AbaDoLivro = 'ficha' | 'mapa' | 'bestiario' | 'trofeus' | 'grimorio' | 'comandos'
 
 export type Hud = {
   luz: Luz | null
@@ -168,6 +168,8 @@ declare module 'claude-code' {
       passagem: Shaped<Passagem | null>
       /** Bioma visitado com /cronicas fase (só para ver o cenário); null = o da página da jornada. */
       visita: string | null
+      /** Versão nova do mod publicada no GitHub (o número), ou null: estrelinha no Livro. */
+      novaVersao: string | null
     }
   }
 }

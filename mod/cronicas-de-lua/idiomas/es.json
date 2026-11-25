@@ -129,7 +129,9 @@
     "livro": {
       "nome": "Libro",
       "explica": "Ficha, páginas,\nbestiario y trofeos.",
-      "aberto_explica": "Haz clic para cerrar."
+      "aberto_explica": "Haz clic para cerrar.",
+      "nova_nome": "Versión nueva {versao} (disponible)",
+      "nova_explica": "Salió una actualización de las Crónicas.\nCómo actualizar: /cronicas updates"
     }
   },
   "lua_nova": {
@@ -143,7 +145,8 @@
       "mapa": "Mapa",
       "bestiario": "Bestiario",
       "trofeus": "Trofeos",
-      "grimorio": "Grimorio"
+      "grimorio": "Grimorio",
+      "comandos": "Comandos"
     },
     "ficha": {
       "titulo": "Ficha de Lua",
@@ -246,6 +249,14 @@
         "outros": "Peleas ganadas: {lutas} · jefe en {n} peleas"
       },
       "trofeus": "Trofeos: {n}"
+    },
+    "comandos": {
+      "titulo": "Comandos",
+      "subtitulo": "Escribe /cronicas y el comando en la caja de mensajes.",
+      "nova": "Versión nueva {versao} (disponible)",
+      "nova_como": "Cómo actualizar: /cronicas updates",
+      "link": "Todos los comandos explicados (GitHub)",
+      "alt": "Página de comandos: {lista}."
     }
   },
   "superficies": {
@@ -276,7 +287,8 @@
     },
     "livro": {
       "nao_abriu": "📖 El Libro todavía no se abrió: {motivo}"
-    }
+    },
+    "atualizacao": "🌙 Versión nueva de Las Crónicas de Lua: {nova}. Mira cómo actualizar con /cronicas updates."
   },
   "chips": {
     "vigilia": "Vigilia",
@@ -381,7 +393,8 @@
       "estado": "As Crônicas de Lua: escala {escala}x, {px} px por columna, modo {modo}. Nivel {nivel}, {xp} XP, {paginas}/10 páginas.",
       "uso": "Usa /cronicas scale 1|2|3, /cronicas ruler y /cronicas width <px> (calibrar el ancho), /cronicas image|frame, /cronicas test (comparar los dos), /cronicas new-moon (simular caché fría), /cronicas vigil (luz de luna casi al final, para ver la Vigilia), /cronicas boss [nombre] y /cronicas hit (probar el jefe), /cronicas elite (la próxima pelea es el élite) o /cronicas language (idioma del juego).",
       "trofeus": "Trofeos: {lista}",
-      "uso_cenario": "Para ver el escenario: /cronicas walk [segundos] (Lua camina y se detiene respirando) y /cronicas stage [bioma] (cambio de fase al siguiente bioma o al que pidas; no cuenta página)."
+      "uso_cenario": "Para ver el escenario: /cronicas walk [segundos] (Lua camina y se detiene respirando) y /cronicas stage [bioma] (cambio de fase al siguiente bioma o al que pidas; no cuenta página).",
+      "uso_atualizacao": "Versión nueva: /cronicas updates (cómo actualizar), updates check (comprueba ahora), updates off|on (desactiva o activa el aviso)."
     },
     "linha": "Altura de línea: {n} px. Las áreas del ratón se recalcularon.",
     "teste": "Prueba activada: la franja aparece dos veces, A (marco interactivo) y B (imagen). /cronicas test otra vez la desactiva.",
@@ -405,6 +418,18 @@
       "vai": "Cambio de fase: {de} → {para}. Solo para ver el escenario: no cuenta página. Se queda allí hasta el próximo jefe, que trae su propio bioma.",
       "chefao": "Ahora no: hay un jefe en escena. Derrótalo con /cronicas hit.",
       "desconhecido": "No conozco el bioma \"{pedido}\". Los biomas: {lista}."
+    },
+    "atualizacao": {
+      "tem_nova": "Versión nueva de Las Crónicas de Lua: {nova} (la tuya es {local}). Para actualizar, escribe en la caja de mensajes, uno a la vez:\n{cmd1}\n{cmd2}\nDespués abre una sesión nueva. Mientras haya una versión nueva, el botón del Libro muestra una estrellita.",
+      "em_dia": "Tienes la versión más nueva de Las Crónicas de Lua ({local}).",
+      "sem_resposta": "No se pudo comprobar ahora (sin internet o acceso bloqueado). La versión instalada es {local}.",
+      "bloqueado": "La comprobación está bloqueada en este equipo (CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC): el mod no consulta GitHub. La versión instalada es {local}.",
+      "desligado": "El aviso de versión nueva está desactivado (/cronicas updates on lo activa). La versión instalada es {local}.",
+      "ultima": "Última comprobación: {dia}.",
+      "como": "Cómo funciona: una vez al día, en la primera sesión, el mod lee solo el número de la versión publicada en GitHub (un archivo público). No se envía nada sobre ti ni sobre tus conversaciones, y nada se descarga ni se instala solo: quien actualiza eres tú. /cronicas updates off lo desactiva; /cronicas updates check comprueba ahora.",
+      "ligada": "Aviso de versión nueva activado: una vez al día el mod comprueba si salió una versión nueva. /cronicas updates off lo desactiva.",
+      "desligada": "Aviso de versión nueva desactivado: el mod ya no consulta GitHub. /cronicas updates on lo activa de nuevo.",
+      "teste": "Prueba: el Libro muestra la estrellita de una versión nueva de mentira ({versao}) hasta la próxima sesión. Pasa el ratón por el Libro para ver el globo."
     }
   }
 }

@@ -26,6 +26,8 @@ Requires a recent Claude Code with mod support (built and tested on 2.1.331).
 
 The mod runs two read-only commands on your machine, nothing else: `ps` (to notice when the app restarted, for the intro) and, on macOS, `defaults read -g AppleLanguages` (your system language).
 
+**Updates.** Once a day, in the first session, the mod also reads the version number published in this repository (a public file on GitHub). Nothing about you or your conversations is sent, and nothing is downloaded or installed on its own. When a new version is out, the Book button gets a little star and its balloon tells you; to update, type `/plugin marketplace update cronicas-de-lua`, then `/plugin update cronicas-de-lua@cronicas-de-lua`, and open a new session. `/cronicas updates off` turns the check off (it also stays off when `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` is set). If you'd rather have updates arrive by themselves, Claude Code has its own auto-update option for marketplaces.
+
 ## Where it runs
 | Surface | What you get |
 |---|---|
@@ -48,7 +50,7 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 | 🏮&nbsp;**Vigil** | Keeps the cache warm by sending a tiny message just before the moonlight runs out (at most 6 times, only while you are away). **Off by default: it spends your plan limit.** |
 | 🎒&nbsp;**Backpack** | Offers to compact the conversation (like `/compact`), with a confirmation. |
 | 🚩&nbsp;**Banner** | Asks Claude to write a mission summary so you can continue in a new session. |
-| 📖&nbsp;**Book** | Opens Lua's Book: her sheet, the journey map (the biomes she has visited), the bestiary of defeated bosses, the trophy shelf and the grimoire (Claude's tools as spells). |
+| 📖&nbsp;**Book** | Opens Lua's Book: her sheet, the journey map (the biomes she has visited), the bestiary of defeated bosses, the trophy shelf and the grimoire (Claude's tools as spells), plus a Commands page listing every `/cronicas` command, with a link to their explanation here. When a new version is out, a little star shines on the Book and the Commands page shows how to update. |
 
 ![Lua's Book: sheet, journey map, bestiary, trophies and grimoire](previa_livro.gif)
 
@@ -87,6 +89,7 @@ Type them in Claude's message box, like a normal message. The answer shows up on
 |---|---|
 | <code>/cronicas</code> | Lua's summary: level, XP, recovered pages (x/10), latest trophies and the band settings. It also lists every command. |
 | <code>/cronicas&nbsp;language&nbsp;[code]</code> | Lists the game's languages or switches to one: `en`, `pt-BR`, `es`, `fr`, `de`, `zh`, `ja`, `ko` (`auto` goes back to the system language). |
+| <code>/cronicas&nbsp;updates&nbsp;[check&#124;off&#124;on]</code> | Shows your version and whether a new one is out, with how to update. `check` checks now; `off` / `on` turns the daily check off or on. |
 | <code>/cronicas&nbsp;ruler</code> | Shows a ruler under the scene to measure the band. Type it again to hide it. |
 | <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | Calibrates the width with the last whole number at the ruler's right edge (e.g. `/cronicas width 752`). |
 | <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | Pixel size of the scene: 1x, 2x or 3x. |

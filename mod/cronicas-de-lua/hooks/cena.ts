@@ -2016,6 +2016,8 @@ export type EstadoBotoes = {
   mochila: boolean
   estandarte: 'enrolado' | 'escrevendo' | 'pronto'
   livro: boolean
+  /** Há uma versão nova do mod publicada (o número dela): estrelinha no Livro e aviso no balão. */
+  novaVersao?: string
 }
 
 /** Nome e explicação do balão de cada botão, conforme o estado. Curtos: cabem numa linha. */
@@ -2034,6 +2036,9 @@ export function rotuloBotao(b: NomeBotao, e?: EstadoBotoes): [string, string] {
           ? [tx('botoes.estandarte.nome'), tx('botoes.estandarte.pronto')]
           : [tx('botoes.estandarte.nome'), tx('botoes.estandarte.explica')]
     case 'livro':
+      if (e?.novaVersao !== undefined && e.livro !== true) {
+        return [tx('botoes.livro.nova_nome', { versao: e.novaVersao }), tx('botoes.livro.nova_explica', { versao: e.novaVersao })]
+      }
       return e?.livro === true ? [tx('botoes.livro.nome'), tx('botoes.livro.aberto_explica')] : [tx('botoes.livro.nome'), tx('botoes.livro.explica')]
   }
 }
@@ -2059,7 +2064,45 @@ function iconeBotao(d: Doc, b: NomeBotao, bx: number, y: number, e: EstadoBotoes
     const k = d.anim('0%,25%,50%,75%{filter:brightness(2.2)}12.5%,37.5%,62.5%,87.5%,100%{filter:none}', PISCA_MS, 'step-end', -desde, '1 both')
     corpo = `<g class="${k}">${corpo}</g>`
   }
+  if (b === 'livro' && e?.novaVersao !== undefined) {
+    corpo += estrelaNova(d, bx + 23, y - 4, agora)
+  }
   return corpo
+}
+
+/**
+ * A estrelinha de versão nova no canto do Livro: 4 pontas, 11x11 px, dourada
+ * com miolo branco e contorno escuro (pedido do usuário: maior e brilhando).
+ * Pulsa devagar; a cada ~2,4 s dá um clarão (cresce e clareia) e três faíscas
+ * em cruz piscam em volta, cada uma no seu tempo.
+ */
+const ESTRELA_NOVA: readonly (readonly [number, number, number, number, string])[] = [
+  [5, 0, 1, 11, '#f2c14e'],
+  [0, 5, 11, 1, '#f2c14e'],
+  [4, 2, 3, 7, '#f2c14e'],
+  [2, 4, 7, 3, '#f2c14e'],
+  [5, 2, 1, 7, '#fff6d0'],
+  [2, 5, 7, 1, '#fff6d0'],
+  [4, 4, 3, 3, '#ffffff'],
+]
+/** Faíscas em volta da estrela: [dx, dy] do centro delas, relativo ao canto da estrela. */
+const FAISCAS_NOVA: readonly (readonly [number, number])[] = [[-3, 3], [2, 14], [10, 12]]
+
+function estrelaNova(d: Doc, x: number, y: number, agora: number): string {
+  const forma = (dx: number, dy: number, cor?: string) => ESTRELA_NOVA.map(([a, b, w, h, c]) => `<rect x='${x + a + dx}' y='${y + b + dy}' width='${w}' height='${h}' fill='${cor ?? c}'/>`).join('')
+  const contorno = [[-1, 0], [1, 0], [0, -1], [0, 1]].map(([dx, dy]) => forma(dx ?? 0, dy ?? 0, '#1a1430')).join('')
+  const ms = 2400
+  const atraso = -mod(agora, ms)
+  // clarão: cresce 1,35x e clareia, volta; depois só pulsa de leve
+  const kc = d.anim('0%{transform:scale(1);filter:brightness(1)}6%{transform:scale(1.35);filter:brightness(1.6)}14%{transform:scale(1);filter:brightness(1)}55%{opacity:1}75%{opacity:0.7}100%{opacity:1;transform:scale(1)}', ms, 'ease-in-out', atraso, 'infinite')
+  const kf = d.anim('0%{opacity:0}6%{opacity:1}18%{opacity:0}100%{opacity:0}', ms, 'step-end', atraso, 'infinite')
+  const faiscas = FAISCAS_NOVA.map(([fx, fy], i) => {
+    const cx = x + fx
+    const cy = y + fy
+    // cada faísca entra um pouco depois da outra (o atraso a mais segura a vez dela)
+    return `<g class='${kf}' style='animation-delay:${Math.round(atraso + (i + 1) * 180)}ms'><rect x='${cx}' y='${cy - 1}' width='1' height='3' fill='#fff6d0'/><rect x='${cx - 1}' y='${cy}' width='3' height='1' fill='#fff6d0'/><rect x='${cx}' y='${cy}' width='1' height='1' fill='#ffffff'/></g>`
+  }).join('')
+  return `<g class='${kc}' style='transform-box:fill-box;transform-origin:center'>${contorno}${forma(0, 0)}</g>${faiscas}`
 }
 const PASSO_BOTAO = 38 // 32 px de botão + 6 de vão, igual entre todos
 export const LARGURA_BOTOES = PASSO_BOTAO * 3 + 32

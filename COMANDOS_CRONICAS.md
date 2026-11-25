@@ -12,6 +12,7 @@ Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idi
 |---|---|
 | `language` (`lang`) | `idioma` |
 | `intro` | `abertura` |
+| `updates` (`update`) | `atualizacao` |
 | `scale` | `escala` |
 | `ruler` | `regua` |
 | `width` | `largura` (e `phone` além de `celular` no fim) |
@@ -46,6 +47,17 @@ Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idi
 | `/cronicas language auto` | Esquece a escolha e volta ao idioma do sistema (no Mac, o das preferências de idioma; sem tradução, inglês). Também aceita `sistema`. |
 
 **O jogo fala os 8 idiomas**: inglês, português, espanhol, francês, alemão, chinês, japonês e coreano.
+
+## ✨ Versão nova
+
+| Comando | O que faz |
+|---|---|
+| `/cronicas updates` | Mostra a **sua versão** e se **saiu uma nova**, com o jeito de atualizar (os dois comandos do Claude Code, um de cada vez: `/plugin marketplace update cronicas-de-lua` e depois `/plugin update cronicas-de-lua@cronicas-de-lua`; depois, abrir uma sessão nova). Também funciona como `/cronicas atualizacao`. |
+| `/cronicas updates check` | Confere **agora** no GitHub (sem esperar o dia seguinte). Também aceita `conferir`/`verificar`. |
+| `/cronicas updates off` · `on` | Desliga (ou liga de novo) a conferência. Desligada, o mod **não consulta mais o GitHub**. Também aceita `desligar`/`ligar`. |
+| `/cronicas updates test` | Mostra a **estrelinha** e o balão de uma versão nova **de mentira**, só nesta sessão, para ver como fica (não consulta nada). |
+
+**Como funciona:** uma vez por dia, na primeira sessão, o mod lê **só o número da versão** publicada no GitHub (o `plugin.json`, um arquivo público). Se houver uma mais nova que a sua, o botão do **Livro** ganha uma **estrelinha dourada pulsando** e o balão dele (passando o mouse) avisa; clicando no Livro, ele abre direto na página **Comandos**, com uma faixa dourada que diz a versão e como atualizar; na primeira vez que aparece, também sobe um aviso no canto. **Nada sobre você ou suas conversas é enviado** (o pedido não leva dados seus; o GitHub vê só o endereço de rede, como em qualquer acesso), **nada é baixado nem instalado sozinho**: quem atualiza é você. Sem internet, nada aparece e ele tenta de novo no outro dia. Também fica desligado quando o computador tem `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` ligado. Se você preferir que as atualizações cheguem sozinhas, o próprio Claude Code tem uma opção de atualização automática dos marketplaces.
 
 ## 🖼️ Ajustar a faixa
 
@@ -107,7 +119,7 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | 🏮 **Vigília** (🔥 acesa) | Começa **apagada**. Clicando, acende (a chama tremula, toca um som e aparece o aviso do custo). Acesa, quando o luar está pra acabar (5 min antes no cache de 1 h; 1 min antes no de 5 min) e o Claude está parado, a Lua manda uma mensagem curtinha pra manter o cache quente; a lanterna pisca e toca o som. **No máximo 6 mensagens** por vez que é acesa; depois ela apaga sozinha e avisa (com outro som). Clique de novo pra apagar. ⚠️ Cada mensagem gasta um pouco do limite do plano. Vale só pra conversa atual. |
 | 🎒 **Mochila** | Arruma a conversa (compacta o contexto, como o `/compact`). Pede confirmação embaixo da cena: **Arrumar a mochila** ou **Agora não**. Fica cheia (ícone e barra tremendo) acima de 80%. Só funciona com o Claude parado. |
 | 🚩 **Estandarte** | Pede ao Claude o **resumo da missão** pra continuar numa sessão nova (o `PROXIMA_SESSAO.md`). A bandeira ondula enquanto ele escreve; no fim, aparece **🌙 Nova conversa** (ou **Fechar**). Só funciona com o Claude parado. |
-| 📖 **Livro** | Abre e fecha o painel do Livro, ao lado da conversa, com 5 abas: **Ficha** (a Lua, nível, XP, lutas, chefões, troféus e as páginas das Crônicas), **Mapa** (o mapa da jornada: os 9 biomas num caminho, os visitados em cor, e uma lua onde a Lua está), **Bestiário** (os 10 chefões; os que ainda não caíram ficam em silhueta), **Troféus** (a estante com os troféus dos elites; passe o mouse para ler o nome do erro) e **Grimório** (as ferramentas do Claude como feitiços, com quantas vezes cada uma foi usada). |
+| 📖 **Livro** | Abre e fecha o painel do Livro, ao lado da conversa (com uma **estrelinha dourada** no canto quando saiu uma versão nova do mod: veja **Versão nova**), com 6 abas: **Ficha** (a Lua, nível, XP, lutas, chefões, troféus e as páginas das Crônicas), **Mapa** (o mapa da jornada: os 9 biomas num caminho, os visitados em cor, e uma lua onde a Lua está), **Bestiário** (os 10 chefões; os que ainda não caíram ficam em silhueta), **Troféus** (a estante com os troféus dos elites; passe o mouse para ler o nome do erro), **Grimório** (as ferramentas do Claude como feitiços, com quantas vezes cada uma foi usada) e **Comandos** (os nomes em inglês de todos os `/cronicas`, com um link para o README no idioma do jogo, na seção de comandos; com versão nova, uma faixa dourada no topo diz a versão e como atualizar, e o Livro abre direto nessa página). |
 
 ## 🔘 Botões abaixo da cena
 
@@ -117,4 +129,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 25/11/2026 (`/cronicas passear` e `/cronicas fase` para ver o cenário).*
+*Última atualização: 25/11/2026 (`/cronicas updates` e a página Comandos do Livro).*

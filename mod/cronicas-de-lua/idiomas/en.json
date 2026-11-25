@@ -129,7 +129,9 @@
     "livro": {
       "nome": "Book",
       "explica": "Stats, pages,\nbestiary and trophies.",
-      "aberto_explica": "Click to close."
+      "aberto_explica": "Click to close.",
+      "nova_nome": "New version {versao} (available)",
+      "nova_explica": "An update of the Chronicles is out.\nHow to update: /cronicas updates"
     }
   },
   "lua_nova": {
@@ -143,7 +145,8 @@
       "mapa": "Map",
       "bestiario": "Bestiary",
       "trofeus": "Trophies",
-      "grimorio": "Grimoire"
+      "grimorio": "Grimoire",
+      "comandos": "Commands"
     },
     "ficha": {
       "titulo": "Lua's Stats",
@@ -246,6 +249,14 @@
         "outros": "Fights won: {lutas} · boss in {n} fights"
       },
       "trofeus": "Trophies: {n}"
+    },
+    "comandos": {
+      "titulo": "Commands",
+      "subtitulo": "Type /cronicas and the command in the message box.",
+      "nova": "New version {versao} (available)",
+      "nova_como": "How to update: /cronicas updates",
+      "link": "Every command explained (GitHub)",
+      "alt": "Commands page: {lista}."
     }
   },
   "superficies": {
@@ -276,7 +287,8 @@
     },
     "livro": {
       "nao_abriu": "📖 The Book didn't open yet: {motivo}"
-    }
+    },
+    "atualizacao": "🌙 New version of The Chronicles of Lua: {nova}. See how to update with /cronicas updates."
   },
   "chips": {
     "vigilia": "Vigil",
@@ -381,7 +393,8 @@
       "estado": "As Crônicas de Lua: scale {escala}x, {px} px per column, {modo} mode. Level {nivel}, {xp} XP, {paginas}/10 pages.",
       "uso": "Use /cronicas scale 1|2|3, /cronicas ruler and /cronicas width <px> (calibrate the width), /cronicas image|frame, /cronicas test (compare both), /cronicas new-moon (simulate a cold cache), /cronicas vigil (moonlight near its end, to see the Vigil), /cronicas boss [name] and /cronicas hit (try the boss), /cronicas elite (the next fight is the elite) or /cronicas language (game language).",
       "trofeus": "Trophies: {lista}",
-      "uso_cenario": "To see the scenery: /cronicas walk [seconds] (Lua walks, then stops and breathes) and /cronicas stage [biome] (stage change to the next biome or the one you name; no page is counted)."
+      "uso_cenario": "To see the scenery: /cronicas walk [seconds] (Lua walks, then stops and breathes) and /cronicas stage [biome] (stage change to the next biome or the one you name; no page is counted).",
+      "uso_atualizacao": "New version: /cronicas updates (how to update), updates check (check now), updates off|on (turn the notice off or on)."
     },
     "linha": "Line height: {n} px. The mouse areas were recalculated.",
     "teste": "Test on: the band shows twice, A (interactive frame) and B (image). /cronicas test again turns it off.",
@@ -405,6 +418,18 @@
       "vai": "Stage change: {de} → {para}. Just for sightseeing: no page is counted. She stays there until the next boss, who brings their own biome.",
       "chefao": "Not now: a boss is on stage. Defeat it with /cronicas hit.",
       "desconhecido": "I don't know the biome \"{pedido}\". Biomes: {lista}."
+    },
+    "atualizacao": {
+      "tem_nova": "New version of The Chronicles of Lua: {nova} (yours is {local}). To update, type these in the message box, one at a time:\n{cmd1}\n{cmd2}\nThen open a new session. While there is a new version, the Book button shows a little star.",
+      "em_dia": "You have the latest version of The Chronicles of Lua ({local}).",
+      "sem_resposta": "Couldn't check right now (offline or access blocked). Your installed version is {local}.",
+      "bloqueado": "Checking is blocked on this computer (CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC): the mod doesn't contact GitHub. Your installed version is {local}.",
+      "desligado": "The new-version notice is off (/cronicas updates on turns it on). Your installed version is {local}.",
+      "ultima": "Last check: {dia}.",
+      "como": "How it works: once a day, in the first session, the mod reads only the version number published on GitHub (a public file). Nothing about you or your conversations is sent, and nothing is downloaded or installed on its own: you decide when to update. /cronicas updates off turns it off; /cronicas updates check checks now.",
+      "ligada": "New-version notice on: once a day the mod checks whether a new version is out. /cronicas updates off turns it off.",
+      "desligada": "New-version notice off: the mod no longer contacts GitHub. /cronicas updates on turns it back on.",
+      "teste": "Test: the Book shows the little star of a pretend new version ({versao}) until the next session. Hover over the Book to see the balloon."
     }
   }
 }

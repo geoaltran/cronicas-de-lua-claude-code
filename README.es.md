@@ -26,6 +26,8 @@ Requiere un Claude Code reciente con soporte para mods (creado y probado en la 2
 
 El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuándo se reinició la app, por la introducción) y, en macOS, `defaults read -g AppleLanguages` (el idioma del sistema).
 
+**Actualizaciones.** Una vez al día, en la primera sesión, el mod también lee el número de la versión publicada en este repositorio (un archivo público en GitHub). No se envía nada sobre ti ni sobre tus conversaciones, y nada se descarga ni se instala solo. Cuando sale una versión nueva, el botón del Libro muestra una estrellita y su globo te avisa; para actualizar, escribe `/plugin marketplace update cronicas-de-lua`, después `/plugin update cronicas-de-lua@cronicas-de-lua`, y abre una sesión nueva. `/cronicas updates off` desactiva la comprobación (también queda desactivada con `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC`). Si prefieres que las actualizaciones lleguen solas, Claude Code tiene su propia opción de actualización automática de los marketplaces.
+
 ## Dónde funciona
 | Superficie | Qué obtienes |
 |---|---|
@@ -48,7 +50,7 @@ El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuán
 | 🏮&nbsp;**Vigilia** | Mantiene la caché caliente enviando un mensaje cortito justo antes de que se apague la luz de luna (como mucho 6 veces, y solo mientras no estás). **Apagada por defecto: gasta el límite de tu plan.** |
 | 🎒&nbsp;**Mochila** | Ofrece compactar la conversación (como `/compact`), con confirmación. |
 | 🚩&nbsp;**Estandarte** | Pide a Claude un resumen de la misión para continuar en una sesión nueva. |
-| 📖&nbsp;**Libro** | Abre el Libro de Lua: su ficha, el mapa del viaje (los biomas que ha visitado), el bestiario de jefes derrotados, la estantería de trofeos y el grimorio (las herramientas de Claude como hechizos). |
+| 📖&nbsp;**Libro** | Abre el Libro de Lua: su ficha, el mapa del viaje (los biomas que ha visitado), el bestiario de jefes derrotados, la estantería de trofeos y el grimorio (las herramientas de Claude como hechizos), además de una página de Comandos con todos los comandos de `/cronicas` y un enlace a su explicación aquí. Cuando sale una versión nueva, una estrellita brilla en el Libro y la página de Comandos muestra cómo actualizar. |
 
 ![El Libro de Lua: ficha, mapa del viaje, bestiario, trofeos y grimorio](previa_livro.gif)
 
@@ -87,6 +89,7 @@ Escríbelos en la caja de mensajes de Claude, como un mensaje normal. La respues
 |---|---|
 | <code>/cronicas</code> | Resumen de Lua: nivel, XP, páginas recuperadas (x/10), últimos trofeos y los ajustes de la franja. También lista todos los comandos. |
 | <code>/cronicas&nbsp;language&nbsp;[code]</code> | Muestra los idiomas del juego o cambia a uno: `en`, `pt-BR`, `es`, `fr`, `de`, `zh`, `ja`, `ko` (`auto` vuelve al idioma del sistema). |
+| <code>/cronicas&nbsp;updates&nbsp;[check&#124;off&#124;on]</code> | Muestra tu versión y si salió una nueva, con cómo actualizar. `check` comprueba ahora; `off` / `on` desactiva o activa la comprobación diaria. |
 | <code>/cronicas&nbsp;ruler</code> | Muestra una regla bajo la escena para medir la franja. Escríbelo de nuevo para ocultarla. |
 | <code>/cronicas&nbsp;width&nbsp;&lt;px&gt;</code> | Calibra el ancho con el último número entero en el borde derecho de la regla (p. ej. `/cronicas width 752`). |
 | <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | Tamaño del píxel de la escena: 1x, 2x o 3x. |

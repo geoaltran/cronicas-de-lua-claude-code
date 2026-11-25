@@ -129,7 +129,9 @@
     "livro": {
       "nome": "책",
       "explica": "능력치, 페이지,\n도감과 트로피.",
-      "aberto_explica": "클릭하면 닫혀요."
+      "aberto_explica": "클릭하면 닫혀요.",
+      "nova_nome": "새 버전 {versao} (업데이트 가능)",
+      "nova_explica": "연대기 업데이트가 나왔어요.\n업데이트 방법: /cronicas updates"
     }
   },
   "lua_nova": {
@@ -143,7 +145,8 @@
       "mapa": "지도",
       "bestiario": "도감",
       "trofeus": "트로피",
-      "grimorio": "마법서"
+      "grimorio": "마법서",
+      "comandos": "명령어"
     },
     "ficha": {
       "titulo": "Lua의 능력치",
@@ -246,6 +249,14 @@
         "outros": "승리 {lutas}번 · 보스까지 {n}번 남음"
       },
       "trofeus": "트로피: {n}"
+    },
+    "comandos": {
+      "titulo": "명령어",
+      "subtitulo": "메시지 창에 /cronicas 와 명령어를 입력하세요.",
+      "nova": "새 버전 {versao} (업데이트 가능)",
+      "nova_como": "업데이트 방법: /cronicas updates",
+      "link": "모든 명령어 설명 (GitHub)",
+      "alt": "명령어 페이지: {lista}."
     }
   },
   "superficies": {
@@ -276,7 +287,8 @@
     },
     "livro": {
       "nao_abriu": "📖 책이 아직 열리지 않았어요: {motivo}"
-    }
+    },
+    "atualizacao": "🌙 루나 연대기 새 버전: {nova}. 업데이트 방법은 /cronicas updates 에서 확인하세요."
   },
   "chips": {
     "vigilia": "불침번",
@@ -381,7 +393,8 @@
       "estado": "As Crônicas de Lua: 배율 {escala}x, 칸당 {px} px, {modo} 모드. 레벨 {nivel}, {xp} XP, 페이지 {paginas}/10.",
       "uso": "사용법: /cronicas scale 1|2|3, /cronicas ruler와 /cronicas width <px>(너비 보정), /cronicas image|frame, /cronicas test(둘 다 비교), /cronicas new-moon(식은 캐시 시뮬레이션), /cronicas vigil(달빛을 거의 끝으로, 불침번 보기), /cronicas boss [이름]과 /cronicas hit(보스전 체험), /cronicas elite(다음 전투는 엘리트), /cronicas language(게임 언어).",
       "trofeus": "트로피: {lista}",
-      "uso_cenario": "배경을 보려면: /cronicas walk [초] (루아가 걷다가 멈춰서 숨을 쉬어요)와 /cronicas stage [지역] (다음 지역이나 고른 지역으로 스테이지 이동, 페이지는 세지 않아요)."
+      "uso_cenario": "배경을 보려면: /cronicas walk [초] (루아가 걷다가 멈춰서 숨을 쉬어요)와 /cronicas stage [지역] (다음 지역이나 고른 지역으로 스테이지 이동, 페이지는 세지 않아요).",
+      "uso_atualizacao": "새 버전: /cronicas updates (업데이트 방법), updates check (지금 확인), updates off|on (알림 끄기·켜기)."
     },
     "linha": "줄 높이: {n} px. 마우스 영역을 다시 계산했어요.",
     "teste": "테스트 켜짐: 띠가 두 번 나와요. A(조작 가능한 프레임)와 B(이미지). /cronicas test를 다시 입력하면 꺼져요.",
@@ -405,6 +418,18 @@
       "vai": "스테이지 이동: {de} → {para}. 구경만 하는 거라 페이지는 세지 않아요. 다음 보스가 자기 지역을 데려올 때까지 그곳에 있어요.",
       "chefao": "지금은 안 돼요: 보스가 있어요. /cronicas hit 로 쓰러뜨리세요.",
       "desconhecido": "\"{pedido}\" 지역은 몰라요. 지역: {lista}."
+    },
+    "atualizacao": {
+      "tem_nova": "루나 연대기 새 버전: {nova} (지금 버전은 {local}). 업데이트하려면 메시지 창에 하나씩 입력하세요:\n{cmd1}\n{cmd2}\n그다음 새 세션을 여세요. 새 버전이 있는 동안 책 버튼에 작은 별이 보여요.",
+      "em_dia": "루나 연대기 최신 버전을 쓰고 있어요 ({local}).",
+      "sem_resposta": "지금은 확인할 수 없어요 (인터넷이 없거나 접근이 막혀 있어요). 설치된 버전은 {local} 이에요.",
+      "bloqueado": "이 컴퓨터에서는 확인이 막혀 있어요 (CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC). 모드는 GitHub에 접속하지 않아요. 설치된 버전은 {local} 이에요.",
+      "desligado": "새 버전 알림이 꺼져 있어요 (/cronicas updates on 으로 켜기). 설치된 버전은 {local} 이에요.",
+      "ultima": "마지막 확인: {dia}.",
+      "como": "작동 방식: 하루에 한 번, 첫 세션에서 모드는 GitHub에 공개된 버전 번호만 읽어요 (공개 파일). 당신이나 대화에 관한 정보는 전혀 보내지 않고, 저절로 내려받거나 설치하지도 않아요. 업데이트는 당신이 결정해요. /cronicas updates off 로 끄고, /cronicas updates check 로 지금 확인해요.",
+      "ligada": "새 버전 알림을 켰어요: 하루에 한 번 새 버전이 나왔는지 확인해요. /cronicas updates off 로 끌 수 있어요.",
+      "desligada": "새 버전 알림을 껐어요: 모드는 더 이상 GitHub에 접속하지 않아요. /cronicas updates on 으로 다시 켜요.",
+      "teste": "테스트: 다음 세션까지 책에 가짜 새 버전({versao})의 작은 별이 보여요. 책에 마우스를 올리면 말풍선이 보여요."
     }
   }
 }

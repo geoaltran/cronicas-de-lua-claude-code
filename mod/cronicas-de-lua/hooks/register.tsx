@@ -7,6 +7,7 @@ import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icone
 import { ABERTURA, BOTOES, FIM_ABERTURA, FIM_PASSAGEM, PASSAGEM, biomaDaPagina, biomaDe, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua, tamanhoNoApp } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
 import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, tp, usarIdioma } from './t'
+import { type Atualizacao, CMD_ATUALIZAR, CMD_CATALOGO, URL_VERSAO, versaoDeTeste, versaoDoJson, versaoNova } from './atualizacao'
 import { DEMORADA_MS, ELITE, ELITE_XP, ENTRA, JUNTA_MS, PREVIA, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, previaDoChefao, quandoAcerta, roteiro, tipoTrofeu, xpDaFerramenta } from './luta'
 import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, proximoChefao, vidaEmTarefas, xpDoChefao } from './chefao'
 
@@ -70,6 +71,8 @@ const abertura = atom({ plugin: 'cronicas-de-lua', key: 'abertura' } as const, n
 const passagem = atom({ plugin: 'cronicas-de-lua', key: 'passagem' } as const, null as Passagem | null, { shape: 'passagem-1' })
 /** Bioma visitado com /cronicas fase (só para ver o cenário); null = o da página da jornada. */
 const visita = atom({ plugin: 'cronicas-de-lua', key: 'visita' } as const, null as string | null)
+/** Versão nova do mod publicada no GitHub (o número), ou null: estrelinha no Livro. */
+const novaVersao = atom({ plugin: 'cronicas-de-lua', key: 'novaVersao' } as const, null as string | null)
 /** Quantos erros de ações diferentes o elite lembra (os mais velhos saem). */
 const ERROS_MAX = 20
 /** Quantos troféus ficam guardados. */
@@ -214,6 +217,108 @@ async function marcarFimDoLuar($: $, restanteMs: number): Promise<void> {
 // dia e na primeira sessão depois que o app reinicia; /cronicas abertura
 // mostra de novo; um clique na cena pula.
 let alarmesAbertura: Timer[] = []
+
+/** O README no idioma do jogo, já na seção dos comandos (a âncora que o GitHub gera do título). */
+const README_COMANDOS: Readonly<Record<string, readonly [string, string]>> = {
+  en: ['README.md', 'commands'],
+  'pt-BR': ['README.pt-BR.md', 'comandos'],
+  es: ['README.es.md', 'comandos'],
+  fr: ['README.fr.md', 'commandes'],
+  de: ['README.de.md', 'befehle'],
+  'zh-CN': ['README.zh-CN.md', '命令'],
+  ja: ['README.ja.md', 'コマンド'],
+  ko: ['README.ko.md', '명령어'],
+}
+
+function readmeDosComandos(): string {
+  const [arq, ancora] = README_COMANDOS[idioma()] ?? ['README.md', 'commands']
+  return `https://github.com/geoaltran/cronicas-de-lua-claude-code/blob/main/${arq}#${encodeURIComponent(ancora)}`
+}
+
+/** Quanto o aviso de versão nova espera depois do começo da sessão (a faixa desenha antes). */
+const ESPERA_ATUALIZACAO = 3000
+
+/** A versão instalada (o plugin.json do próprio mod), validada; undefined se não deu para ler. */
+async function versaoLocal($: $): Promise<string | undefined> {
+  try {
+    return versaoDoJson(await $.fs.read(`${$.plugin.root}/.claude-plugin/plugin.json`))
+  } catch {
+    return undefined
+  }
+}
+
+async function lerAtualizacao($: $): Promise<Atualizacao> {
+  return { ...((await $.store.get('atualizacao')) as Atualizacao | undefined) }
+}
+
+type Conferencia = { local: string | undefined; nova: string | null; resultado: 'ok' | 'falhou' | 'bloqueado' | 'desligado' | 'hoje' }
+
+/**
+ * Aviso de versão nova: no máximo uma consulta por dia (ou agora, com `forcar`),
+ * só a leitura do plugin.json público no GitHub. Ver `atualizacao.ts`.
+ * O resultado acende ou apaga a estrelinha do Livro; a primeira vez que uma
+ * versão nova aparece, um aviso de canto (uma vez por versão).
+ */
+async function conferirAtualizacao($: $, forcar: boolean, avisar: boolean): Promise<Conferencia> {
+  const st = await lerAtualizacao($)
+  const local = await versaoLocal($)
+  if (st.desligada === true) {
+    await update($, novaVersao, () => null)
+    return { local, nova: null, resultado: 'desligado' }
+  }
+  const hoje = diaDe(await $.clock.now())
+  let resultado: Conferencia['resultado'] = 'hoje'
+  if (forcar || st.dia !== hoje) {
+    if ((await $.env.get('CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC')) !== undefined) {
+      resultado = 'bloqueado'
+    } else {
+      try {
+        const r = await $.http.fetch(URL_VERSAO)
+        const remota = r.ok ? versaoDoJson(r.text) : undefined
+        if (remota === undefined) {
+          resultado = 'falhou'
+        } else {
+          st.remota = remota
+          resultado = 'ok'
+        }
+      } catch {
+        resultado = 'falhou'
+      }
+      // falhou também conta como a consulta do dia (sem internet, não insiste a cada sessão)
+      st.dia = hoje
+    }
+  }
+  const nova = versaoNova(st.remota, local)
+  await update($, novaVersao, () => nova)
+  if (nova !== null && avisar && st.avisada !== nova) {
+    $.ui.toast(tx('avisos.atualizacao', { nova }))
+    st.avisada = nova
+  }
+  await $.store.set('atualizacao', st)
+  return { local, nova, resultado }
+}
+
+/** O texto do /cronicas updates (sem argumento, check, on). */
+function textoAtualizacao(c: Conferencia, st: Atualizacao): string {
+  const local = c.local ?? '?'
+  if (c.resultado === 'desligado') {
+    return tx('comando.atualizacao.desligado', { local }) + '\n' + tx('comando.atualizacao.como')
+  }
+  const linhas = [
+    c.nova !== null
+      ? tx('comando.atualizacao.tem_nova', { nova: c.nova, local, cmd1: CMD_CATALOGO, cmd2: CMD_ATUALIZAR })
+      : c.resultado === 'bloqueado'
+        ? tx('comando.atualizacao.bloqueado', { local })
+        : c.resultado === 'falhou'
+          ? tx('comando.atualizacao.sem_resposta', { local })
+          : tx('comando.atualizacao.em_dia', { local }),
+  ]
+  if (st.dia !== undefined && c.resultado !== 'bloqueado') {
+    linhas.push(tx('comando.atualizacao.ultima', { dia: st.dia }))
+  }
+  linhas.push(tx('comando.atualizacao.como'))
+  return linhas.join('\n')
+}
 
 /** O dia local (AAAA-MM-DD) de uma hora em ms. */
 function diaDe(ms: number): string {
@@ -991,6 +1096,10 @@ async function alternarLivro($: $): Promise<void> {
     await update($, botoes, (b): Botoes => ({ ...b, livro: false }))
     return
   }
+  // com a estrelinha de versão nova acesa, o Livro abre na página dos comandos (o aviso está lá)
+  if ((await read($, novaVersao)) !== null) {
+    await update($, livroAba, () => 'comandos')
+  }
   const r = await $.ui.open({ id: LIVRO, title: tx('livro.titulo_painel') })
   await update($, botoes, (b): Botoes => ({ ...b, livro: true }))
   if (!r.isPlaced) {
@@ -1220,14 +1329,14 @@ function acoesDaFaixa($: $, els: Elementos, bt: Botoes, confirmando: boolean, ca
  * aberta, um SVG em modo imagem na largura do painel. Na estante de troféus,
  * as áreas de hover do app por cima de cada troféu mostram o nome do erro.
  */
-function livroNoPainel($: $, els: Elementos, jogo: Jogo, aba: AbaDoLivro, colunas: number, a: Ajustes, sup: Sup = 'desktop') {
-  const { Box, Button, Svg } = els
+function livroNoPainel($: $, els: Elementos, jogo: Jogo, aba: AbaDoLivro, colunas: number, a: Ajustes, sup: Sup = 'desktop', nova: string | null = null) {
+  const { Box, Button, Link, Svg } = els
   const remota = sup !== 'desktop'
   const px = Math.max(200, colunas * (remota ? pxColunaDe(a, sup) : PX_CELULA) - 4)
   // pixel art em escala inteira: 2x quando a página cabe (o texto em 1x fica miúdo), senão 1x
   const escala = px >= 2 * LARGURA_LIVRO ? 2 : 1
   const W = Math.floor(px / escala)
-  const p = paginaDoLivro(aba, jogo, W, escala)
+  const p = paginaDoLivro(aba, jogo, W, escala, nova ?? undefined)
   const aj: Ajustes = { ...a, escala }
   return (
     <Box flexDirection="column" gap={1}>
@@ -1240,6 +1349,7 @@ function livroNoPainel($: $, els: Elementos, jogo: Jogo, aba: AbaDoLivro, coluna
         {remota ? <Svg source={p.svg} alt={p.alt} /> : <Svg source={p.svg} height={p.altura} alt={p.alt} />}
         {p.alvos.length > 0 && !remota ? areasDeHover(els, aj, colunas, W, p.alvos, false) : null}
       </Box>
+      {aba === 'comandos' ? <Link key="readme" href={readmeDosComandos()} label={tx('livro.comandos.link')} /> : null}
     </Box>
   )
 }
@@ -1365,6 +1475,11 @@ export const SUBCOMANDOS: Readonly<Record<string, string>> = {
   hit: 'golpe',
   walk: 'passear',
   stage: 'fase',
+  updates: 'atualizacao',
+  update: 'atualizacao',
+  'atualização': 'atualizacao',
+  'atualizações': 'atualizacao',
+  atualizacoes: 'atualizacao',
   vigil: 'vigilia',
   'new-moon': 'lua-nova',
 }
@@ -1392,7 +1507,7 @@ async function registrarComando($: $): Promise<void> {
   await $.command.register({
     name: 'cronicas',
     description: tx('comando.descricao'),
-    argumentHint: 'language [en|pt-BR|…] | intro [on|off] | scale 2 | ruler | width 690 | image | frame | test | new-moon | vigil | boss [list N] [name] | hit | elite | surfaces',
+    argumentHint: 'language [en|pt-BR|…] | updates [check|off|on] | intro [on|off] | scale 2 | ruler | width 690 | image | frame | test | new-moon | vigil | boss [list N] [name] | hit | elite | surfaces',
   })
 }
 
@@ -1438,6 +1553,16 @@ export const register: Register = on => {
       }
     }
     await registrarComando($)
+    // aviso de versão nova: num alarme logo depois (a sessão não fica presa à
+    // rede; o trabalho solto de um gancho não sobrevive a ele)
+    const interativa = e.isInteractive
+    try {
+      $.clock.after(ESPERA_ATUALIZACAO, () => {
+        void conferirAtualizacao($, false, interativa).catch(() => undefined)
+      })
+    } catch {
+      // sem alarme, fica para a próxima sessão
+    }
     return next(e)
   })
 
@@ -1449,6 +1574,28 @@ export const register: Register = on => {
     const n = Number(valor)
     if (chave === 'language' || chave === 'lang' || chave === 'idioma') {
       return { text: await comandoIdioma($, valor) }
+    }
+    if (chave === 'atualizacao') {
+      const op = (valor ?? '').toLowerCase()
+      const st = await lerAtualizacao($)
+      if (['off', 'desligar', 'desliga', 'nao', 'não'].includes(op)) {
+        await $.store.set('atualizacao', { ...st, desligada: true })
+        await update($, novaVersao, () => null)
+        return { text: tx('comando.atualizacao.desligada') }
+      }
+      if (['test', 'teste', 'prova'].includes(op)) {
+        const versao = versaoDeTeste(await versaoLocal($))
+        await update($, novaVersao, () => versao)
+        return { text: tx('comando.atualizacao.teste', { versao }) }
+      }
+      const ligar = ['on', 'ligar', 'liga', 'sim'].includes(op)
+      if (ligar) {
+        await $.store.set('atualizacao', { ...st, desligada: false })
+      }
+      const forcar = ligar || ['check', 'conferir', 'verificar', 'agora', 'now'].includes(op)
+      const c = await conferirAtualizacao($, forcar, false)
+      const texto = textoAtualizacao(c, await lerAtualizacao($))
+      return { text: ligar ? tx('comando.atualizacao.ligada') + '\n' + texto : texto }
     }
     if (chave === 'superficies' || chave === 'superfícies') {
       // diagnóstico da Fase 5: onde esta sessão está desenhando agora
@@ -1647,6 +1794,8 @@ export const register: Register = on => {
           tx('comando.ajuda.uso') +
           '\n' +
           tx('comando.ajuda.uso_cenario') +
+          '\n' +
+          tx('comando.ajuda.uso_atualizacao') +
           ((atual.jogo.trofeus ?? []).length > 0 ? '\n' + tx('comando.ajuda.trofeus', { lista: (atual.jogo.trofeus ?? []).slice(0, 5).join(' · ') }) : ''),
       }
     }
@@ -1692,8 +1841,8 @@ export const register: Register = on => {
       const { Text } = els
       return <Text>{tx('livro.widget', { nivel: nivelDe(jogo.xp).nivel, paginas: paginasNoCiclo(jogo.paginas), trofeus: (jogo.trofeus ?? []).length })}</Text>
     }
-    const [aba, a] = await Promise.all([read($, livroAba), lerAjustes($)])
-    return livroNoPainel($, els, jogo, aba, e.props.bodyColumns, a, e.surface)
+    const [aba, a, nova] = await Promise.all([read($, livroAba), lerAjustes($), read($, novaVersao)])
+    return livroNoPainel($, els, jogo, aba, e.props.bodyColumns, a, e.surface, nova)
   })
 
   // Mana e Mochila: o engine avisa quando os números mudam.
@@ -1855,6 +2004,7 @@ export const register: Register = on => {
     const ab = await read($, abertura)
     const ps = await read($, passagem)
     const vis = await read($, visita)
+    const nova = await read($, novaVersao)
     colunasPor[sup] = e.props.bodyColumns
     ultimaSup = sup
     const pxColuna = pxColunaDe(a, sup)
@@ -1874,6 +2024,7 @@ export const register: Register = on => {
       mochila: (estado.mochila ?? 0) > 80 || bt.mochila !== 'nada',
       estandarte: bt.estandarte === 'nada' ? 'enrolado' : bt.estandarte,
       livro: bt.livro,
+      ...(nova === null ? {} : { novaVersao: nova }),
     }
     const vista = { agora, W, escala: a.escala, celula: PX_CELULA / a.escala, modo, caminho: c, hud: estado, textoLongo, botoes: true, estadoBotoes, semBaloes: !textoLongo, ...(vis === null ? {} : { bioma: vis }), ...(luta === undefined ? {} : { luta }), ...(ch === null ? {} : { chefao: ch }), ...(ab !== null && luta === undefined && ch === null ? { abertura: ab } : {}), ...(ps !== null && ab === null && luta === undefined && ch === null ? { passagem: ps } : {}) } as const
     // desktop (sem quadro, teste ou prova): cenário e frente em dois Svg sobrepostos
