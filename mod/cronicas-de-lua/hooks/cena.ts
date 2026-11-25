@@ -409,6 +409,48 @@ function haloDaLanterna(d: Doc, x: number, y: number, k: number, agora: number):
   return `<g class="${c}">${([[9, 0.16], [6, 0.26], [4, 0.4]] as const).map(([rr, a]) => `<circle cx="${x}" cy="${y}" r="${rr}" fill="#ffd68c" opacity="${a}"/>`).join('')}</g>`
 }
 
+/**
+ * Reflexo correndo no vidro (fase B, prévia "vidro_brilho" do Castelo): uma
+ * faixa de luz diagonal atravessa o vidro de cada espelho, cada um no seu
+ * tempo, recortada pelo retângulo do vidro. Caixas no
+ * meio.png (x0, y0, x1, y1) já com o `descer_cena` (12); a outra metade do meio
+ * é espelhada (x -> 957 - x). Rola com o meio.
+ */
+const VIDRO: Record<string, readonly (readonly [number, number, number, number])[]> = {
+  // só o vidro dos 4 espelhos (usuário, 25/11/2026: nada na moldura, nas colunas
+  // nem nos cristais); medido pela cor azul-clara do vidro, 1 px dentro da moldura
+  castelo_vidro: [[76, 153, 92, 193], [116, 150, 133, 193], [312, 156, 329, 192], [382, 153, 399, 193]],
+}
+
+function reflexoNoVidro(d: Doc, nome: string, topo: number, agora: number): string {
+  const lista = VIDRO[nome]
+  if (lista === undefined) {
+    return ''
+  }
+  const ms = 5300
+  const rnd = sorteio(11)
+  let s = ''
+  const caixas = lista.flatMap(([x0, y0, x1, y1]) => [[x0, y0, x1, y1], [957 - x1, y0, 957 - x0, y1]] as const)
+  for (const [x0, y0a, x1, y1a] of caixas) {
+    const y0 = y0a - topo
+    const y1 = y1a - topo
+    const h = y1 - y0
+    const anda = x1 - x0 + h / 2 + 12
+    const id = d.id('vd')
+    const cp = d.id('vc')
+    // a faixa: miolo claro (3 px) e borda mais fraca (7 px), inclinada como na prévia
+    // (usuário, 25/11/2026: a 90% ficou forte demais; miolo 55%, borda 28%)
+    const faixa = (larg: number, op: number) =>
+      `<polygon points="${x0 - 6 - larg / 2},${y1} ${x0 - 6 + larg / 2},${y1} ${x0 - 6 + larg / 2 - h / 2},${y0} ${x0 - 6 - larg / 2 - h / 2},${y0}" fill="#ffffff" opacity="${op}"/>`
+    // passa em 30% do ciclo; no resto, parada fora da peça
+    const k = d.anim(`0%{transform:translateX(0px)}30%{transform:translateX(${r(anda)}px)}100%{transform:translateX(${r(anda)}px)}`, ms, 'linear', -mod(agora + rnd() * ms, ms), 'infinite')
+    s +=
+      `<clipPath id="${cp}"><rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${h}"/></clipPath>` +
+      `<g id="${id}" clip-path="url(#${cp})"><g class="${k}">${faixa(7, 0.28)}${faixa(3, 0.55)}</g></g><use href="#${id}" x="${P}"/>`
+  }
+  return s
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -644,6 +686,10 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   const md = b.camadas.meio
   if (md !== undefined) {
     partes.push(rolo(camadaBioma(d, pre + 'meio', md, md.oy - topo, 2), md.vel))
+  }
+  // reflexo correndo no vidro (Castelo), rola com o meio; nada na economia
+  if (md !== undefined && VIDRO[nome] !== undefined && v.economia !== true) {
+    partes.push(rolo(reflexoNoVidro(d, nome, topo, agora), md.vel))
   }
   // vapor nas chaminés (rola com o meio; menos na luta, nenhum na economia)
   if (md !== undefined && CHAMINES[nome] !== undefined && v.economia !== true) {
