@@ -9,7 +9,7 @@ Ein Pixel-Art-RPG-Mod für Claude Code. Jedes Tool ist ein Monster, dein Kontext
 ![Lua kämpft gegen ein Monster, während Claude arbeitet](previa_luta.gif)
 
 ## Was ist das?
-Ein Streifen direkt über dem Nachrichtenfeld. Während Claude arbeitet, wandert Lua durch einen Wald mit Parallax-Effekt; jedes Mal, wenn Claude ein Tool benutzt, taucht ein Monster auf und sie kämpft dagegen. Hinter dem Spiel ist der Streifen ein ehrliches Dashboard deiner Sitzung: wie warm der Prompt-Cache noch ist, wie viel vom Limit deines Plans übrig ist und wie voll das Kontextfenster ist.
+Ein Streifen direkt über dem Nachrichtenfeld. Während Claude arbeitet, wandert Lua durch 9 Biome mit Parallax-Effekt; jedes Mal, wenn Claude ein Tool benutzt, taucht ein Monster auf und sie kämpft dagegen. Hinter dem Spiel ist der Streifen ein ehrliches Dashboard deiner Sitzung: wie warm der Prompt-Cache noch ist, wie viel vom Limit deines Plans übrig ist und wie voll das Kontextfenster ist.
 
 ![Lua wandert durch den Wald](previa_caminhada.gif)
 
@@ -22,7 +22,7 @@ Tippe in einer Claude-Code-Sitzung:
 
 Antworte mit `y`, um den Marketplace hinzuzufügen, und wähle dann einen Geltungsbereich. Der Streifen erscheint über dem Nachrichtenfeld.
 
-Benötigt ein aktuelles Claude Code mit Mod-Unterstützung (gebaut und getestet mit 2.1.330).
+Benötigt ein aktuelles Claude Code mit Mod-Unterstützung (gebaut und getestet mit 2.1.331).
 
 Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um zu merken, wann die App neu gestartet wurde, fürs Intro) und unter macOS `defaults read -g AppleLanguages` (die Systemsprache).
 
@@ -37,7 +37,7 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 ## Die Balken
 | Balken | Bedeutet |
 |---|---|
-| **Mondlicht** (blasses Gold) | Wie warm der Prompt-Cache noch ist (Zeit seit der letzten Antwort im Verhältnis zur Lebensdauer des Caches). Ein Mond am Himmel nimmt mit ihm ab. **Neumond** = Lua fällt in Ohnmacht und die nächste Nachricht kostet mehr (der Cache ist kalt). |
+| **Mondlicht** (blasses Gold) | Wie warm der Prompt-Cache noch ist (Zeit seit der letzten Antwort im Verhältnis zur Lebensdauer des Caches). Ein Mond am Himmel nimmt mit ihm ab. **Neumond** = Lua schläft ein und die nächste Nachricht kostet mehr (der Cache ist kalt). |
 | **Sternenmana** | Was vom 5-Stunden-Limit deines Plans übrig ist (das 7-Tage-Limit steht im Tooltip). |
 | **Rucksack** | Wie viel vom Kontextfenster belegt ist. Ab 80 % wackelt der Rucksack und schlägt vor, aufzuräumen (zu komprimieren). |
 | **XP / Level** | Steigt, während du arbeitest. Alle 2 Level glänzen Luas Zauberstab und Gewand ein bisschen mehr. |
@@ -48,9 +48,9 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 | 🏮&nbsp;**Nachtwache** | Hält den Cache warm, indem sie kurz vor dem Erlöschen des Mondlichts eine winzige Nachricht schickt (höchstens 6-mal und nur, während du weg bist). **Standardmäßig aus: Sie verbraucht das Limit deines Plans.** |
 | 🎒&nbsp;**Rucksack** | Bietet an, das Gespräch zu komprimieren (wie `/compact`), mit Bestätigung. |
 | 🚩&nbsp;**Banner** | Bittet Claude um eine Zusammenfassung der Mission, damit du in einer neuen Sitzung weitermachen kannst. |
-| 📖&nbsp;**Buch** | Öffnet Luas Buch: ihr Charakterblatt, das Bestiarium der besiegten Bosse, das Trophäenregal und das Grimoire (Claudes Tools als Zauber). |
+| 📖&nbsp;**Buch** | Öffnet Luas Buch: ihr Charakterblatt, die Reisekarte (die Biome, die sie schon besucht hat), das Bestiarium der besiegten Bosse, das Trophäenregal und das Grimoire (Claudes Tools als Zauber). |
 
-![Luas Buch: Charakterblatt, Bestiarium, Trophäen und Grimoire](previa_livro.gif)
+![Luas Buch: Charakterblatt, Reisekarte, Bestiarium, Trophäen und Grimoire](previa_livro.gif)
 
 ## Was im Spiel passiert
 | Echtes Ereignis | Im Spiel |
@@ -61,13 +61,24 @@ Der Mod führt auf deinem Rechner nur zwei Befehle aus, die nur lesen: `ps` (um 
 | Ein langsames Tool | Lua kanalisiert mit einem magischen Kreis zu ihren Füßen |
 | Das Tool schlägt fehl | Das Monster schlägt zurück; Lua blinkt rot (nur optisch) |
 | Ein später behobener Fehler | Elite (Obsidiangolem); wenn er fällt, bleibt eine Trophäe fürs Regal |
-| Eine Aufgabenliste wird erstellt, oder alle 12 Kämpfe | **Boss**: Leben in Blöcken, einer pro Aufgabe. Normale Treffer prallen an seinem **Schild** ab (Lua kratzt sich am Kopf ❓💧); eine erledigte Aufgabe räumt einen Block ab; die letzte ist ein **KRITISCHER** Treffer. Der Boss fällt mit einer wiedergefundenen Seite (x/10) und einem Levelaufstieg |
+| Eine Aufgabenliste wird erstellt, oder alle 12 Kämpfe | **Boss**: Leben in Blöcken, einer pro Aufgabe. Normale Treffer prallen an seinem **Schild** ab (Lua kratzt sich am Kopf ❓💧); eine erledigte Aufgabe räumt einen Block ab; die letzte ist ein **KRITISCHER** Treffer. Der Boss fällt mit einer wiedergefundenen Seite (x/10) und einem Levelaufstieg, und Lua zieht ins nächste Biom weiter |
 
 ![Kampf gegen Dame Penumbra: der Schild hält, eine Aufgabe nimmt einen Block, kritischer Treffer](previa_chefao_penumbra.gif)
 
-![Kampf gegen den Uhrmacher](previa_chefao_relojoeiro.gif)
+![Kampf gegen den Uhrmacher im Uhrturm](previa_chefao_relojoeiro.gif)
+
+![Kampf gegen den Obsidiangolem in den Ruinen](previa_chefao_golem.gif)
 
 Monster nach Tool: Dateien lesen → Vespera · Code bearbeiten → Uhrmacher / Sir Solis · Terminal → Ignis · Web → Leviathan / Nébula · Integrationen (MCP) → Spiegelkönig · Subagenten → Klone der Dame Penumbra. Die Bosse kommen der Reihe nach, jeder mit einer Seite der Chroniken, bis zu Malakor, danach Neues Spiel+.
+
+## Die Biome
+Lunária hat 9 Biome, eins für jeden Abschnitt der Reise, jedes zu seiner eigenen Tageszeit und mit eigenen Animationen: Wald (Vespera und Dame Penumbra), Ruinen (Obsidiangolem), Meer (Leviathan), Vulkan (Ignis), Uhrturm (Uhrmacher), Morgenrot (Sir Solis), Glasschloss (Spiegelkönig), Sternenhimmel (Nébula) und Finsternis (Malakor). Wellen und ein kreisender Leuchtturm, pulsierende Lava, Zahnräder, Sonnenstrahlen, Spiegelungen, die über die Spiegel huschen, Sternschnuppen und eigene Partikel an jedem Ort.
+
+![Lua wandert durch die 9 Biome](previa_biomas.gif)
+
+Wenn der Boss eines Bioms fällt, folgt der **Levelwechsel**: Lua geht über den Rand hinaus, der Bildschirm wird schwarz und sie betritt das nächste Biom, unter dem Seitentitel in Pixel-Art.
+
+![Levelwechsel: von den Ruinen ans Meer, mit dem Seitentitel](previa_passagem.gif)
 
 ## Befehle
 Tipp sie wie eine normale Nachricht in Claudes Eingabefeld. Die Antwort siehst nur du: Claude bekommt nichts davon mit und dein Plan-Limit wird nicht angetastet. Jeder Unterbefehl hört auch auf seinen portugiesischen Namen (`regua`, `largura`, `chefao`, `golpe`…).
@@ -81,7 +92,7 @@ Tipp sie wie eine normale Nachricht in Claudes Eingabefeld. Die Antwort siehst n
 | <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | Pixelgröße der Szene: 1x, 2x oder 3x. |
 | <code>/cronicas&nbsp;intro</code> | Spielt das Intro jetzt ab (ein Klick überspringt es). `intro off` / `intro on` schaltet das automatische Intro (erste Sitzung des Tages) aus oder ein. |
 | <code>/cronicas&nbsp;surfaces</code> | Sagt, wo diese Sitzung gerade gezeichnet wird (Desktop-App, VS Code, Terminal, Handy). |
-| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Ruft den nächsten Boss der Reise oder einen bestimmten (`vespera`, `ignis`, `malakor`…). `/cronicas boss list` ruft einen Aufgabenlisten-Boss mit Schild. |
+| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Ruft den nächsten Boss der Reise oder einen bestimmten (`vespera`, `ignis`, `malakor`…); die Szene wechselt in sein Biom. `/cronicas boss list` ruft einen Aufgabenlisten-Boss mit Schild. |
 | <code>/cronicas&nbsp;hit</code> | Trifft den Boss auf der Bühne; beim Aufgabenlisten-Boss erledigt er eine Aufgabe. Der letzte Treffer ist der kritische. |
 | <code>/cronicas&nbsp;elite</code> | Der nächste normale Kampf wird zum Elite-Gegner (Obsidiangolem) mit einer Trophäe. |
 | <code>/cronicas&nbsp;vigil</code> | Bringt das Mondlicht fast ans Ende, damit du die Nachtwache arbeiten siehst (mit brennender Laterne schickt sie eine echte, winzige Nachricht). |

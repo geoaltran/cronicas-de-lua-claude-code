@@ -9,7 +9,7 @@ Un mod RPG en pixel art para Claude Code. Cada herramienta es un monstruo, tu ve
 ![Lua luchando contra un monstruo mientras Claude trabaja](previa_luta.gif)
 
 ## Qué es
-Una franja justo encima de la caja de mensajes. Mientras Claude trabaja, Lua camina por un bosque en parallax; cada vez que Claude usa una herramienta, aparece un monstruo y ella lo combate. Detrás del juego, la franja es un panel honesto de tu sesión: qué tan caliente sigue la caché del prompt, cuánto queda del límite de tu plan y qué tan llena está la ventana de contexto.
+Una franja justo encima de la caja de mensajes. Mientras Claude trabaja, Lua recorre 9 biomas en parallax; cada vez que Claude usa una herramienta, aparece un monstruo y ella lo combate. Detrás del juego, la franja es un panel honesto de tu sesión: qué tan caliente sigue la caché del prompt, cuánto queda del límite de tu plan y qué tan llena está la ventana de contexto.
 
 ![Lua caminando por el bosque](previa_caminhada.gif)
 
@@ -22,7 +22,7 @@ En una sesión de Claude Code, escribe:
 
 Responde `y` para añadir el marketplace y elige un alcance. La franja aparece encima de la caja de mensajes.
 
-Requiere un Claude Code reciente con soporte para mods (creado y probado en la 2.1.330).
+Requiere un Claude Code reciente con soporte para mods (creado y probado en la 2.1.331).
 
 El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuándo se reinició la app, por la introducción) y, en macOS, `defaults read -g AppleLanguages` (el idioma del sistema).
 
@@ -37,7 +37,7 @@ El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuán
 ## Las barras
 | Barra | Significa |
 |---|---|
-| **Luz de Luna** (dorado pálido) | Qué tan caliente sigue la caché del prompt (tiempo desde la última respuesta frente a la vida de la caché). Una luna en el cielo mengua con ella. **Luna nueva** = Lua se desmaya y el próximo mensaje cuesta más (la caché está fría). |
+| **Luz de Luna** (dorado pálido) | Qué tan caliente sigue la caché del prompt (tiempo desde la última respuesta frente a la vida de la caché). Una luna en el cielo mengua con ella. **Luna nueva** = Lua se queda dormida y el próximo mensaje cuesta más (la caché está fría). |
 | **Maná Estelar** | Lo que queda del límite de 5 horas de tu plan (el de 7 días, en el globo de ayuda). |
 | **Mochila** | Cuánto de la ventana de contexto está en uso. Por encima del 80 %, la mochila tiembla y sugiere ordenarla (compactar). |
 | **XP / Nivel** | Sube mientras trabajas. Cada 2 niveles, la varita y la ropa de Lua brillan un poco más. |
@@ -48,9 +48,9 @@ El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuán
 | 🏮&nbsp;**Vigilia** | Mantiene la caché caliente enviando un mensaje cortito justo antes de que se apague la luz de luna (como mucho 6 veces, y solo mientras no estás). **Apagada por defecto: gasta el límite de tu plan.** |
 | 🎒&nbsp;**Mochila** | Ofrece compactar la conversación (como `/compact`), con confirmación. |
 | 🚩&nbsp;**Estandarte** | Pide a Claude un resumen de la misión para continuar en una sesión nueva. |
-| 📖&nbsp;**Libro** | Abre el Libro de Lua: su ficha, el bestiario de jefes derrotados, la estantería de trofeos y el grimorio (las herramientas de Claude como hechizos). |
+| 📖&nbsp;**Libro** | Abre el Libro de Lua: su ficha, el mapa del viaje (los biomas que ha visitado), el bestiario de jefes derrotados, la estantería de trofeos y el grimorio (las herramientas de Claude como hechizos). |
 
-![El Libro de Lua: ficha, bestiario, trofeos y grimorio](previa_livro.gif)
+![El Libro de Lua: ficha, mapa del viaje, bestiario, trofeos y grimorio](previa_livro.gif)
 
 ## Qué pasa en el juego
 | Evento real | En el juego |
@@ -61,13 +61,24 @@ El mod ejecuta solo dos comandos de lectura en tu equipo: `ps` (para saber cuán
 | Una herramienta lenta | Lua canaliza con un círculo mágico a sus pies |
 | La herramienta falla | El monstruo contraataca; Lua parpadea en rojo (solo visual) |
 | Un error corregido después | Élite (Gólem de Obsidiana); al caer deja un trofeo para la estantería |
-| Se crea una lista de tareas, o cada 12 combates | **Jefe**: vida en bloques, uno por tarea. Los golpes normales rebotan en su **escudo** (Lua se rasca la cabeza ❓💧); una tarea terminada tumba un bloque; la última es un golpe **CRÍTICO**. El jefe cae con una página recuperada (x/10) y una subida de nivel |
+| Se crea una lista de tareas, o cada 12 combates | **Jefe**: vida en bloques, uno por tarea. Los golpes normales rebotan en su **escudo** (Lua se rasca la cabeza ❓💧); una tarea terminada tumba un bloque; la última es un golpe **CRÍTICO**. El jefe cae con una página recuperada (x/10) y una subida de nivel, y Lua sigue hacia el bioma siguiente |
 
 ![Combate contra Dama Penumbra: el escudo aguanta, una tarea tumba un bloque, golpe crítico](previa_chefao_penumbra.gif)
 
-![Combate contra el Relojero](previa_chefao_relojoeiro.gif)
+![Combate contra el Relojero en la Torre del Reloj](previa_chefao_relojoeiro.gif)
+
+![Combate contra el Gólem de Obsidiana en las Ruinas](previa_chefao_golem.gif)
 
 Monstruos por herramienta: leer archivos → Vespera · editar código → Relojero / Sir Solis · terminal → Ignis · web → Leviatán / Nébula · integraciones (MCP) → Rey Espejo · subagentes → clones de Dama Penumbra. Los jefes llegan en orden, una página de las Crónicas cada uno, hasta Malakor, y luego Nueva Partida+.
+
+## Los biomas
+Lunária tiene 9 biomas, uno por cada tramo del viaje, cada uno a su hora del día y con sus propias animaciones: Bosque (Vespera y Dama Penumbra), Ruinas (Gólem de Obsidiana), Mar (Leviatán), Volcán (Ignis), Torre del Reloj (Relojero), Aurora (Sir Solis), Castillo de Cristal (Rey Espejo), Cielo Estrellado (Nébula) y Eclipse (Malakor). Olas y un faro que gira, lava que palpita, engranajes, rayos de sol, reflejos que corren por los espejos, estrellas fugaces y partículas propias en cada lugar.
+
+![Lua recorriendo los 9 biomas](previa_biomas.gif)
+
+Cuando cae el jefe de un bioma, llega el **cambio de fase**: Lua sale caminando por el borde, la pantalla se funde a negro y ella entra en el bioma siguiente, bajo el título de la página en pixel art.
+
+![Cambio de fase: de las Ruinas al Mar, con el título de la página](previa_passagem.gif)
 
 ## Comandos
 Escríbelos en la caja de mensajes de Claude, como un mensaje normal. La respuesta aparece solo para ti: Claude no recibe nada y no se gasta el límite del plan. Cada subcomando también responde a su nombre en portugués (`regua`, `largura`, `chefao`, `golpe`…).
@@ -81,7 +92,7 @@ Escríbelos en la caja de mensajes de Claude, como un mensaje normal. La respues
 | <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | Tamaño del píxel de la escena: 1x, 2x o 3x. |
 | <code>/cronicas&nbsp;intro</code> | Reproduce la apertura ahora (un clic la salta). `intro off` / `intro on` apaga o enciende la automática (primera sesión del día). |
 | <code>/cronicas&nbsp;surfaces</code> | Dice dónde se está dibujando esta sesión (app de escritorio, VS Code, terminal, móvil). |
-| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Llama al próximo jefe del viaje, o a uno elegido (`vespera`, `ignis`, `malakor`…). `/cronicas boss list` llama a un jefe de lista de tareas, con escudo. |
+| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Llama al próximo jefe del viaje, o a uno elegido (`vespera`, `ignis`, `malakor`…), y la escena pasa a su bioma. `/cronicas boss list` llama a un jefe de lista de tareas, con escudo. |
 | <code>/cronicas&nbsp;hit</code> | Golpea al jefe en escena; contra un jefe de lista, completa una tarea. El último golpe es el crítico. |
 | <code>/cronicas&nbsp;elite</code> | El próximo combate normal será la élite (Gólem de Obsidiana) con un trofeo. |
 | <code>/cronicas&nbsp;vigil</code> | Deja la luz de luna casi al final para ver la Vigilia en acción (con el farol encendido, envía un mensajito de verdad). |

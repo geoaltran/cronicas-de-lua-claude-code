@@ -69,7 +69,7 @@ Estes comandos fazem acontecer na hora o que normalmente depende do trabalho do 
 
 | Comando | O que faz |
 |---|---|
-| `/cronicas chefao` | Chama o **próximo chefão da jornada**, com 3 de vida. |
+| `/cronicas chefao` | Chama o **próximo chefão da jornada**, com 3 de vida. A cena vai para o **bioma** dele; quando ele cai, a passagem de fase leva a Lua ao bioma da página seguinte. |
 | `/cronicas chefao <nome>` | Chama **um chefão específico**, com 3 de vida. Aceita o nome com ou sem acento, só o começo, ou o começo de qualquer palavra do nome (`solis`, `espelho`, `obsidiana`): `vespera`, `dama`, `golem`, `leviata`, `ignis`, `relojoeiro`, `sir solis`, `rei espelho`, `nebula`, `malakor`. |
 | `/cronicas chefao lista` | Chama um **chefão de lista de tarefas** (de mentira), com 3 tarefas: a vida vem em blocos, um por tarefa. Enquanto ele está em cena, cada ferramenta que o Claude usa bate no **escudo** e tira só um pouquinho (número pequeno cinza; às vezes 0). Também aceita o número de tarefas e o nome: `/cronicas chefao lista 5 relojoeiro`. |
 | `/cronicas golpe` | Uma **luta de verdade** contra o chefão em cena, como se o Claude tivesse usado uma ferramenta: a Lua ataca, o chefão pisca branco, recua e treme, e sai o número de dano. Cada golpe é uma luta (vários seguidos entram na fila). Num chefão comum, tira 1 de vida. Num chefão de lista, **conclui uma tarefa**: a vida desce até o fim do bloco. O golpe que derruba é **CRÍTICO** (número grande dourado, a cena treme); ele se desfaz em pixels, sobe "+PÁGINA x/10" e a Lua ganha um nível. |
@@ -104,4 +104,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 25/11/2026 (`/cronicas chefao` acha o chefão por qualquer palavra do nome).*
+*Última atualização: 25/11/2026 (`/cronicas chefao` leva a cena ao bioma do chefão; acha o chefão por qualquer palavra do nome).*

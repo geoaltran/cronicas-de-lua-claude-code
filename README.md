@@ -9,7 +9,7 @@ A pixel-art RPG mod for Claude Code. Every tool call is a monster, your context 
 ![Lua fighting a monster while Claude works](previa_luta.gif)
 
 ## What it is
-A band right above the message box. While Claude works, Lua walks through a forest in parallax; every time Claude uses a tool, a monster shows up and she fights it. Behind the game, the band is an honest dashboard of your session: how warm the prompt cache is, how much of your plan limit is left, and how full the context window is.
+A band right above the message box. While Claude works, Lua travels through 9 parallax biomes; every time Claude uses a tool, a monster shows up and she fights it. Behind the game, the band is an honest dashboard of your session: how warm the prompt cache is, how much of your plan limit is left, and how full the context window is.
 
 ![Lua walking through the forest](previa_caminhada.gif)
 
@@ -22,7 +22,7 @@ In a Claude Code session, type:
 
 Answer `y` to add the marketplace, then pick a scope. The band appears above the message box.
 
-Requires a recent Claude Code with mod support (built and tested on 2.1.330).
+Requires a recent Claude Code with mod support (built and tested on 2.1.331).
 
 The mod runs two read-only commands on your machine, nothing else: `ps` (to notice when the app restarted, for the intro) and, on macOS, `defaults read -g AppleLanguages` (your system language).
 
@@ -37,7 +37,7 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 ## The bars
 | Bar | Means |
 |---|---|
-| **Moonlight** (pale gold) | How warm the prompt cache still is (time since the last reply vs. the cache lifetime). A moon in the sky wanes with it. **New moon** = Lua faints and the next message costs more (the cache is cold). |
+| **Moonlight** (pale gold) | How warm the prompt cache still is (time since the last reply vs. the cache lifetime). A moon in the sky wanes with it. **New moon** = Lua falls asleep and the next message costs more (the cache is cold). |
 | **Star Mana** | What is left of your plan's 5-hour limit (the 7-day one in the tooltip). |
 | **Backpack** | How much of the context window is used. Above 80% the backpack shakes and suggests packing (compacting). |
 | **XP / Level** | Grows as you work. Every 2 levels Lua's wand and outfit get a little shinier. |
@@ -48,9 +48,9 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 | 🏮&nbsp;**Vigil** | Keeps the cache warm by sending a tiny message just before the moonlight runs out (at most 6 times, only while you are away). **Off by default: it spends your plan limit.** |
 | 🎒&nbsp;**Backpack** | Offers to compact the conversation (like `/compact`), with a confirmation. |
 | 🚩&nbsp;**Banner** | Asks Claude to write a mission summary so you can continue in a new session. |
-| 📖&nbsp;**Book** | Opens Lua's Book: her sheet, the bestiary of defeated bosses, the trophy shelf and the grimoire (Claude's tools as spells). |
+| 📖&nbsp;**Book** | Opens Lua's Book: her sheet, the journey map (the biomes she has visited), the bestiary of defeated bosses, the trophy shelf and the grimoire (Claude's tools as spells). |
 
-![Lua's Book: sheet, bestiary, trophies and grimoire](previa_livro.gif)
+![Lua's Book: sheet, journey map, bestiary, trophies and grimoire](previa_livro.gif)
 
 ## What happens in the game
 | Real event | In the game |
@@ -61,13 +61,24 @@ The mod runs two read-only commands on your machine, nothing else: `ps` (to noti
 | A slow tool | Lua channels with a magic circle at her feet |
 | The tool fails | The monster counter-attacks; Lua blinks red (visual only) |
 | An error fixed later | Elite (Obsidian Golem); its fall leaves a trophy for the shelf |
-| A task list is created, or every 12 fights | **Boss**: life in blocks, one per task. Ordinary hits bounce off its **shield** (Lua scratches her head ❓💧); a finished task drops a block; the last one is a **CRITICAL** hit. The boss falls with a recovered page (x/10) and a level up |
+| A task list is created, or every 12 fights | **Boss**: life in blocks, one per task. Ordinary hits bounce off its **shield** (Lua scratches her head ❓💧); a finished task drops a block; the last one is a **CRITICAL** hit. The boss falls with a recovered page (x/10) and a level up, and Lua moves on to the next biome |
 
 ![Boss fight against Lady Penumbra: the shield holds, a task drops a block, critical hit](previa_chefao_penumbra.gif)
 
-![Boss fight against the Clockmaker](previa_chefao_relojoeiro.gif)
+![Boss fight against the Clockmaker in the Clock Tower](previa_chefao_relojoeiro.gif)
+
+![Boss fight against the Obsidian Golem in the Ruins](previa_chefao_golem.gif)
 
 Monsters by tool: reading files → Vespera · editing code → Clockmaker / Sir Solis · terminal → Ignis · web → Leviathan / Nébula · integrations (MCP) → Mirror King · subagents → clones of Lady Penumbra. The bosses come in order, one page of the Chronicles each, up to Malakor, then New Game+.
+
+## The biomes
+Lunária has 9 biomes, one for each stretch of the journey, each at its own time of day and with its own animations: Forest (Vespera and Lady Penumbra), Ruins (Obsidian Golem), Sea (Leviathan), Volcano (Ignis), Clock Tower (Clockmaker), Dawn (Sir Solis), Glass Castle (Mirror King), Starry Sky (Nébula) and Eclipse (Malakor). Waves and a turning lighthouse, pulsing lava, spinning gears, sunbeams, reflections running across mirrors, shooting stars, and particles of their own in every place.
+
+![Lua walking through the 9 biomes](previa_biomas.gif)
+
+When a biome's boss falls, a **stage transition** follows: Lua walks off the edge, the screen fades to black and she walks into the next biome under a pixel-art page title.
+
+![Stage transition: from the Ruins to the Sea, with the title PAGE 4 · SEA](previa_passagem.gif)
 
 ## Commands
 Type them in Claude's message box, like a normal message. The answer shows up only for you: Claude receives nothing and no plan limit is spent. Every subcommand also answers to its Portuguese name (`regua`, `largura`, `chefao`, `golpe`…).
@@ -81,7 +92,7 @@ Type them in Claude's message box, like a normal message. The answer shows up on
 | <code>/cronicas&nbsp;scale&nbsp;1&#124;2&#124;3</code> | Pixel size of the scene: 1x, 2x or 3x. |
 | <code>/cronicas&nbsp;intro</code> | Plays the opening now (a click skips it). `intro off` / `intro on` turns the automatic one (first session of the day) off or on. |
 | <code>/cronicas&nbsp;surfaces</code> | Tells where this session is being drawn (desktop app, VS Code, terminal, phone). |
-| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Calls the next boss of the journey, or a chosen one (`vespera`, `ignis`, `malakor`…). `/cronicas boss list` calls a task-list boss with a shield. |
+| <code>/cronicas&nbsp;boss&nbsp;[name]</code> | Calls the next boss of the journey, or a chosen one (`vespera`, `ignis`, `malakor`…), and the scene moves to its biome. `/cronicas boss list` calls a task-list boss with a shield. |
 | <code>/cronicas&nbsp;hit</code> | Hits the boss on stage; against a task-list boss it completes a task. The last hit is the critical one. |
 | <code>/cronicas&nbsp;elite</code> | The next regular fight becomes the elite (Obsidian Golem) carrying a trophy. |
 | <code>/cronicas&nbsp;vigil</code> | Brings the moonlight close to its end so you can watch the Vigil work (with the lantern lit it sends a real, tiny message). |

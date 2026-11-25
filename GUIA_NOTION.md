@@ -38,7 +38,7 @@ A ordem da jornada:
 9. ✨ **Nébula, o Dragão das Estrelas Caídas:** guardião do segredo final.
 10. 🌑 **Malakor, o Devorador de Eclipses:** o chefe final, feito de fumaça e estrelas apagadas.
 
-Quando um chefão aparece, a cena toda ganha **o tom dele**, e uma **barra de vida dourada** com o nome dele surge no alto, encostada nele. A faixa continua do mesmo tamanho. Enquanto ele está em cena, cada coisa que o Claude faz vira um golpe nele, mas a vida só cai quando uma tarefa da lista é concluída.
+Cada chefão mora num **bioma** (veja O cenário): quando ele aparece, a cena vai para a terra dele, e uma **barra de vida dourada** com o nome dele surge no alto, encostada nele. A faixa continua do mesmo tamanho. Enquanto ele está em cena, cada coisa que o Claude faz vira um golpe nele, mas a vida só cai quando uma tarefa da lista é concluída.
 
 ### 💥 Como é uma luta
 
@@ -64,11 +64,25 @@ Quando um chefão aparece, a cena toda ganha **o tom dele**, e uma **barra de vi
 - 🏮 **Vigília:** mantém a **luz acesa** (o cache quente). **Lanterna apagada** = desligada; **acesa** = ligada, com a chama tremulando. ⚠️ Gasta um pouquinho do limite, por isso começa desligada.
 - 🎒 **Mochila:** sugere **arrumar a conversa** (compactar) quando ela está cheia. Fica **estufada** com itens saindo quando precisa.
 - 🚩 **Estandarte:** **passa a missão para a próxima sessão** (escreve um resumo pra continuar depois). **Enrolado** = parado; **desfraldado** = pronto.
-- 📖 **Livro:** guarda a **ficha da Lua**, as **páginas recuperadas**, o **bestiário** dos chefões derrotados e o **grimório**, com as ferramentas do Claude viradas magias. **Fechado** = normal; **aberto e brilhando** = tem coisa nova.
+- 📖 **Livro:** guarda a **ficha da Lua**, o **mapa da jornada** 🗺️ (os biomas por onde ela já passou e onde está agora), as **páginas recuperadas**, o **bestiário** dos chefões derrotados e o **grimório**, com as ferramentas do Claude viradas magias. **Fechado** = normal; **aberto e brilhando** = tem coisa nova.
 
 ## 🗺️ O cenário
 
-A **Floresta de Lunária**, com o castelo e a lua crescente no horizonte, em 5 camadas que se movem em velocidades diferentes: céu, nuvens, ilhas flutuantes, árvores e chão. Tem estrelinhas cintilando ✨, vaga-lumes 🪲 e folhas caindo 🍃. Os outros biomas (mar, ruínas, torre do relógio…) ficam para as próximas versões.
+O reino de Lunária tem **9 biomas**, um para cada parte da jornada, cada um num horário do dia. A Lua anda pelo bioma da página em que está, e cada um tem várias camadas que se movem em velocidades diferentes (parallax), com animações próprias:
+
+1. 🌲 **Floresta** (Vespera e Dama Penumbra): castelo e lua crescente no horizonte, vaga-lumes 🪲 e folhas caindo 🍃.
+2. 🏛️ **Ruínas** (Golem, ao crepúsculo): luas gravadas nas pedras acendendo, cristais pulsando e uma névoa rasteira passando na frente dos pés da Lua.
+3. 🌊 **Mar** (Leviatã, noite de lua cheia): reflexo da lua tremendo na água, ondas, espuma batendo nas pedras e nos naufrágios, e um farol girando.
+4. 🌋 **Vulcão** (Ignis, ao entardecer): lava pulsando, gotas de lava no ar, fumaça e brasas subindo.
+5. ⏰ **Torre do Relógio** (Relojoeiro, de madrugada): engrenagens girando nas paredes, ponteiros andando, vapor nas chaminés e lanternas acesas.
+6. ☀️ **Aurora** (Sir Solis, ao amanhecer): raios do sol com uma onda de luz, bandeiras ao vento e pétalas caindo.
+7. 🪞 **Castelo de Vidro** (Rei Espelho, de dia): reflexos correndo nos espelhos e estrelinhas nos cristais.
+8. ✨ **Céu Estelar** (Nébula, à noite): cristais acendendo, raios correndo nas pontes e estrelas cadentes.
+9. 🌑 **Eclipse** (Malakor): a coroa do eclipse pulsando em volta da lua.
+
+Cada bioma tem suas **partículas** no ar (brasas, poeira dourada, pétalas, poeira de estrela, brilhos) e, nos céus escuros, passam **estrelas cadentes** 🌠.
+
+**Passagem de fase:** quando o chefão do bioma cai, a Lua sai andando pela borda da tela, tudo escurece e ela entra no bioma seguinte, com o título da página em pixel (por exemplo, **"PÁGINA 4 · MAR"**), como nos jogos antigos.
 
 ---
 

@@ -3,7 +3,8 @@
 // código de mod/cronicas-de-lua/hooks, fotografado no Chrome sem janela com as
 // animações pausadas, e juntado em GIF por montar_gif.py.
 //
-// Uso: node gravar_gifs.mjs [caminhada] [luta] [chefao_penumbra] [chefao_relojoeiro] [livro]
+// Uso: node gravar_gifs.mjs [caminhada] [luta] [chefao_penumbra] [chefao_relojoeiro] [chefao_golem]
+//      [livro] [biomas] [passagem]
 //      (sem nomes: todos). Precisa do Google Chrome (ou CHROME=<caminho>) e da
 //      .venv com Pillow. Grava previa_<nome>.gif na raiz do projeto.
 import { execFileSync, spawn } from 'node:child_process'
@@ -81,7 +82,8 @@ async function foto(cmd, svg, w, h, arq, avanco = 0) {
       const quadro = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
       if (${novo}) {
         document.body.innerHTML = ${novo ? JSON.stringify(svg) : "''"}
-        document.querySelector('svg')?.pauseAnimations?.()
+        // todo <svg> tem o seu relógio SMIL: pausa todos (só o primeiro deixava a Lua correr)
+        for (const s of document.querySelectorAll('svg')) s.pauseAnimations?.()
         window.__anims = document.getAnimations()
         for (const a of window.__anims) a.pause()
         window.__base = window.__anims.map(a => Number(a.currentTime ?? 0))
@@ -102,7 +104,7 @@ async function foto(cmd, svg, w, h, arq, avanco = 0) {
         await quadro()
       }
       window.__anims.forEach((a, i) => { a.currentTime = window.__base[i] + ${avanco} })
-      document.querySelector('svg')?.setCurrentTime?.(${avanco / 1000})
+      for (const s of document.querySelectorAll('svg')) s.setCurrentTime?.(${avanco / 1000})
       await quadro()
       return 1
     })()`,
@@ -166,19 +168,19 @@ const ROTEIROS = {
   caminhada: { ms: 55, seg: 9.9, cena: t => {
     const para = T + 5500
     const caminho = { andando: true, desde: T, dist0: 300, ate: para }
-    return cena(t, { caminho: t < para ? caminho : { andando: false, desde: para, dist0: distancia(caminho, para) } })
+    return cena(t, { bioma: 'floresta', caminho: t < para ? caminho : { andando: false, desde: para, dist0: distancia(caminho, para) } })
   } },
 
-  // luta comum: um comando demorado chama o Ignis; a Lua canaliza até o resultado e vence
+  // luta comum: um comando demorado chama o Ignis (no Vulcão, o bioma dele); a Lua canaliza até o resultado e vence
   luta: (() => {
     const t0 = T + 1400
     const l = luta('terminal', 'ignis', t0, [{ at: t0 + 3600, ok: true, dano: 23 }])
     const fim = fimDa(l)
     const ida = { andando: true, desde: T - 2000, dist0: 300, ate: t0 + 700 }
     return { ms: 55, seg: (fim - T) / 1000 + 2.4, cena: t => {
-      if (t < t0) return cena(t, { caminho: ida })
-      if (t < fim) return cena(t, { caminho: ida, luta: l })
-      return cena(t, { caminho: { andando: true, desde: fim, dist0: distancia(ida, fim) }, hud: hud(t, { jogo: { xp: xpDoNivel(12, 42), paginas: 3, lutas: 10 } }) })
+      if (t < t0) return cena(t, { bioma: 'vulcao', caminho: ida })
+      if (t < fim) return cena(t, { bioma: 'vulcao', caminho: ida, luta: l })
+      return cena(t, { bioma: 'vulcao', caminho: { andando: true, desde: fim, dist0: distancia(ida, fim) }, hud: hud(t, { jogo: { xp: xpDoNivel(12, 42), paginas: 3, lutas: 10 } }) })
     } }
   })(),
 }
@@ -220,6 +222,38 @@ function chefaoDeLista(nome, papel, pagina) {
 }
 ROTEIROS.chefao_penumbra = chefaoDeLista('dama_penumbra', 'subagente', 2)
 ROTEIROS.chefao_relojoeiro = chefaoDeLista('relojoeiro', 'editar', 6)
+ROTEIROS.chefao_golem = chefaoDeLista('golem_obsidiana', 'terminal', 3)
+
+// os 9 biomas: a Lua andando, um pouco em cada um (corte seco de um para o outro)
+const BIOMAS = ['floresta', 'ruinas', 'mar', 'vulcao', 'torre', 'aurora', 'castelo_vidro', 'ceu_estelar', 'eclipse']
+const POR_BIOMA = Number(process.env.POR_BIOMA ?? 1.65)
+// 110 ms: o mesmo ritmo da passada da Lua (e o GIF fica abaixo de ~6 MB)
+ROTEIROS.biomas = { ms: 110, seg: BIOMAS.length * POR_BIOMA, cena: t => {
+  const k = Math.min(BIOMAS.length - 1, Math.floor((t - T) / 1000 / POR_BIOMA))
+  return cena(t, { bioma: BIOMAS[k], caminho: { andando: true, desde: T - 4000, dist0: 300 + k * 900 } })
+} }
+
+// passagem de fase: o Golem caiu nas Ruínas; a Lua sai andando, escurece, o título
+// "PAGE 4 · SEA" aparece e ela entra no Mar
+ROTEIROS.passagem = (() => {
+  const at = T + 900
+  const p = { at, de: 'ruinas', para: 'mar', pagina: 4 }
+  const fimP = at + 4300 + 4000
+  const parada = { andando: false, desde: T - 20000, dist0: 500 }
+  const fases = {}
+  // 40 ms por quadro: na saída a passada da Lua troca a cada 45 ms e, a 55 ms, o GIF pulava passadas
+  return { ms: Number(process.env.PASSAGEM_MS ?? 40), seg: (fimP - T) / 1000 + 1.8, cena: t => {
+    if (t < at) return cena(t, { bioma: 'ruinas', caminho: parada })
+    if (t < fimP) {
+      // como no app: uma cena por fase (saída e entrada), só o relógio anda. Remontar a
+      // cena a cada quadro fazia a Lua ir e voltar (o Chrome não repõe o SMIL no ponto certo)
+      const inicio = t < at + 4300 ? at : at + 4300
+      const base = (fases[inicio] ??= cena(inicio, { caminho: parada, passagem: p }))
+      return { ...base, avanco: t - inicio }
+    }
+    return cena(t, { caminho: { andando: true, desde: fimP, dist0: 0 } })
+  } }
+})()
 
 // o Livro: ficha, bestiário, troféus (de tipos diferentes) e grimório, uma página de cada vez
 const JOGO_LIVRO = {
@@ -233,7 +267,7 @@ const JOGO_LIVRO = {
 const LARGURA_LIVRO = Number(process.env.LARGURA_LIVRO ?? 700)
 const ALTURA_LIVRO = Number(process.env.ALTURA_LIVRO ?? 0)
 ROTEIROS.livro = (() => {
-  const abas = ['ficha', 'bestiario', 'trofeus', 'grimorio']
+  const abas = ['ficha', 'mapa', 'bestiario', 'trofeus', 'grimorio']
   const porAba = 3.2
   const paginas = {}
   return { ms: 55, seg: abas.length * porAba, cena: t => {
