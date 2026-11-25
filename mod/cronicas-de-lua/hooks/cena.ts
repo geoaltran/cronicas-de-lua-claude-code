@@ -640,10 +640,45 @@ function luzDoFarol(d: Doc, lx: number, ly: number, agora: number): string {
  * prévia) e ganha um amarelo-claro por cima, mais forte que na prévia.
  * Devolve o que vai na mesma rolagem da camada, logo depois dela.
  */
-const LAVA = new Set(['vulcao'])
+type Um = (n: number, de: number, val: number) => string
+/**
+ * O brilho por cor de cada bioma: o filtro que separa os pixels (tabelas em
+ * degrau por canal; o último passo soma os três e pinta) e a força. Vulcão: a
+ * lava. Céu Estelar (prévia `pulsar_cristais`): os cristais ciano/brancos
+ * (G > 165, B > 165, R < G + 10) clareando para (210, 255, 250), mais forte que
+ * os 35% da prévia.
+ */
+const BRILHO_COR: Record<string, { filtro: (um: Um) => string; opacidade: number }> = {
+  vulcao: {
+    filtro: (um) =>
+      `<feComponentTransfer><feFuncR type='discrete' tableValues='${um(17, 13, 1)}'/><feFuncG type='discrete' tableValues='${um(11, 3, 1)}'/><feFuncB type='discrete' tableValues='${um(17, 8, 0)}'/></feComponentTransfer>` +
+      `<feColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 0.88 0 0 0 0 0.51 1 1 1 0 -2'/>`,
+    opacidade: 0.75,
+  },
+  ceu_estelar: {
+    filtro: (um) =>
+      // R vira 20 x (G - R) + 0,78: passa quando R < G + 10
+      `<feColorMatrix type='matrix' values='-20 20 0 0 0.78 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0'/>` +
+      `<feComponentTransfer><feFuncR type='discrete' tableValues='${um(50, 1, 1)}'/><feFuncG type='discrete' tableValues='${um(17, 11, 1)}'/><feFuncB type='discrete' tableValues='${um(17, 11, 1)}'/></feComponentTransfer>` +
+      `<feColorMatrix type='matrix' values='0 0 0 0 0.82 0 0 0 0 1 0 0 0 0 0.98 1 1 1 0 -2'/>`,
+    opacidade: 0.6,
+  },
+  // Ruínas: só os cristais ciano (G e B > 215; as pedras claras ficam de fora)
+  ruinas: {
+    filtro: (um) =>
+      `<feColorMatrix type='matrix' values='-20 20 0 0 0.78 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0'/>` +
+      `<feComponentTransfer><feFuncR type='discrete' tableValues='${um(50, 1, 1)}'/><feFuncG type='discrete' tableValues='${um(51, 43, 1)}'/><feFuncB type='discrete' tableValues='${um(51, 43, 1)}'/></feComponentTransfer>` +
+      `<feColorMatrix type='matrix' values='0 0 0 0 0.86 0 0 0 0 1 0 0 0 0 1 1 1 1 0 -2'/>`,
+    opacidade: 0.6,
+  },
+}
 const lavaDefs = new WeakMap<Doc, { filtro: string; mascara: string }>()
 
-function lavaPulsando(d: Doc, camada: string, agora: number): string {
+function lavaPulsando(d: Doc, nome: string, camada: string, agora: number): string {
+  const bc = BRILHO_COR[nome]
+  if (bc === undefined) {
+    return ''
+  }
   let ids = lavaDefs.get(d)
   if (ids === undefined) {
     ids = { filtro: d.id('lf'), mascara: d.id('lm') }
@@ -655,9 +690,7 @@ function lavaPulsando(d: Doc, camada: string, agora: number): string {
     const kp = d.anim('0%{opacity:0.12}50%{opacity:0.45}100%{opacity:0.12}', 28000, 'ease-in-out', -mod(agora, 28000), 'infinite')
     const ko = d.anim('from{transform:translateX(0px)}to{transform:translateX(90px)}', 14000, 'linear', -mod(agora, 14000), 'infinite')
     d.defs.push(
-      `<filter id='${ids.filtro}' color-interpolation-filters='sRGB'>` +
-        `<feComponentTransfer><feFuncR type='discrete' tableValues='${um(17, 13, 1)}'/><feFuncG type='discrete' tableValues='${um(11, 3, 1)}'/><feFuncB type='discrete' tableValues='${um(17, 8, 0)}'/></feComponentTransfer>` +
-        `<feColorMatrix type='matrix' values='0 0 0 0 1 0 0 0 0 0.88 0 0 0 0 0.51 1 1 1 0 -2'/></filter>` +
+      `<filter id='${ids.filtro}' color-interpolation-filters='sRGB'>${bc.filtro(um)}</filter>` +
         `<linearGradient id='${gr}'><stop offset='0.09' stop-color='#000'/><stop offset='0.25' stop-color='#fff'/><stop offset='0.41' stop-color='#000'/></linearGradient>` +
         `<pattern id='${pt}' patternUnits='userSpaceOnUse' width='90' height='400' patternTransform='skewX(-65)'><rect width='90' height='400' fill='url(#${gr})'/></pattern>` +
         `<mask id='${ids.mascara}' maskUnits='userSpaceOnUse' x='-100' y='-50' width='2200' height='400'>` +
@@ -665,7 +698,7 @@ function lavaPulsando(d: Doc, camada: string, agora: number): string {
         `<g class='${ko}'><rect x='-400' y='-50' width='2600' height='400' fill='url(#${pt})'/></g></mask>`,
     )
   }
-  return `<g filter='url(#${ids.filtro})' mask='url(#${ids.mascara})' opacity='0.75'>${camada}</g>`
+  return `<g filter='url(#${ids.filtro})' mask='url(#${ids.mascara})' opacity='${bc.opacidade}'>${camada}</g>`
 }
 
 /**
@@ -807,10 +840,31 @@ function brasasNasPontas(d: Doc, pontas: readonly (readonly [number, number])[],
  * ciclo de ~4 s; miolo branco, braços azul-claro e contorno azul para
  * aparecer no vidro. Pontos no meio.png (já com o descer_cena) e nas ilhas.
  */
-const ESTRELINHAS: Record<string, { meio: readonly (readonly [number, number])[]; ilhas: readonly (readonly (readonly [number, number])[])[] }> = {
+type Pontos = readonly (readonly [number, number])[]
+/** `soltos`: cada ponto com ciclo e fase sorteados e o lado espelhado com o seu próprio tempo. */
+const ESTRELINHAS: Record<string, { meio: Pontos; ilhas: readonly Pontos[]; chao?: Pontos; ciclo?: number; ciclo_chao?: number; soltos?: boolean }> = {
   castelo_vidro: {
     meio: [[64, 111], [410, 122], [410, 110], [183, 148], [292, 167], [299, 165], [194, 167], [279, 169]],
     ilhas: [[[7, 6], [11, 26]], [[6, 12], [11, 4]]],
+  },
+  // Céu Estelar (prévia `brilhar`): na ponta de cima dos cristais maiores do meio e
+  // dos cristais da ponte (chão); ciclos de 40 e 34 quadros
+  ceu_estelar: {
+    meio: [[92, 143], [156, 158], [455, 159], [64, 174], [297, 176], [408, 175]],
+    ilhas: [],
+    chao: [[32, 184], [24, 191], [340, 183], [345, 190]],
+    ciclo: 40,
+    ciclo_chao: 34,
+    soltos: true,
+  },
+  // Ruínas: na ponta dos cristais ciano (como no Céu Estelar)
+  ruinas: {
+    meio: [[412, 101], [155, 146], [289, 149], [470, 175], [55, 198], [347, 200]],
+    ilhas: [],
+    chao: [[406, 201], [15, 204]],
+    ciclo: 40,
+    ciclo_chao: 34,
+    soltos: true,
   },
 }
 const estrelinhaDefs = new WeakMap<Doc, string[]>()
@@ -863,15 +917,268 @@ function cruzesDeBrilho(d: Doc): string[] {
   return ids
 }
 
-function estrelinha(d: Doc, x: number, y: number, agora: number, fase: number): string {
-  const [b0, b1, b3] = cruzesDeBrilho(d)
-  const ms = 36 * 110
-  const p = (n: number) => ((n * 100) / 36).toFixed(2)
-  const atraso = -mod(agora + fase * 110, ms)
-  const k0 = d.anim(`0%{opacity:1}${p(1)}%{opacity:0}100%{opacity:0}`, ms, 'step-end', atraso, 'infinite')
-  const k1 = d.anim(`0%{opacity:0}${p(1)}%{opacity:1}${p(2)}%{opacity:0}${p(3)}%{opacity:1}${p(4)}%{opacity:0}100%{opacity:0}`, ms, 'step-end', atraso, 'infinite')
-  const k3 = d.anim(`0%{opacity:0}${p(2)}%{opacity:1}${p(3)}%{opacity:0}100%{opacity:0}`, ms, 'step-end', atraso, 'infinite')
-  return `<g transform='translate(${x},${y})'><use href='#${b0}' class='${k0}' opacity='0'/><use href='#${b1}' class='${k1}' opacity='0'/><use href='#${b3}' class='${k3}' opacity='0'/></g>`
+/**
+ * Estrelinhas de uma lista de pontos na metade esquerda, com a direita
+ * espelhada. Soltas (usuário, 25/11/2026: "mais aleatório"): cada ponto com o
+ * seu ciclo (75%, 100%, 130% ou 160% do ciclo) e a sua fase, e o lado espelhado com tempo
+ * próprio; senão, a metade espelhada repete a esquerda.
+ */
+function estrelinhasDosPontos(d: Doc, pontos: Pontos, topo: number, agora: number, ciclo: number, soltos: boolean, semente: number): string {
+  const rnd = sorteio(semente)
+  if (!soltos) {
+    return metadeEspelhada(d, pontos.map(([x, y]) => estrelinha(d, x, y - topo, agora, Math.floor(rnd() * ciclo), ciclo)).join(''))
+  }
+  const s = pontos
+    .flatMap(([x, y]) => [[x, y], [957 - x, y]] as const)
+    .map(([x, y]) => {
+      // 4 ciclos possíveis (os desenhos de animação se repetem; só o atraso muda)
+      const c = Math.round(ciclo * ([0.75, 1, 1.3, 1.6][Math.floor(rnd() * 4)] ?? 1))
+      return estrelinha(d, x, y - topo, agora, Math.floor(rnd() * c), c)
+    })
+    .join('')
+  const id = d.id('es')
+  return `<g id='${id}'>${s}</g><use href='#${id}' x='${P}'/>`
+}
+
+/**
+ * Uma estrelinha: uma tira com as 3 cruzes lado a lado (células de 9 px),
+ * vista por uma janela 9 x 9 que anda quadro a quadro (braço 0, 1, 3, 1 e
+ * vazio até o fim do ciclo): uma regra de animação só por ponto.
+ */
+const tiraDeCruzes = new WeakMap<Doc, string>()
+function estrelinha(d: Doc, x: number, y: number, agora: number, fase: number, ciclo = 36): string {
+  let tc = tiraDeCruzes.get(d)
+  if (tc === undefined) {
+    const [b0, b1, b3] = cruzesDeBrilho(d)
+    tc = d.id('tc')
+    tiraDeCruzes.set(d, tc)
+    d.defs.push(`<g id='${tc}'><use href='#${b0}' x='4' y='4'/><use href='#${b1}' x='13' y='4'/><use href='#${b3}' x='22' y='4'/></g>`)
+  }
+  const ms = ciclo * 110
+  const p = (n: number) => ((n * 100) / ciclo).toFixed(2)
+  const q = (c: number) => `transform:translateX(${-9 * c}px)`
+  const k = d.anim(`0%{${q(0)}}${p(1)}%{${q(1)}}${p(2)}%{${q(2)}}${p(3)}%{${q(1)}}${p(4)}%{${q(3)}}100%{${q(3)}}`, ms, 'step-end', -mod(agora + fase * 110, ms), 'infinite')
+  return `<svg x='${x - 4}' y='${y - 4}' width='9' height='9' overflow='hidden'><use href='#${tc}' class='${k}'/></svg>`
+}
+
+/**
+ * Céu Estelar (fase B, prévia `pedestal`): a estrela em cima da pedra do meio
+ * com um halo verde-água pulsando (3 anéis, ~3,3 s), mais forte que na prévia.
+ * Ponto no meio.png; a outra metade é espelhada (vai na metade do meio).
+ */
+const PEDESTAL: Record<string, readonly [number, number]> = {
+  ceu_estelar: [297, 181],
+}
+
+function halosDoPedestal(d: Doc, nome: string, topo: number, agora: number): string {
+  const pd = PEDESTAL[nome]
+  if (pd === undefined) {
+    return ''
+  }
+  const ms = 3300
+  const k = d.anim('0%{transform:scale(1);opacity:0.3}50%{transform:scale(1.25);opacity:1}100%{transform:scale(1);opacity:0.3}', ms, 'ease-in-out', -mod(agora, ms), 'infinite')
+  const aneis = ([[10, 0.14], [8, 0.24], [6, 0.36]] as const).map(([rr, a]) => `<circle r='${rr}' fill='#96fff0' opacity='${a}'/>`).join('')
+  return `<g transform='translate(${pd[0] + 0.5},${pd[1] - topo + 0.5})'><g class='${k}'>${aneis}</g></g>`
+}
+
+/**
+ * Céu Estelar (fase B, prévia `brilho_lua`): halo azul-arroxeado em degraus em
+ * volta do disco da lua, respirando devagar (~4 s); o disco fica como está
+ * (anéis vazados no meio). Mais forte que na prévia.
+ */
+const HALO_LUA: Record<string, string> = {
+  ceu_estelar: '#a596ff',
+}
+
+function haloDaLua(d: Doc, nome: string, x0: number, fT: number, agora: number): string {
+  const cor = HALO_LUA[nome]
+  const lc = LUA_CEU[nome]
+  if (cor === undefined || lc === undefined) {
+    return ''
+  }
+  const cx = lc[0] + lc[2] / 2 - x0
+  const cy = lc[1] + lc[3] / 2 - fT
+  const r0 = Math.min(lc[2], lc[3]) / 2
+  const ms = 4000
+  const k = d.anim('0%{opacity:0.35}50%{opacity:1}100%{opacity:0.35}', ms, 'ease-in-out', -mod(agora, ms), 'infinite')
+  const anel = (dr: number) => `M${r(cx - r0 - dr)} ${r(cy)}a${r0 + dr} ${r0 + dr} 0 1 0 ${2 * (r0 + dr)} 0a${r0 + dr} ${r0 + dr} 0 1 0 ${-2 * (r0 + dr)} 0zM${r(cx - r0)} ${r(cy)}a${r0} ${r0} 0 1 0 ${2 * r0} 0a${r0} ${r0} 0 1 0 ${-2 * r0} 0z`
+  const aneis = ([[12, 0.1], [8, 0.17], [4, 0.26]] as const).map(([dr, a]) => `<path d='${anel(dr)}' fill='${cor}' fill-rule='evenodd' opacity='${a}'/>`).join('')
+  return `<g class='${k}'>${aneis}</g>`
+}
+
+/**
+ * Céu Estelar (fase B, prévia `raios_ponte`): raios de luz correndo pelas
+ * pontes de energia, cada um numa linha da ponte, com cor, tamanho e
+ * velocidade sorteados, sempre no mesmo sentido (cabeça clara, rastro que
+ * some). Caixas no chão.png (x0, x1, y0, y1) e os tons da cor de cada ponte
+ * (como na prévia); a outra metade é espelhada (vai na metade do chão).
+ */
+const PONTES: Record<string, readonly { x0: number; x1: number; y0: number; y1: number; tons: readonly string[] }[]> = {
+  ceu_estelar: [
+    { x0: 48, x1: 134, y0: 200, y1: 215, tons: ['#82ffff', '#92ffff', '#b4ffff', '#53b8b1', '#ffffff'] },
+    { x0: 350, x1: 435, y0: 198, y1: 215, tons: ['#ffe6ff', '#ffe7ff', '#ffffff', '#b899bf', '#ffffff'] },
+  ],
+}
+
+function raiosNasPontes(d: Doc, nome: string, topo: number, agora: number, porPonte: number): string {
+  const lista = PONTES[nome]
+  if (lista === undefined || porPonte <= 0) {
+    return ''
+  }
+  const rnd = sorteio(59)
+  const grads = new Map<string, string>()
+  const grad = (cor: string) => {
+    let id = grads.get(cor)
+    if (id === undefined) {
+      id = d.id('rg')
+      grads.set(cor, id)
+      d.defs.push(`<linearGradient id='${id}'><stop offset='0' stop-color='${cor}' stop-opacity='0'/><stop offset='0.85' stop-color='${cor}' stop-opacity='0.9'/><stop offset='1' stop-color='#fff' stop-opacity='1'/></linearGradient>`)
+    }
+    return id
+  }
+  let s = ''
+  for (const pt of lista) {
+    const larg = pt.x1 - pt.x0
+    const cp = d.id('pc')
+    // anda a largura da ponte mais 32 px (entra e sai inteiro); a duração muda por raio
+    const quadros = `from{transform:translateX(0px)}to{transform:translateX(${larg + 32}px)}`
+    let raios = ''
+    for (let i = 0; i < porPonte; i++) {
+      const y = pt.y0 + Math.floor(rnd() * (pt.y1 - pt.y0 + 1)) - topo
+      const comp = 6 + Math.floor(rnd() * 11)
+      const vel = (4 + rnd() * 4) / 0.11 // px por segundo (4 a 8 px por quadro de 110 ms)
+      const ms = ((larg + 32) / vel) * 1000
+      const cor = pt.tons[Math.floor(rnd() * pt.tons.length)] ?? '#ffffff'
+      const k = d.anim(quadros, ms, 'steps(' + Math.round((larg + 32) / 3) + ')', -mod(agora + rnd() * ms, ms), 'infinite')
+      raios += `<rect class='${k}' x='${pt.x0 - 16 - Math.round(comp / 2)}' y='${y}' width='${comp}' height='1' fill='url(#${grad(cor)})'/>`
+    }
+    s += `<clipPath id='${cp}'><rect x='${pt.x0}' y='${pt.y0 - topo}' width='${larg}' height='${pt.y1 - pt.y0 + 1}'/></clipPath><g clip-path='url(#${cp})'>${raios}</g>`
+  }
+  return s
+}
+
+/**
+ * Ruínas (fase B, ideia do usuário em 25/11/2026): as luas crescentes gravadas
+ * nas lápides e no arco acendem devagar em lilás, cada uma no seu tempo, como
+ * runas reconhecendo a Lua (o sulco gravado clareia e ganha um halo). Os
+ * pixels do sulco foram recortados da arte (meio.png); a outra metade é
+ * espelhada.
+ */
+const LUAS_GRAVADAS: Record<string, readonly { c: readonly [number, number]; d: string }[]> = {
+  ruinas: [
+    {
+      c: [284, 174],
+      d: 'M284 166h6v1h-6zM282 167h10v1h-10zM281 168h8v1h-8zM290 168h2v1h-2zM280 169h7v1h-7zM280 170h6v1h-6zM280 171h5v1h-5zM279 172h5v1h-5zM279 173h5v1h-5zM279 174h5v1h-5zM279 175h5v1h-5zM279 176h6v1h-6zM280 177h5v1h-5zM280 178h6v1h-6zM281 179h6v1h-6zM282 180h6v1h-6zM283 181h8v1h-8zM284 182h7v1h-7z',
+    },
+    {
+      c: [320, 173],
+      d: 'M320 166h4v1h-4zM319 167h6v1h-6zM318 168h2v1h-2zM321 168h2v1h-2zM317 169h2v1h-2zM321 169h1v1h-1zM317 170h5v1h-5zM316 171h2v1h-2zM319 171h2v1h-2zM316 172h1v1h-1zM319 172h2v1h-2zM316 173h1v1h-1zM319 173h2v1h-2zM316 174h1v1h-1zM319 174h2v1h-2zM316 175h1v1h-1zM319 175h2v1h-2zM317 176h1v1h-1zM320 176h2v1h-2zM317 177h1v1h-1zM321 177h2v1h-2zM318 178h1v1h-1zM322 178h2v1h-2zM319 179h2v1h-2zM323 179h4v1h-4zM320 180h6v1h-6z',
+    },
+    {
+      c: [438, 132],
+      d: 'M437 125h6v1h-6zM436 126h8v1h-8zM435 127h9v1h-9zM434 128h6v1h-6zM434 129h5v1h-5zM433 130h5v1h-5zM433 131h5v1h-5zM433 132h5v1h-5zM433 133h5v1h-5zM434 134h5v1h-5zM434 135h6v1h-6zM435 136h10v1h-10zM436 137h9v1h-9zM437 138h7v1h-7z',
+    },
+  ],
+}
+
+function luasGravadas(d: Doc, nome: string, topo: number, agora: number): string {
+  const lista = LUAS_GRAVADAS[nome]
+  if (lista === undefined) {
+    return ''
+  }
+  let s = ''
+  lista.forEach((l, i) => {
+    const ms = 6000 + i * 1300
+    const k = d.anim('0%{opacity:0}35%{opacity:1}55%{opacity:1}100%{opacity:0}', ms, 'ease-in-out', -mod(agora + i * 2300, ms), 'infinite')
+    s +=
+      `<g class='${k}' opacity='0'><circle cx='${l.c[0] + 0.5}' cy='${l.c[1] - topo + 0.5}' r='10' fill='#c9a6ff' opacity='0.22'/>` +
+      `<circle cx='${l.c[0] + 0.5}' cy='${l.c[1] - topo + 0.5}' r='7' fill='#c9a6ff' opacity='0.18'/>` +
+      `<path transform='translate(0,${-topo})' d='${l.d}' fill='#eadcff'/></g>`
+  })
+  return s
+}
+
+/**
+ * Ruínas (fase B): folhas soltando das trepadeiras dos arcos, da coluna e da
+ * moita da lápide e caindo devagar até o chão, balançando. De vez em quando
+ * (cada folha cai em ~40% do ciclo). Pontos no meio.png; a outra metade é
+ * espelhada.
+ */
+const FOLHAS: Record<string, readonly (readonly [number, number])[]> = {
+  ruinas: [[14, 126], [40, 118], [66, 112], [318, 147], [462, 112], [474, 128]],
+}
+
+function folhasCaindo(d: Doc, nome: string, topo: number, agora: number): string {
+  const lista = FOLHAS[nome]
+  if (lista === undefined) {
+    return ''
+  }
+  // (usuário, 25/11/2026: caíam várias juntas) as duas metades soltas (o lado
+  // espelhado tem o seu próprio tempo) e a queda (3,5 a 5 s) num ciclo longo
+  // (14 a 26 s): quase sempre uma folha de cada vez
+  const rnd = sorteio(61)
+  let s = ''
+  const pontos = lista.flatMap(([x, y]) => [[x, y], [956 - x, y]] as const)
+  pontos.forEach(([x, y], i) => {
+    const alt = 198 - y
+    const b = 3 + Math.floor(rnd() * 3)
+    const ms = 14000 + Math.floor(rnd() * 12000)
+    const f = (3500 + rnd() * 1500) / ms
+    const pc = (q: number) => ((f * q * 100) / 4).toFixed(1)
+    const t = (dy: number, dx: number) => `transform:translate(${dx}px,${r(dy)}px)`
+    const qs =
+      `0%{${t(0, 0)};opacity:1}${pc(1)}%{${t(alt * 0.25, b)}}${pc(2)}%{${t(alt * 0.5, -b)}}${pc(3)}%{${t(alt * 0.75, b)}}` +
+      `${pc(4)}%{${t(alt, 0)};opacity:1}${((f + 0.03) * 100).toFixed(1)}%{${t(alt, 0)};opacity:0}100%{${t(0, 0)};opacity:0}`
+    const k = d.anim(qs, ms, 'step-end', -mod(agora + rnd() * ms, ms), 'infinite')
+    const cor = i % 3 === 0 ? '#4f8f49' : '#6fae55'
+    s += `<path class='${k}' d='M${x} ${y - topo}h2v1h-1v1h-1z' fill='${cor}' opacity='0'/>`
+  })
+  const id = d.id('fo')
+  return `<g id='${id}'>${s}</g><use href='#${id}' x='${P}'/>`
+}
+
+/**
+ * Ruínas (fase B): névoa rasteira lilás passando na altura dos pés, NA FRENTE
+ * dos personagens (usuário, 25/11/2026: atrás do chão ela não aparecia), levada
+ * pelo vento e rolando com o chão. Faixas em degraus de transparência (pixel
+ * art), em [0, 958) com as cópias da volta. Vai no Svg da frente.
+ */
+const NEVOA: Record<string, { y: number; cor: string }> = {
+  ruinas: { y: 204, cor: '#f4eeff' },
+}
+
+function nevoaRasteira(d: Doc, nome: string, topo: number): string {
+  const nv = NEVOA[nome]
+  if (nv === undefined) {
+    return ''
+  }
+  const rnd = sorteio(67)
+  let faixas = ''
+  for (let i = 0; i < 5; i++) {
+    const w = 120 + Math.floor(rnd() * 100)
+    const x = Math.floor((i * P) / 5 + rnd() * 60)
+    const y = nv.y + Math.floor(rnd() * 5) - topo
+    faixas +=
+      // (usuário, 25/11/2026: mais alta e um pouco mais densa que a 1ª versão) 14 px de altura em 3 degraus
+      `<rect x='${x}' y='${y - 7}' width='${w}' height='14' opacity='0.2'/>` +
+      `<rect x='${x + 10}' y='${y - 5}' width='${w - 20}' height='10' opacity='0.24'/>` +
+      `<rect x='${x + 24}' y='${y - 3}' width='${w - 48}' height='6' opacity='0.28'/>`
+  }
+  const id = d.id('nv')
+  return `<g fill='${nv.cor}'><g id='${id}'>${faixas}</g><use href='#${id}' x='${P}'/><use href='#${id}' x='${2 * P}'/></g>`
+}
+
+/** A névoa rasteira na frente dos pés: rola com o chão (e com o vento); nada na economia. */
+function nevoaNaFrente(d: Doc, v: Vista, dist: number): string {
+  const nome = biomaDe(v)
+  if (NEVOA[nome] === undefined || v.economia === true) {
+    return ''
+  }
+  const x0 = Math.floor(480 - v.W / 2)
+  const andando = andandoAgora(v.caminho, v.agora)
+  const para = andando && v.caminho.ate !== undefined ? v.caminho.ate - v.agora : undefined
+  const vento = d.rolo(nevoaRasteira(d, nome, JANELA.compacto.topo), (v.agora / 1000) * 4, 4)
+  return d.rolo(vento, x0 - PAD + dist, andando ? VEL : 0, para)
 }
 
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
@@ -1025,16 +1332,19 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   const rolo = (conteudo: string, vel: number, base = x0 - PAD) => d.rolo(conteudo, base + dist * vel, andando ? VEL * vel : 0, para)
   const partes: string[] = []
   // a camada e, no Vulcão, a lava dela pulsando por cima (na mesma rolagem; nada na economia)
-  const comLava = LAVA.has(nome) && v.economia !== true
+  const comLava = BRILHO_COR[nome] !== undefined && v.economia !== true
   const camadaComLava = (img: string, c: CamadaBioma) => {
     const base = camadaBioma(d, img, c, c.oy - topo, 2)
-    return comLava ? base + lavaPulsando(d, base, agora) : base
+    return comLava ? base + lavaPulsando(d, nome, base, agora) : base
   }
 
   // 1. fundo parado (céu, lua, o que fica longe de verdade): o centro e, dos
   // lados, tiras do próprio centro (o vai-e-volta do fundo largo)
   partes.push(fundoBioma(d, b, pre, x0, W, b.fundo_oy - fT))
   partes.push(haloDoSol(d, nome, x0, topo, agora))
+  if (v.economia !== true) {
+    partes.push(haloDaLua(d, nome, x0, fT, agora))
+  }
   if (b.lua !== undefined) {
     const ec = b.lua.eclipse
     if (ec !== undefined) {
@@ -1167,11 +1477,16 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   if (md !== undefined && VIDRO[nome] !== undefined && v.economia !== true) {
     partes.push(rolo(reflexoNoVidro(d, nome, topo, agora), md.vel))
   }
+  // Ruínas: luas gravadas acendendo e folhas caindo (rolam com o meio); nada na
+  // economia (a névoa rasteira vai na frente dos personagens: nevoaNaFrente)
+  if (md !== undefined && v.economia !== true && (LUAS_GRAVADAS[nome] !== undefined || FOLHAS[nome] !== undefined)) {
+    partes.push(rolo(metadeEspelhada(d, luasGravadas(d, nome, topo, agora)) + folhasCaindo(d, nome, topo, agora), md.vel))
+  }
   // estrelinhas nos cristais do meio (Castelo), rolam com ele; nada na economia
   const est = ESTRELINHAS[nome]
   if (md !== undefined && est !== undefined && v.economia !== true) {
-    const rnd = sorteio(47)
-    partes.push(rolo(metadeEspelhada(d, est.meio.map(([x, y]) => estrelinha(d, x, y - topo, agora, Math.floor(rnd() * 36))).join('')), md.vel))
+    const ciclo = est.ciclo ?? 36
+    partes.push(rolo(estrelinhasDosPontos(d, est.meio, topo, agora, ciclo, est.soltos === true, 47) + metadeEspelhada(d, halosDoPedestal(d, nome, topo, agora)), md.vel))
   }
   // vapor nas chaminés (rola com o meio; menos na luta, nenhum na economia)
   if (md !== undefined && CHAMINES[nome] !== undefined && v.economia !== true) {
@@ -1190,7 +1505,13 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // 6. chão da frente
   const ch = b.camadas.chao
   if (ch !== undefined) {
-    partes.push(rolo(camadaComLava(pre + 'chao', ch), ch.vel))
+    const ec = est?.chao
+    const cc = est?.ciclo_chao ?? 36
+    const brilhosChao =
+      ec === undefined || v.economia === true
+        ? ''
+        : metadeEspelhada(d, raiosNasPontes(d, nome, topo, agora, v.luta !== undefined ? 4 : 8)) + estrelinhasDosPontos(d, ec, topo, agora, cc, est?.soltos === true, 53)
+    partes.push(rolo(camadaComLava(pre + 'chao', ch) + brilhosChao, ch.vel))
   }
   return partes.join('')
 }
@@ -2174,6 +2495,8 @@ export function montar(v: Vista): { svg: string; fundo: string; frente: string; 
   if (ab?.fase !== 1) {
     corpo.push(lua(d, v, l.desmaiada, lt === undefined ? undefined : { corpo: lt.luaCorpo, trilha: lt.luaTrilha }))
   }
+  // névoa rasteira (Ruínas) na frente dos pés da Lua e do monstro
+  corpo.push(nevoaNaFrente(d, v, dist))
   if (ab?.fase === 2) {
     // a noite da fase 1 abre e mostra a floresta
     corpo.push(`<rect width="${v.W}" height="${H}" fill="${NOITE}" opacity="0"><animate attributeName="opacity" values="1;0" dur="${seg(ABERTURA.clareia)}" begin="${seg(-ab.t)}" fill="freeze"/></rect>`)
