@@ -222,6 +222,101 @@ function particula(d: Doc, nome: string, x: number, y: number, fasesMs: number, 
 
 // ---------------------------------------------------------------- biomas
 
+/**
+ * Partículas de cada bioma (no lugar dos vaga-lumes da floresta; aprovado em
+ * 24/11/2026), feitas no código em pixels de 1 ou 2 px: `sobe` (brasas,
+ * cristais), `cai` devagar balançando (poeira, pólen, poeira de estrela) ou
+ * `pisca` no lugar (brilhos em cruz na água e no vidro). `y` é a faixa de
+ * altura onde nascem (y da arte, como o chão em 209); `dur`, o ciclo (ms).
+ */
+type ParticulaBioma = {
+  jeito: 'sobe' | 'cai' | 'pisca'
+  cores: readonly string[]
+  n: number
+  y: readonly [number, number]
+  dur: readonly [number, number]
+  alt?: number
+  /** Tamanhos sorteados: 1 ponto, 2 quadradinho, 3 cruz pequena, 4 cruz grande. */
+  tamanhos: readonly number[]
+  /** Sombra de 1 px (embaixo, à direita) para destacar num cenário da mesma cor. */
+  sombra?: string
+}
+const PARTICULAS_BIOMA: Record<string, ParticulaBioma> = {
+  ruinas: { jeito: 'sobe', cores: ['#c9a6ff', '#efe0ff', '#9c7bff'], n: 7, y: [160, 200], dur: [5000, 8000], alt: 50, tamanhos: [2, 2, 1] },
+  mar: { jeito: 'pisca', cores: ['#ffffff', '#cfefff'], n: 9, y: [150, 188], dur: [2200, 4200], tamanhos: [1, 3, 3] },
+  vulcao: { jeito: 'sobe', cores: ['#ffab40', '#ff7043', '#ffe082'], n: 13, y: [178, 205], dur: [2800, 4600], alt: 70, tamanhos: [2, 2, 2, 1] },
+  // (ajustes do usuário, 25/11/2026: mais poeira e de tamanhos variados na Torre;
+  // pétalas com contraste na Aurora; mais brilhos e maiores no Castelo; mais
+  // estrelas e de tamanhos variados no Céu Estelar)
+  torre: { jeito: 'cai', cores: ['#ffd27a', '#e0b060', '#fff0c0'], n: 12, y: [80, 140], dur: [7000, 10000], tamanhos: [1, 2, 2, 3] },
+  aurora: { jeito: 'cai', cores: ['#ffffff', '#ff9eb5', '#fff3d6'], n: 10, y: [80, 140], dur: [6500, 9500], tamanhos: [2, 2, 3], sombra: '#8a5a2b' },
+  castelo_vidro: { jeito: 'pisca', cores: ['#ffffff', '#b3e5fc', '#ffffff'], n: 16, y: [95, 200], dur: [2000, 4000], tamanhos: [1, 3, 3, 4], sombra: '#4a9fd4' },
+  ceu_estelar: { jeito: 'cai', cores: ['#fff59d', '#e1d5ff', '#ffffff'], n: 16, y: [75, 150], dur: [6000, 9000], tamanhos: [1, 1, 2, 3, 4] },
+  eclipse: { jeito: 'sobe', cores: ['#b388ff', '#ff8a65', '#ffcc80'], n: 8, y: [178, 205], dur: [3200, 5200], alt: 60, tamanhos: [2, 2, 1] },
+}
+
+/** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
+function formaParticula(x: number, y: number, tam: number, cor: string): string {
+  const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
+  if (tam <= 1) {
+    return q(x, y, 1, 1)
+  }
+  if (tam === 2) {
+    return q(x, y, 2, 2)
+  }
+  if (tam === 3) {
+    return q(x, y - 1, 1, 3) + q(x - 1, y, 3, 1)
+  }
+  return q(x, y - 2, 1, 5) + q(x - 2, y, 5, 1) + q(x - 1, y - 1, 3, 3)
+}
+
+/**
+ * As partículas do bioma em [0, 958) e a cópia seguinte (a camada dá a volta),
+ * para rolar junto com o meio. `quantas`: menos na luta, nenhuma na economia.
+ */
+function particulasDoBioma(d: Doc, nome: string, topo: number, agora: number, quantas: number): string {
+  const pb = PARTICULAS_BIOMA[nome]
+  if (pb === undefined || quantas <= 0) {
+    return ''
+  }
+  const rnd = sorteio(17 + nome.length)
+  let s = ''
+  for (let i = 0; i < quantas; i++) {
+    const x = Math.floor(rnd() * P)
+    const y = pb.y[0] + Math.floor(rnd() * (pb.y[1] - pb.y[0])) - topo
+    const dur = pb.dur[0] + Math.floor(rnd() * (pb.dur[1] - pb.dur[0]))
+    const fase = Math.floor(rnd() * dur)
+    const cor = pb.cores[i % pb.cores.length] ?? '#ffffff'
+    const tam = pb.tamanhos[Math.floor(rnd() * pb.tamanhos.length)] ?? 2
+    const forma = (pb.sombra === undefined ? '' : formaParticula(x + 1, y + 1, tam, pb.sombra)) + formaParticula(x, y, tam, cor)
+    let quadros: string
+    let passos: number
+    let corpo: string
+    if (pb.jeito === 'pisca') {
+      // um brilho que acende de vez em quando
+      const liga = 55 + Math.floor(rnd() * 20)
+      quadros = `0%{opacity:0}${liga}%{opacity:1}${liga + 6}%{opacity:0.6}${liga + 12}%{opacity:0}100%{opacity:0}`
+      passos = 1
+      corpo = forma
+    } else {
+      const sobe = pb.jeito === 'sobe'
+      const alt = sobe ? (pb.alt ?? 50) + Math.floor(rnd() * 20) : 209 - 14 - y - topo
+      const dy = sobe ? -alt : alt
+      const b1 = Math.floor(rnd() * 7) - 3
+      const b2 = Math.floor(rnd() * 9) - 4
+      quadros =
+        `0%{transform:translate(0px,0px);opacity:0}12%{opacity:1}` +
+        `33%{transform:translate(${b1}px,${r(dy / 3)}px)}66%{transform:translate(${b2}px,${r((2 * dy) / 3)}px)}` +
+        `85%{opacity:1}100%{transform:translate(${b1 + b2}px,${dy}px);opacity:0}`
+      passos = Math.max(6, r(Math.abs(dy) / 3))
+      corpo = forma
+    }
+    const k = d.anim(quadros, dur, `steps(${passos})`, -mod(agora + fase, dur), 'infinite')
+    s += `<g class="${k}">${corpo}<g transform="translate(${P} 0)">${corpo}</g></g>`
+  }
+  return s
+}
+
 type CamadaBioma = { oy: number; desce: number; repete: 'espelho' | 'repete' | 'inteira'; vel: number; remendos: number; vento?: number }
 type IlhaBioma = { x: number; y: number }
 export type Bioma = {
@@ -382,6 +477,12 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   const md = b.camadas.meio
   if (md !== undefined) {
     partes.push(rolo(camadaBioma(d, pre + 'meio', md, md.oy - topo, 2), md.vel))
+  }
+  // partículas do bioma: no ar, na altura do meio (rolam com ele); menos na luta
+  const nPart = PARTICULAS_BIOMA[nome]?.n ?? 0
+  const part = particulasDoBioma(d, nome, topo, agora, v.economia === true ? 0 : v.luta !== undefined ? Math.ceil(nPart / 2) : nPart)
+  if (part !== '') {
+    partes.push(rolo(part, md?.vel ?? 0.5))
   }
   if (v.chefao !== undefined && fimDoChefao(v.chefao) > agora && v.tom === 'fundo') {
     partes.push(tingir(v.chefao, W, alturaCena(v.modo), 0.3))

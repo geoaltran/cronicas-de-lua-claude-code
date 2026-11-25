@@ -47,8 +47,12 @@ test('todo bioma cabe no limite do app nas cenas mais pesadas', () => {
   for (const bioma of ['floresta', 'ruinas', 'mar', 'vulcao', 'torre', 'aurora', 'castelo_vidro', 'ceu_estelar', 'eclipse']) {
     for (const W of [508, 760, 958]) {
       for (const e of estados) {
-        const { svg, fundo, frente } = montar({ agora: T, W, escala: 2, modo: 'compacto', caminho: parada, hud: hud(2), botoes: true, bioma, ...e } as Parameters<typeof montar>[0])
-        expect(svg.length).toBeLessThan(129000)
+        const vista = { agora: T, W, escala: 2, modo: 'compacto', caminho: parada, hud: hud(2), botoes: true, bioma, ...e } as Parameters<typeof montar>[0]
+        const { svg, fundo, frente } = montar(vista)
+        // o Svg único (editor, celular, modo quadro): se passar, o mod refaz em
+        // economia (sem partículas), como no register; esse tem de caber
+        const unico = svg.length < 129000 ? svg : montar({ ...vista, economia: true }).svg
+        expect(unico.length).toBeLessThan(129000)
         expect(svg).toContain(bioma === 'floresta' ? '#meio' : `#b_${bioma}_chao`)
         // desktop: cenário e frente em dois Svg, cada um bem abaixo do teto codificado (~124 mil)
         expect(tamanhoNoApp(fundo)).toBeLessThan(99000)
