@@ -727,6 +727,77 @@ function lavaNoAr(d: Doc, cx: number, cy: number, agora: number, fases: number):
   return s
 }
 
+/**
+ * Vulcão (fase B, prévia `fumaca`): fumaça no estilo da arte, bolhas opacas
+ * em pixel (cor clara com a sombra mais escura embaixo e à direita, sem
+ * transparência). Cada sopro é um cacho de 3 bolhas que sobe, é levado pelo
+ * vento e no fim encolhe até sumir. Os sopros de cada fonte se espalham pelo
+ * ciclo (vira uma coluna). `fuso`: começa fino, engorda e afina de novo (galhos).
+ * Longe, a fumaça puxa para a cor do ar (cores já misturadas, como na prévia).
+ */
+type Fumaca = { ms: number; alto: number; vento: number; esp: number; tam: number; fuso: boolean; clara: string; escura: string }
+const FUMACAS: Record<string, { cratera: Fumaca; galhos: Fumaca; chao: Fumaca; pontas: readonly (readonly [number, number])[]; fontes_chao: readonly (readonly [number, number])[] }> = {
+  vulcao: {
+    // cratera: bem longe (névoa 45% da cor do céu), bolhas menores e espaçadas (pedido do usuário na prévia)
+    cratera: { ms: 11000, alto: 28, vento: 6, esp: 1.5, tam: 0.7, fuso: false, clara: '#75484a', escura: '#61343a' },
+    // pontas dos galhos (presas ao meio), com a brasa acesa na ponta
+    galhos: { ms: 8000, alto: 33, vento: 7, esp: 1.4, tam: 0.9, fuso: true, clara: '#8f7163', escura: '#6b4c46' },
+    // chão do campo ao longe: colunas altas, névoa 25%
+    chao: { ms: 11000, alto: 60, vento: 8, esp: 1.5, tam: 0.55, fuso: false, clara: '#8e5e54', escura: '#73423e' },
+    // pontas de galho no meio.png (as da prévia, grudadas no galho) e fontes no longe.png
+    // (usuário, 25/11/2026: de 16 fontes na volta para 8; 2 galhos e 2 no chão por metade)
+    pontas: [[68, 115], [325, 150]],
+    fontes_chao: [[176, 172], [430, 176]],
+  },
+}
+
+function sopros(d: Doc, fontes: readonly (readonly [number, number])[], f: Fumaca, dy: number, agora: number, porFonte: number): string {
+  if (porFonte <= 0) {
+    return ''
+  }
+  // os cachos: 1, 2 (a mais alta à direita ou à esquerda) ou 3 bolhas (raio 2) com a sombra antes, centrados em (0, 0);
+  // cada sopro sorteia um (usuário, 25/11/2026: de 3 em 3 parecia tudo igual)
+  const cachos: [number, number][][] = [[[0, 0]], [[-1.2 * f.esp, 0.3 * f.esp], [1.2 * f.esp, -0.6 * f.esp]], [[-1.2 * f.esp, -0.6 * f.esp], [1.2 * f.esp, 0.3 * f.esp]], [[-2 * f.esp, 0], [0, -f.esp], [2 * f.esp, 0]]]
+  const pfs = cachos.map((bolhas) => {
+    const id = d.id('pf')
+    const circ = (dx: number, cor: string) => bolhas.map(([x, y]) => `<circle cx='${r(x + dx)}' cy='${r(y + dx)}' r='2' fill='${cor}'/>`).join('')
+    d.defs.push(`<g id='${id}' shape-rendering='crispEdges'>${circ(1, f.escura)}${circ(0, f.clara)}</g>`)
+    return id
+  })
+  let qs = ''
+  for (let i = 0; i <= 5; i++) {
+    const fr = i / 5
+    const esc = f.fuso ? ((0.6 + 2.6 * Math.sin(Math.PI * fr)) * f.tam) / 2 : ((2 + fr * 40 * 0.16) * f.tam * (fr < 0.7 ? 1 : Math.max(0, (1 - fr) / 0.3))) / 2
+    qs += `${i * 20}%{transform:translate(${r(f.vento * fr * fr)}px,${r(-f.alto * fr)}px) scale(${esc.toFixed(2)})}`
+  }
+  // cada fonte no seu ritmo e cada sopro do seu tamanho (sorteados): as colunas
+  // não ficam iguais, e nada disso cria animação nova (só muda a duração e a escala)
+  const rnd = sorteio(43 + fontes.length + Math.round(f.alto))
+  let s = ''
+  fontes.forEach(([x, y]) => {
+    const ms = Math.round(f.ms * (0.7 + rnd() * 0.6))
+    const fase = rnd() * ms
+    for (let j = 0; j < porFonte; j++) {
+      const k = d.anim(qs, ms, `steps(${Math.max(3, Math.round(f.alto / 5))})`, -mod(agora + fase + (j * ms) / porFonte + rnd() * (ms / porFonte / 2), ms), 'infinite')
+      const esc = 0.7 + rnd() * 0.6
+      const pf = pfs[Math.floor(rnd() * pfs.length)] ?? pfs[0]
+      s += `<g transform='translate(${x},${y + dy}) scale(${esc.toFixed(2)})'><use href='#${pf}' class='${k}'/></g>`
+    }
+  })
+  return s
+}
+
+/** A brasa acesa na ponta do galho (3 x 2 px), pulsando com a onda de calor. */
+function brasasNasPontas(d: Doc, pontas: readonly (readonly [number, number])[], dy: number, agora: number): string {
+  const ms = 2000
+  let s = ''
+  pontas.forEach(([x, y]) => {
+    const k = d.anim('0%{fill:#ff7828}50%{fill:#ffe664}100%{fill:#ff7828}', ms, 'steps(4)', -mod(agora + x * 140, ms), 'infinite')
+    s += `<path class='${k}' d='M${x} ${y + dy - 1}h1v1h1v1h-3v-1h1z'/>`
+  })
+  return s
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -922,6 +993,10 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
     // gotas de lava estourando da cratera (menos na luta)
     if (boca !== undefined) {
       partes.push(lavaNoAr(d, boca[0], boca[1] + 1, agora, v.luta !== undefined ? 1 : 2))
+      const fm = FUMACAS[nome]
+      if (fm !== undefined) {
+        partes.push(sopros(d, [boca], fm.cratera, -2, agora, v.luta !== undefined ? 3 : 5))
+      }
     }
     // luz girando no farol (antes das ilhas: elas passam na frente do facho)
     const lp = FAROL[nome]
@@ -964,7 +1039,9 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // 4. longe (campo, mar, planície da placa)
   const lg = b.camadas.longe
   if (lg !== undefined) {
-    partes.push(rolo(camadaComLava(pre + 'longe', lg), lg.vel))
+    const fm = v.economia === true ? undefined : FUMACAS[nome]
+    const fumacaLonge = fm === undefined ? '' : metadeEspelhada(d, sopros(d, fm.fontes_chao, fm.chao, -topo, agora, v.luta !== undefined ? 2 : 3))
+    partes.push(rolo(camadaComLava(pre + 'longe', lg) + fumacaLonge, lg.vel))
   }
   if (b.ilhas_na_frente) {
     partes.push(camIlhas)
@@ -987,7 +1064,10 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // 5. meio
   const md = b.camadas.meio
   if (md !== undefined) {
-    partes.push(rolo(camadaComLava(pre + 'meio', md), md.vel))
+    const fg = v.economia === true ? undefined : FUMACAS[nome]
+    const fumacaGalhos =
+      fg === undefined ? '' : metadeEspelhada(d, sopros(d, fg.pontas, fg.galhos, -topo, agora, v.luta !== undefined ? 2 : 3) + brasasNasPontas(d, fg.pontas, -topo, agora))
+    partes.push(rolo(camadaComLava(pre + 'meio', md) + fumacaGalhos, md.vel))
     // Mar: cristas das ondas subindo e espuma batendo nas pedras (rolam com o meio; nada na economia)
     if (v.economia !== true && (CRISTAS[nome] !== undefined || ESPUMA[nome] !== undefined)) {
       partes.push(rolo(cristasDasOndas(d, nome, camadaBioma(d, pre + 'meio', md, md.oy - topo, 1), topo, agora) + espumaNasPedras(d, nome, topo, agora), md.vel))
