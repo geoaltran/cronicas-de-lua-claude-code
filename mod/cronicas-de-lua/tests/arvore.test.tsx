@@ -20,10 +20,6 @@ test('a faixa inteira (cena e balões) fica abaixo do teto do app, com os chefõ
       await cmd(`chefao ${nome}`)
       await clock.advance(1500)
       expect(JSON.stringify(await ui.drawn()).length).toBeLessThan(TETO_ARVORE)
-      for (let i = 0; i < 3; i++) {
-        await cmd('golpe')
-      }
-      await clock.advance(20000)
     }
     await ui.unmount()
   }

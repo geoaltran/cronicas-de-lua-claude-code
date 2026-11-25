@@ -255,6 +255,48 @@ const PARTICULAS_BIOMA: Record<string, ParticulaBioma> = {
   eclipse: { jeito: 'sobe', cores: ['#b388ff', '#ff8a65', '#ffcc80'], n: 8, y: [178, 205], dur: [3200, 5200], alt: 60, tamanhos: [2, 2, 1] },
 }
 
+/**
+ * Estrelas cadentes (fase B) nos céus escuros: de vez em quando um risco
+ * dourado cruza o alto da cena, descendo para a esquerda, e some. Parado na
+ * tela (o céu não rola). Cada uma tem o seu ciclo; o resto do tempo, nada.
+ */
+function estrelasCadentes(d: Doc, W: number, agora: number, quantas: number): string {
+  const rnd = sorteio(29)
+  let s = ''
+  for (let i = 0; i < quantas; i++) {
+    const dur = 7000 + Math.floor(rnd() * 6000)
+    const x = 60 + Math.floor(rnd() * Math.max(40, W - 120))
+    const y = 4 + Math.floor(rnd() * 22)
+    const fase = Math.floor(rnd() * dur)
+    const voa = 0.09 // fração do ciclo em que ela cruza (~0,6 a 1,2 s)
+    // cabeça branca e o rastro subindo para a direita, cada vez mais apagado
+    const rastro = [1, 0.8, 0.55, 0.35, 0.2]
+      .map((o, j) => `<rect x="${x + j * 2}" y="${y - j}" width="2" height="1" fill="${j === 0 ? '#ffffff' : '#fff3c4'}" opacity="${o}"/>`)
+      .join('')
+    const k = d.anim(
+      `0%{transform:translate(0px,0px);opacity:0}1%{opacity:1}${(voa * 100 * 0.7).toFixed(1)}%{opacity:1}${(voa * 100).toFixed(1)}%{transform:translate(-56px,28px);opacity:0}100%{transform:translate(-56px,28px);opacity:0}`,
+      dur,
+      'linear',
+      -mod(agora + fase, dur),
+      'infinite',
+    )
+    s += `<g class="${k}" opacity="0">${rastro}</g>`
+  }
+  return s
+}
+
+/**
+ * A coroa do eclipse pulsando (fase B): dois anéis de luz em volta do anel da
+ * lua, que acendem e apagam devagar, fora de compasso. Atrás do sprite da lua.
+ */
+function coroaDoEclipse(d: Doc, cx: number, cy: number, raio: number, agora: number): string {
+  const anel = (rr: number, larg: number, cor: string, de: number, ate: number, ms: number, fase: number) => {
+    const k = d.anim(`0%{opacity:${de}}50%{opacity:${ate}}100%{opacity:${de}}`, ms, 'ease-in-out', -mod(agora + fase, ms), 'infinite')
+    return `<circle class="${k}" cx="${cx}" cy="${cy}" r="${rr}" fill="none" stroke="${cor}" stroke-width="${larg}" opacity="${de}"/>`
+  }
+  return anel(raio + 2, 2, '#ffd08a', 0.25, 0.75, 2600, 0) + anel(raio + 5, 2, '#ff9e57', 0.1, 0.45, 3400, 900)
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -335,7 +377,7 @@ export type Bioma = {
   estrelas: readonly (readonly [number, number, number, number])[]
   estrela_cor: string
   marco?: { x: number; y_tela: number }
-  lua?: { x: number; y_tela: number }
+  lua?: { x: number; y_tela: number; eclipse?: { centro: readonly [number, number]; raio_anel: number } }
   reflexo?: { x: number; y: number; n: number; ms: number }
   torre?: { x: number; y: number }
   relogio?: { centro: readonly [number, number]; minuto: number; hora: number; cor: readonly [number, number, number] }
@@ -408,6 +450,10 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // lados, tiras do próprio centro (o vai-e-volta do fundo largo)
   partes.push(fundoBioma(d, b, pre, x0, W, b.fundo_oy - fT))
   if (b.lua !== undefined) {
+    const ec = b.lua.eclipse
+    if (ec !== undefined) {
+      partes.push(coroaDoEclipse(d, b.lua.x - x0 + ec.centro[0], b.lua.y_tela - topo + ec.centro[1], ec.raio_anel, agora))
+    }
     partes.push(`<use href="${d.img(pre + 'lua')}" x="${b.lua.x - x0}" y="${b.lua.y_tela - topo}"/>`)
   }
   // estrelas cintilando, só no céu limpo (posições do cenario_bioma.py)
@@ -420,6 +466,10 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
     const seq: Q[] = [[0, ms], [1, ms], [2, ms], [3, ms], [-1, ms * 4]]
     const tira = cor === 1 ? COR_ESTRELA[b.estrela_cor] ?? 'p_estrela_azul' : 'p_estrela'
     partes.push(d.tira(tira, x, sy, 7, 7, seq, agora + fase * 440))
+  }
+  // estrelas cadentes nos céus escuros (menos na luta, nenhuma na economia)
+  if (b.ceu_escuro && v.economia !== true) {
+    partes.push(estrelasCadentes(d, W, agora, v.luta !== undefined ? 1 : 2))
   }
   // marco: parado, de pé no horizonte (farol, vulcão)
   if (b.marco !== undefined) {
