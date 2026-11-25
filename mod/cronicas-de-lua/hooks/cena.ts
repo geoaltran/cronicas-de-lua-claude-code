@@ -568,6 +568,69 @@ function espumaNasPedras(d: Doc, nome: string, topo: number, agora: number): str
   return metadeEspelhada(d, s)
 }
 
+/**
+ * Mar (fase B, prévia `facho` com `farol_giro`): a luz do farol girando. Uma
+ * volta a cada 18 s: o facho deitado cresce para um lado, encolhe, some atrás
+ * da torre e cresce para o outro; a ponta some em 5 degraus; a lâmpada acende
+ * mais quando a luz aponta para nós. Amarelo-quente (`facho_cor`,
+ * `lampada_cor`, escolha do usuário), mais forte que na prévia (no app a luz
+ * fraca some). `lx`, `ly`: a lâmpada, já na tela.
+ */
+const FAROL: Record<string, readonly [number, number]> = {
+  mar: [9, 3], // a lâmpada no marco.png (os dois pixels acesos)
+}
+
+function luzDoFarol(d: Doc, lx: number, ly: number, agora: number): string {
+  const ms = 18000
+  const n = 36
+  let giro = ''
+  let lamp2 = ''
+  let lamp3 = ''
+  for (let i = 0; i <= n; i++) {
+    const ang = (i / n) * 2 * Math.PI
+    const lado = Math.cos(ang)
+    const frente = Math.sin(ang)
+    const ve = frente > -0.2 && 46 * Math.abs(lado) > 3
+    const sx = Math.abs(lado) < 0.07 ? (lado < 0 ? -0.07 : 0.07) : lado
+    const sy = (3 + 5 * Math.abs(lado)) / 8
+    const op = ve ? (70 + 50 * Math.max(frente, 0)) / 120 : 0
+    const pc = ((i / n) * 100).toFixed(2)
+    giro += `${pc}%{transform:scale(${sx.toFixed(3)},${sy.toFixed(3)});opacity:${op.toFixed(2)}}`
+    lamp2 += `${pc}%{opacity:${frente > 0 ? 1 : 0}}`
+    lamp3 += `${pc}%{opacity:${frente > 0.7 ? 1 : 0}}`
+  }
+  const atraso = -mod(agora, ms)
+  const kg = d.anim(giro, ms, 'linear', atraso, 'infinite')
+  const k2 = d.anim(lamp2, ms, 'step-end', atraso, 'infinite')
+  const k3 = d.anim(lamp3, ms, 'step-end', atraso, 'infinite')
+  // a ponta some aos poucos: degraus de transparência pela distância à lâmpada
+  const gr = d.id('fg')
+  const degraus: [number, number][] = [[0.15, 1], [0.35, 0.8], [0.55, 0.6], [0.75, 0.4], [0.95, 0.2]]
+  let stops = ''
+  let de = 0
+  for (const [ate, o] of degraus) {
+    stops += `<stop offset='${de}' stop-color='#fff' stop-opacity='${o}'/><stop offset='${ate}' stop-color='#fff' stop-opacity='${o}'/>`
+    de = ate
+  }
+  stops += `<stop offset='${de}' stop-color='#fff' stop-opacity='0'/>`
+  const mk = d.id('fm')
+  d.defs.push(
+    `<linearGradient id='${gr}' gradientUnits='userSpaceOnUse' x1='0' y1='0' x2='46' y2='0'>${stops}</linearGradient>` +
+      `<mask id='${mk}' maskUnits='userSpaceOnUse' x='-1' y='-9' width='48' height='18'><rect x='-1' y='-9' width='48' height='18' fill='url(#${gr})'/></mask>`,
+  )
+  // facho: por fora 60% e o miolo 85% de frente (na prévia 47% e 67%)
+  const facho =
+    `<g mask='url(#${mk})' shape-rendering='crispEdges'>` +
+    `<polygon points='0,-1 46,-8 46,8 0,1' fill='#ffcd5f' opacity='0.6'/>` +
+    `<polygon points='0,0 23,-2.8 23,2.8' fill='#ffe48c' opacity='0.85'/></g>`
+  // lâmpada: 3x3 sempre; um disco de pixel maior quando a luz vem para a frente
+  const q = (a: number, b: number, w: number, hh: number) => `<rect x='${lx + a}' y='${ly + b}' width='${w}' height='${hh}' fill='#ffeca0'/>`
+  const lampada =
+    `<g opacity='0.95'>${q(-1, -1, 3, 3)}<g class='${k2}'>${q(-2, -1, 5, 3)}${q(-1, -2, 3, 5)}</g>` +
+    `<g opacity='0.7'><g class='${k3}'>${q(-3, -1, 7, 3)}${q(-1, -3, 3, 7)}${q(-2, -2, 5, 5)}</g></g></g>`
+  return `<g transform='translate(${lx},${ly})'><g class='${kg}'>${facho}</g></g>${lampada}`
+}
+
 /** Uma partícula em pixel: ponto, quadradinho, cruz pequena ou cruz grande (com o miolo cheio). */
 function formaParticula(x: number, y: number, tam: number, cor: string): string {
   const q = (a: number, b: number, w: number, h: number) => `<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${cor}"/>`
@@ -748,6 +811,11 @@ function cenarioBioma(d: Doc, v: Vista, dist: number, soCeu: boolean, nome: stri
   // marco: parado, de pé no horizonte (farol, vulcão)
   if (b.marco !== undefined) {
     partes.push(`<use href="${d.img(pre + 'marco')}" x="${b.marco.x - x0}" y="${b.marco.y_tela - topo}"/>`)
+    // luz girando no farol (antes das ilhas: elas passam na frente do facho)
+    const lp = FAROL[nome]
+    if (lp !== undefined && v.economia !== true) {
+      partes.push(luzDoFarol(d, b.marco.x - x0 + lp[0], b.marco.y_tela - topo + lp[1], agora))
+    }
   }
   // 2. nuvens: parallax lento + vento (cada bioma desce as nuvens do seu jeito)
   const nv = b.camadas.nuvens
