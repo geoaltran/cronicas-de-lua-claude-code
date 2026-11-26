@@ -31,7 +31,7 @@ export function cssTexto(semCurta = false): string {
     // Silkscreen: grade de 8 px; 12 px = 1,5 px de tela por pixel da fonte. Fusion: 12 px = 1 para 1.
     (f === undefined ? (semCurta ? '' : face('Silkscreen', FONTE)) : face('Fusion', f.cena)) +
     `.t{font-family:${familiaCurta()};font-size:12px;fill:#fff6d8;stroke:#1d1433;stroke-width:2px;paint-order:stroke;text-rendering:optimizeSpeed}` +
-    '.m{text-anchor:middle}.e{text-anchor:end}.n{fill:#e9d9ff}.b{font-size:12px}' +
+    '.m{text-anchor:middle}.e{text-anchor:end}.n{fill:#e9d9ff}.b{font-size:12px}.b8{font-size:8px}' +
     // textos longos (balões, aviso de lua nova): Pixelify Sans, com minúsculas; ou a Fusion, sempre em 12 px
     (f === undefined
       ? ".l{font-family:'Pixelify Sans','Silkscreen',ui-monospace,monospace;font-weight:500;font-size:10px}"

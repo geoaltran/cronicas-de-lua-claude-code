@@ -25,6 +25,14 @@ test('o bioma segue a página da jornada (o próximo chefão)', () => {
   expect(de(10)).toBe('floresta') // Novo Jogo+: recomeça
 })
 
+test('o chefão caído segura o bioma dele até a passagem (sem piscar o da página nova)', () => {
+  // Malakor caiu no Eclipse: a página já avançou (10 -> Floresta), mas a queda
+  // acabou e a passagem ainda não começou: a cena continua no Eclipse
+  const ch = { ...novoChefao(9, 'lista', T, { total: 1, feitas: 1 }), caiu: T }
+  expect(biomaDe({ agora: T + 3600 + 500, hud: hud(10), chefao: ch })).toBe('eclipse')
+  expect(biomaDe({ agora: T + 3600 + 500, hud: hud(10) })).toBe('floresta')
+})
+
 test('com um chefão em cena, o bioma é o dele (mesmo chamado fora da ordem)', () => {
   const ch = novoChefao(0, 'comando', T, { total: 0, feitas: 0 }, 'nebula')
   expect(biomaDe({ agora: T + 1000, hud: hud(0), chefao: ch })).toBe('ceu_estelar')
@@ -72,4 +80,10 @@ test('todo bioma cabe no limite do app nas cenas mais pesadas', () => {
       }
     }
   }
+})
+
+test('com hora para parar, a Lua troca o andar pela pose parada nessa hora (sem esperar redesenho)', () => {
+  const r = montar({ agora: T, W: 560, escala: 1, modo: 'compacto', hud: hud(0), caminho: { andando: true, desde: T - 3000, dist0: 300, ate: T + 1500 } })
+  expect(r.svg.includes('id="lua_andar"')).toBe(true)
+  expect(r.svg.includes('id="lua_parada"')).toBe(true)
 })

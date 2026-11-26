@@ -7,7 +7,7 @@
 // redesenho no meio da luta continua do mesmo ponto. Ritmo de previa_luta.py
 // (quadros de 70 ms).
 import { META } from './arte'
-import { ANDAR, type Doc, PARADA, type Q, art, esc, mod, r, sorteio } from './base'
+import { ANDAR, type Doc, PARADA, type Q, art, comH2, esc, mod, r, sorteio } from './base'
 import type { Caminho, Golpe, Luta, TipoTrofeu } from '../types'
 import { ehCJK, larguraCurta } from './fontes'
 import { t } from './t'
@@ -320,6 +320,7 @@ const QS_CANAL: Q[] = [[0, 4 * F], [1, 4 * F]]
 const QS_DUVIDA: Q[] = [[0, 7 * F], [1, 7 * F]]
 /** Onde a gota de suor fica no quadro da Lua (80x100): borda do rosto, ao lado do olho. */
 const GOTA = [51, 28] as const
+const GOTA_H2 = [55, 27] as const
 
 /** A Lua na luta, trecho a trecho, do começo ao fim (entre uma ação e outra, parada). */
 export function posesDaLua(l: Luta, rt: Roteiro = roteiro(l)): Pose[] {
@@ -585,8 +586,9 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
   const ex = d.img('exclamacao')
   efeitos += d.janela(ent, ent + 2 * F, agora, `<use href="${ex}" x="${centro - 5}" y="${cabeca - 20}"/>`)
   efeitos += d.janela(ent + 2 * F, ent + EXCL, agora, `<use href="${ex}" x="${centro - 5}" y="${cabeca - 18}"/>`)
-  const sx = lx + 79
-  const sy = ly + 53
+  // ponta da varinha no quadro do lançamento (poses.json)
+  const sx = lx + (comH2() ? 76 : 79)
+  const sy = ly + (comH2() ? 52 : 53)
   rt.ataques.forEach((a, n) => {
     const i = a.a + IMPACTO
     // estrela em arco até o monstro, com faíscas no rastro
@@ -670,7 +672,7 @@ export function desenharLuta(d: Doc, l: Luta, p: Palco): DesenhoLuta {
       // no ritmo dos quadros da dúvida
       const gt = d.img('gota')
       for (let k = 0, t = v; t < v + VITORIA; k++, t += QS_DUVIDA[0]![1]) {
-        efeitos += d.janela(t, Math.min(t + QS_DUVIDA[0]![1], v + VITORIA), agora, `<use href="${gt}" x="${lx + GOTA[0]}" y="${ly + GOTA[1] + (k % 2)}"/>`)
+        efeitos += d.janela(t, Math.min(t + QS_DUVIDA[0]![1], v + VITORIA), agora, `<use href="${gt}" x="${lx + (comH2() ? GOTA_H2 : GOTA)[0]}" y="${ly + (comH2() ? GOTA_H2 : GOTA)[1] + (k % 2)}"/>`)
       }
     }
   } else if (rt.desfecho?.tipo === 'vitoria') {

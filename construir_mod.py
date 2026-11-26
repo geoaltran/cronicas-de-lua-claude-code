@@ -383,6 +383,16 @@ def lua():
     return poses
 
 
+def h2():
+    """Poses alternativas da heroína (assets/h2/poses/, opcional)."""
+    arq = A / "h2" / "poses" / "poses.json"
+    if not arq.exists():
+        return
+    poses = json.loads(arq.read_text())
+    for nome, q in poses["quadros"].items():
+        guarda(f"h2_{nome}", abre(arq.parent / q["arquivo"]), n=q["n"])
+
+
 def efeitos():
     fx = json.loads((A / "efeitos" / "efeitos.json").read_text())
     for nome in ("projetil", "impacto", "canalizar"):
@@ -566,6 +576,7 @@ def main():
         "trofeus": json.loads((A / "ui" / "trofeus" / "trofeus.json").read_text()),
     }
     ui()
+    h2()
     linhas = [
         "// Gerado por construir_mod.py a partir de assets/ (arte aprovada). Não edite à mão.",
         "// Arte e personagens: (c) 2026 George Altran (@geoaltran), CC BY-NC 4.0, sem uso comercial sem autorização (LICENSE-ART).",

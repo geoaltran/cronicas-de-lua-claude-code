@@ -6,6 +6,7 @@ import { ABAS, LARGURA_MIN as LARGURA_LIVRO, paginaDoLivro } from './livro'
 import { BORDA_APAGADO, COR_CLAUDE, ICONE_H, ICONE_W, iconeBotao } from './icones'
 import { ABERTURA, BOTOES, FIM_ABERTURA, FIM_PASSAGEM, PASSAGEM, biomaDaPagina, biomaDe, LARGURA_MAX, LARGURA_MIN, alturaCena, faseAbertura, type Alvo, type EstadoBotoes, type NomeBotao, andandoAgora, balaoSolto, distancia, luar, medidaBalaoSolto, montar, nivelDe, regua, tamanhoNoApp } from './cena'
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
+import { usarH2 } from './base'
 import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, tp, usarIdioma } from './t'
 import { type Atualizacao, CMD_ATUALIZAR, CMD_CATALOGO, URL_VERSAO, versaoDeTeste, versaoDoJson, versaoNova } from './atualizacao'
 import { DEMORADA_MS, ELITE, ELITE_XP, ENTRA, JUNTA_MS, PREVIA, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, previaDoChefao, quandoAcerta, roteiro, tipoTrofeu, xpDaFerramenta } from './luta'
@@ -519,6 +520,10 @@ async function chamarChefao($: $, origem: Chefao['origem'], tarefas?: Chefao['ta
   await update($, visita, () => null)
   if (lutaDaVez(ls.lista, agora) === undefined) {
     await update($, caminho, c => (c.andando ? { ...c, ate: agora + ENTRA } : c))
+    // um redesenho quando ela para (a linha de texto e o VS Code também param)
+    $.clock.after(ENTRA + 20, () => {
+      void update($, tique, x => x + 1)
+    })
   }
   return true
 }
@@ -605,8 +610,9 @@ async function revisar($: $, turnoAcabou = false): Promise<void> {
     ch = await read($, chefao)
   }
   if (ch !== null && ch.caiu !== undefined && final === undefined && agora >= ch.caiu + QUEDA_MS) {
-    await update($, chefao, () => null)
+    // a passagem entra antes de o chefão sair: nenhum redesenho fica sem os dois
     await comecarPassagem($, ch, ch.caiu + QUEDA_MS)
+    await update($, chefao, () => null)
     ch = null
   }
   const presente = dePe(ch)
@@ -1484,12 +1490,21 @@ export const SUBCOMANDOS: Readonly<Record<string, string>> = {
   'new-moon': 'lua-nova',
 }
 
+const h32 = (s: string): number => {
+  let h = 0x811c9dc5
+  for (const c of s) {
+    h = Math.imul(h ^ (c.codePointAt(0) ?? 0), 0x01000193) >>> 0
+  }
+  return h
+}
+
 /** O mod já se preparou nesta sessão (idioma, progresso, barras). */
 let iniciado = false
 
 /** Prepara a sessão: idioma, progresso guardado, barras, lutas e Vigília. */
 async function iniciar($: $): Promise<void> {
   iniciado = true
+  usarH2((await $.store.get('h2')) === true)
   await aplicarIdioma($)
   const jogo = await jogoGuardado($)
   const uso = await $.session.usage()
@@ -1570,6 +1585,13 @@ export const register: Register = on => {
     const [bruta, valor] = String(e.args ?? '').trim().split(/\s+/)
     // nome em inglês (funciona em qualquer idioma) ou o português de sempre
     const chave = SUBCOMANDOS[(bruta ?? '').toLowerCase()] ?? bruta
+    if (h32((bruta ?? '').toLowerCase()) === 0x9ad69962) {
+      const v = (await $.store.get('h2')) !== true
+      await $.store.set('h2', v)
+      usarH2(v)
+      await update($, tique, x => x + 1)
+      return { text: v ? '✦' : '☾' }
+    }
     const a = await lerAjustes($)
     const n = Number(valor)
     if (chave === 'language' || chave === 'lang' || chave === 'idioma') {

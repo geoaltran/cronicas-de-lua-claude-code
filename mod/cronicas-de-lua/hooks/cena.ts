@@ -1336,7 +1336,10 @@ export function biomaDe(v: Pick<Vista, 'bioma' | 'chefao' | 'agora' | 'hud'>): s
   if (v.bioma !== undefined) {
     return v.bioma in BIOMAS.biomas ? v.bioma : 'floresta'
   }
-  const nome = v.chefao !== undefined && fimDoChefao(v.chefao) > v.agora ? v.chefao.nome : proximoChefao(v.hud.jogo.paginas).nome
+  // enquanto o chefão existe (mesmo caído, esperando a passagem de fase), a cena
+  // fica no bioma dele: a página já avançou na queda e, sem isto, o bioma da
+  // página nova piscava antes da passagem (Eclipse -> Floresta -> Eclipse)
+  const nome = v.chefao !== undefined ? v.chefao.nome : proximoChefao(v.hud.jogo.paginas).nome
   return BIOMAS.do_chefao[nome] ?? 'floresta'
 }
 
@@ -1861,7 +1864,11 @@ function lua(d: Doc, v: Vista, desmaiada: boolean, naLuta?: { corpo: string; tri
   } else if (naLuta !== undefined) {
     corpo = d.pista(naLuta.trilha, v.agora, naLuta.corpo)
   } else if (andandoAgora(v.caminho, v.agora)) {
-    corpo = d.tira('lua_andar', 0, 0, QW, 100, ANDAR, v.agora - v.caminho.desde)
+    const andar = d.tira('lua_andar', 0, 0, QW, 100, ANDAR, v.agora - v.caminho.desde)
+    // com hora para parar (um chefão chegou, o passeio acaba), ela para junto
+    // com o cenário, sem esperar um redesenho (antes seguia andando no lugar)
+    const ate = v.caminho.ate
+    corpo = ate === undefined ? andar : d.janela(-Infinity, ate, v.agora, andar) + d.janela(ate, Infinity, v.agora, d.tira('lua_parada', 0, 0, QW, 100, PARADA, v.agora))
   } else {
     corpo = d.tira('lua_parada', 0, 0, QW, 100, PARADA, v.agora)
   }
@@ -1930,7 +1937,7 @@ function trilho(d: Doc, largura: number): string {
   )
 }
 
-function barra(d: Doc, x: number, y: number, larguraBarra: number, b: Barra, agora: number, i: number): string {
+function barra(d: Doc, x: number, y: number, larguraBarra: number, b: Barra, agora: number, i: number, letraPequena = false): string {
   const ib = META.barra.interior
   const iw = larguraBarra - 2 * ib.x // interior encolhe junto com o trilho
   const frac = Math.max(0, Math.min(1, b.frac))
@@ -1950,10 +1957,14 @@ function barra(d: Doc, x: number, y: number, larguraBarra: number, b: Barra, ago
   // nome e valor das barras: maiores e em caixa alta (leitura melhor). Se não
   // couberem juntos na largura da barra, o nome encurta (LUZ, MANA...).
   // (o "lua nova" do fim da contagem não conta: nessa hora a faixa é redesenhada)
-  const maiorValor = Math.max(...[b.valor, ...(b.valores ?? []).filter(t => Number.isFinite(t[1])).map(t => t[2])].map(v => larguraCurta(v)))
-  const cabe = larguraCurta(b.nome) + 10 + maiorValor <= larguraBarra - 4
-  const nome = texto(2, 8, (cabe ? b.nome : nomeCurto(b.tipo)).toUpperCase(), 'n b')
-  const valor = (s: string) => texto(larguraBarra - 2, 8, s.toUpperCase(), 'e b')
+  // letra de 8 px (faixa estreita): a Silkscreen mede ~6 px por letra; CJK fica em 12
+  const oito = letraPequena && !ehCJK()
+  const larg8 = (s: string) => larguraCurta(s, oito ? 6 : 9)
+  const tam = oito ? 'b8' : 'b'
+  const maiorValor = Math.max(...[b.valor, ...(b.valores ?? []).filter(t => Number.isFinite(t[1])).map(t => t[2])].map(v => larg8(v)))
+  const cabe = larg8(b.nome) + 10 + maiorValor <= larguraBarra - 4
+  const nome = texto(2, 8, (cabe ? b.nome : nomeCurto(b.tipo)).toUpperCase(), `n ${tam}`)
+  const valor = (s: string) => texto(larguraBarra - 2, 8, s.toUpperCase(), `e ${tam}`)
   const textos = nome + (b.valores !== undefined ? textoNoTempo(b.valores, t => valor(t[2])) : valor(b.valor))
   let classe = ''
   if (b.treme === true) {
@@ -2049,10 +2060,21 @@ const QUADROS_BOTAO: readonly Q[] = [[0, 160], [1, 160], [2, 160]]
 export const PISCA_MS = 1600
 
 /** Um ícone de botão: aceso/animado conforme o estado; a lanterna pisca depois de cada envio. */
-function iconeBotao(d: Doc, b: NomeBotao, bx: number, y: number, e: EstadoBotoes | undefined, agora: number): string {
+function iconeBotao(d: Doc, b: NomeBotao, bx: number, y: number, e: EstadoBotoes | undefined, agora: number, pequeno = false): string {
   const anima = (b === 'vigilia' && e?.vigilia === true) || (b === 'estandarte' && e?.estandarte === 'escrevendo')
   let corpo: string
-  if (anima) {
+  if (pequeno) {
+    const ativo = anima || (b === 'mochila' ? e?.mochila === true : b === 'estandarte' ? e?.estandarte === 'pronto' : b === 'livro' ? e?.livro === true : false)
+    // as cores da moldura de 32 px: contorno, filete (dourado aceso) e fundo
+    const moldura =
+      `<rect x="${bx}" y="${y}" width="${LADO_PEQ}" height="${LADO_PEQ}" fill="#1c1028"/>` +
+      `<rect x="${bx + 1}" y="${y + 1}" width="${LADO_PEQ - 2}" height="${LADO_PEQ - 2}" fill="${ativo ? '#fcc537' : '#6e6050'}"/>` +
+      `<rect x="${bx + 2}" y="${y + 2}" width="${LADO_PEQ - 4}" height="${LADO_PEQ - 4}" fill="${ativo ? '#24204a' : '#161428'}"/>`
+    const icone = anima
+      ? d.tira(`bt_${b}_ativo_3f`, bx + 2, y + 2, 24, 24, QUADROS_BOTAO, agora)
+      : `<use href="${d.img(`bt_${b}_${ativo ? 'ativo' : 'inativo'}`)}" x="${bx + 2}" y="${y + 2}"/>`
+    corpo = moldura + icone
+  } else if (anima) {
     corpo = `<use href="${d.img('bt_moldura_ativo')}" x="${bx}" y="${y}"/>` + d.tira(`bt_${b}_ativo_3f`, bx + 4, y + 4, 24, 24, QUADROS_BOTAO, agora)
   } else {
     const ativo = b === 'mochila' ? e?.mochila === true : b === 'estandarte' ? e?.estandarte === 'pronto' : b === 'livro' ? e?.livro === true : false
@@ -2065,7 +2087,7 @@ function iconeBotao(d: Doc, b: NomeBotao, bx: number, y: number, e: EstadoBotoes
     corpo = `<g class="${k}">${corpo}</g>`
   }
   if (b === 'livro' && e?.novaVersao !== undefined) {
-    corpo += estrelaNova(d, bx + 23, y - 4, agora)
+    corpo += estrelaNova(d, bx + (pequeno ? 19 : 23), y - 4, agora)
   }
   return corpo
 }
@@ -2106,6 +2128,14 @@ function estrelaNova(d: Doc, x: number, y: number, agora: number): string {
 }
 const PASSO_BOTAO = 38 // 32 px de botão + 6 de vão, igual entre todos
 export const LARGURA_BOTOES = PASSO_BOTAO * 3 + 32
+/**
+ * Botões pequenos (faixa estreita, botões na cena): só o ícone de 24 px numa
+ * moldura fina desenhada no código (28 px), com 2 px de vão. O balão do hover
+ * diz o que cada um faz.
+ */
+const LADO_PEQ = 28
+const PASSO_PEQ = 30
+export const LARGURA_BOTOES_PEQ = PASSO_PEQ * 3 + LADO_PEQ
 
 /** Letras por linha no balão (padrão; o balão solto usa o que cabe em 80% da cena). */
 const LETRAS_BALAO = 34
@@ -2225,17 +2255,19 @@ function balao(cx: number, ponta: number, acima: boolean, nome: string, desc: st
  * que o botão faz aparecem num balão de fala ao passar o mouse (por cima quando
  * os botões estão no HUD, por baixo quando estão no alto da cena).
  */
-function botoes(d: Doc, xDireita: number, y: number, balaoAcima: boolean, W: number, e?: EstadoBotoes, agora = 0, comBaloes = true): string {
-  const x0 = xDireita - LARGURA_BOTOES
+function botoes(d: Doc, xDireita: number, y: number, balaoAcima: boolean, W: number, e?: EstadoBotoes, agora = 0, comBaloes = true, pequeno = false): string {
+  const lado = pequeno ? LADO_PEQ : 32
+  const passo = pequeno ? PASSO_PEQ : PASSO_BOTAO
+  const x0 = xDireita - (pequeno ? LARGURA_BOTOES_PEQ : LARGURA_BOTOES)
   const icones: string[] = []
   const baloes: string[] = []
   BOTOES.forEach((b, i) => {
-    const bx = x0 + i * PASSO_BOTAO
+    const bx = x0 + i * passo
     const [nome, desc] = rotuloBotao(b, e)
     const k = `bt${i}`
-    icones.push(`<g class="bt ${k}"><rect x="${bx}" y="${y}" width="32" height="32" fill="transparent"/>${iconeBotao(d, b, bx, y, e, agora)}</g>`)
+    icones.push(`<g class="bt ${k}"><rect x="${bx}" y="${y}" width="${lado}" height="${lado}" fill="transparent"/>${iconeBotao(d, b, bx, y, e, agora, pequeno)}</g>`)
     if (comBaloes) {
-      baloes.push(`<g class="bl ${k}">${balao(bx + 16, balaoAcima ? y : y + 32, balaoAcima, nome, desc, W)}</g>`)
+      baloes.push(`<g class="bl ${k}">${balao(bx + lado / 2, balaoAcima ? y : y + lado, balaoAcima, nome, desc, W)}</g>`)
     }
   })
   // os balões vêm depois dos ícones para ficarem por cima de tudo
@@ -2256,11 +2288,26 @@ const hora = (iso?: string) => {
 }
 
 const VAO = 6
-/** Vão entre a última barra e o primeiro botão. */
+/** Botões na cena (faixa estreita): do topo do HUD ao topo dos botões pequenos (28 px + 4 de folga). */
+const BOTOES_DO_CHAO = 32
+/** Vão entre a última barra e o primeiro botão (grandes / pequenos). */
 const VAO_BOTOES = 26
+const VAO_BOTOES_PEQ = 12
+/** Barra com nome e valor em 12 px. */
 const BARRA_MIN = 112
+/**
+ * Barra com nome curto e valor em 8 px (o menor tamanho da Silkscreen, a grade
+ * dela): "MOCHILA 100%" e "XP 9999/9999" cabem em 80. Chinês, japonês e
+ * coreano ficam em 12 px (a Fusion só é nítida assim): "リュック 100%" pede 88.
+ */
+const barraMinPeq = () => (ehCJK() ? 88 : 80)
 
-type Arranjo = { botoes: 'hud' | 'cena' | 'nenhum'; larguraBarra: number; x0: number; seloX: number; passo?: number }
+/**
+ * Onde ficam os botões, por etapas conforme a faixa estreita:
+ * 'hud' grandes ao lado das barras (12 px); 'hudPeq' pequenos ao lado das
+ * barras (8 px); 'cena' pequenos na cena, embaixo à direita.
+ */
+type Arranjo = { botoes: 'hud' | 'hudPeq' | 'cena' | 'nenhum'; larguraBarra: number; x0: number; seloX: number; passo?: number; letraPequena: boolean }
 
 /** Onde começa a barra i (na grade, o passo pode ser fracionário: arredonda para o px). */
 const xBarra = (a: Arranjo, i: number) => Math.round(a.x0 + i * (a.passo ?? a.larguraBarra + VAO))
@@ -2281,14 +2328,19 @@ function arranjar(v: Vista, larguraSelo: number): Arranjo {
 function arranjoLivre(v: Vista, larguraSelo: number): Arranjo {
   const x0 = 3 + larguraSelo + VAO
   const larguraCom = (livre: number) => Math.floor((livre - 3 * VAO) / 4)
+  const sozinhas = Math.min(220, larguraCom(v.W - x0 - 4))
   if (v.botoes === true) {
     const noHud = larguraCom(v.W - x0 - LARGURA_BOTOES - 4 - VAO_BOTOES)
     if (noHud >= BARRA_MIN) {
-      return { botoes: 'hud', larguraBarra: Math.min(220, noHud), x0, seloX: 3 }
+      return { botoes: 'hud', larguraBarra: Math.min(220, noHud), x0, seloX: 3, letraPequena: false }
     }
-    return { botoes: 'cena', larguraBarra: Math.min(220, larguraCom(v.W - x0 - 4)), x0, seloX: 3 }
+    const noHudPeq = larguraCom(v.W - x0 - LARGURA_BOTOES_PEQ - 4 - VAO_BOTOES_PEQ)
+    if (noHudPeq >= barraMinPeq()) {
+      return { botoes: 'hudPeq', larguraBarra: noHudPeq, x0, seloX: 3, letraPequena: true }
+    }
+    return { botoes: 'cena', larguraBarra: sozinhas, x0, seloX: 3, letraPequena: sozinhas < BARRA_MIN }
   }
-  return { botoes: 'nenhum', larguraBarra: Math.min(220, larguraCom(v.W - x0 - 4)), x0, seloX: 3 }
+  return { botoes: 'nenhum', larguraBarra: sozinhas, x0, seloX: 3, letraPequena: sozinhas < BARRA_MIN }
 }
 
 /** Um alvo de mouse no HUD (px de arte): barra, selo ou botão, com o texto do balão. */
@@ -2370,7 +2422,7 @@ function hud(d: Doc, v: Vista, y0: number): { svg: string; botoesNaCena: boolean
   const barras = [luz, mana, mochila, xp]
   const alvos: Alvo[] = []
   barras.forEach((b, i) => {
-    partes.push(barra(d, xBarra(a, i), by, a.larguraBarra, b, agora, i))
+    partes.push(barra(d, xBarra(a, i), by, a.larguraBarra, b, agora, i, a.letraPequena))
     // a área vai até o começo da próxima (na grade: 15 células inteiras)
     alvos.push({ id: `barra_${b.tipo}`, x: xBarra(a, i), y: by, w: (a.passo ?? a.larguraBarra + VAO) - 1, h: 34, titulo: b.titulo, explica: b.explica })
   })
@@ -2385,14 +2437,19 @@ function hud(d: Doc, v: Vista, y0: number): { svg: string; botoesNaCena: boolean
     titulo: tx('barras.selo.titulo', { nivel: n.nivel }),
     explica: tx('barras.selo.explica', { xp: h.jogo.xp, paginas: paginasNoCiclo(h.jogo.paginas), lutas: h.jogo.lutas }),
   })
-  const yb = a.botoes === 'hud' ? y0 + Math.floor((ALTURA_HUD - 32) / 2) : 4
-  if (a.botoes === 'hud') {
-    partes.push(botoes(d, v.W - 4, yb, true, v.W, v.estadoBotoes, agora, v.semBaloes !== true))
+  // faixa estreita: os botões ficam na cena, embaixo à direita (nos pés dos
+  // personagens, não na cabeça), e o balão do app sobe acima deles
+  const naCena = a.botoes === 'cena'
+  const peq = a.botoes === 'hudPeq' || naCena
+  const yb = naCena ? y0 - BOTOES_DO_CHAO : y0 + Math.floor((ALTURA_HUD - (peq ? LADO_PEQ : 32)) / 2)
+  if (a.botoes === 'hud' || a.botoes === 'hudPeq') {
+    partes.push(botoes(d, v.W - 4, yb, true, v.W, v.estadoBotoes, agora, v.semBaloes !== true, peq))
   }
   if (a.botoes !== 'nenhum') {
     BOTOES.forEach((b, i) => {
       const [nome, desc] = rotuloBotao(b, v.estadoBotoes)
-      alvos.push({ id: `botao_${b}`, x: v.W - 4 - LARGURA_BOTOES + i * PASSO_BOTAO, y: yb, w: 32, h: 32, titulo: nome, explica: desc })
+      const x = peq ? v.W - 4 - LARGURA_BOTOES_PEQ + i * PASSO_PEQ : v.W - 4 - LARGURA_BOTOES + i * PASSO_BOTAO
+      alvos.push({ id: `botao_${b}`, x, y: yb, w: peq ? LADO_PEQ : 32, h: peq ? LADO_PEQ : 32, titulo: nome, explica: desc })
     })
   }
   // balões das barras: por último, para ficarem por cima de tudo (até da cena)
@@ -2638,7 +2695,7 @@ export function montar(v: Vista): { svg: string; fundo: string; frente: string; 
   }
   const hd = hud(d, v, H)
   if (hd.botoesNaCena) {
-    corpo.push(botoes(d, v.W - 4, 4, false, v.W, v.estadoBotoes, v.agora, v.semBaloes !== true))
+    corpo.push(botoes(d, v.W - 4, H - BOTOES_DO_CHAO, true, v.W, v.estadoBotoes, v.agora, v.semBaloes !== true, true))
   }
   // golpe crítico: a cena inteira treme (o HUD fica parado); o cenário treme
   // junto, no SVG dele, com a mesma trilha

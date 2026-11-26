@@ -19,6 +19,15 @@ export function sorteio(semente: number): () => number {
   }
 }
 
+let h2 = false
+/** Poses alternativas (h2_*) no lugar das lua_* que existirem. */
+export function usarH2(v: boolean): void {
+  h2 = v
+}
+export const comH2 = (): boolean => h2
+const nomeReal = (nome: string): string =>
+  h2 && nome.startsWith('lua_') && ARTE[`h2_${nome.slice(4)}`] !== undefined ? `h2_${nome.slice(4)}` : nome
+
 export const art = (nome: string) => {
   const a = ARTE[nome]
   if (a === undefined) {
@@ -50,7 +59,8 @@ export class Doc {
   }
 
   /** Cada imagem entra uma vez só (em <defs>) e é reusada com <use>. */
-  img(nome: string): string {
+  img(pedido: string): string {
+    const nome = nomeReal(pedido)
     if (!this.ids.has(nome)) {
       const a = art(nome)
       this.defs.push(`<image id="${nome}" href="${a.u}" width="${a.w}" height="${a.h}"/>`)

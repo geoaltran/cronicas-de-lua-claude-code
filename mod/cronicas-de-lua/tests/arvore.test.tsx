@@ -24,3 +24,25 @@ test('a faixa inteira (cena e balões) fica abaixo do teto do app, com os chefõ
     await ui.unmount()
   }
 })
+
+test('com as poses h2 a faixa troca a heroína e continua abaixo do teto', async ($, on) => {
+  const clock = mock.clock(on, { now: T0 })
+  mock.store(on, { idioma: 'pt-BR', jogo: { xp: 137, paginas: 2, lutas: 5 }, ajustes: {}, h2: true })
+  on('session.usage', () => ({ value: { startedAt: 0, context: { window: 200000, tokens: 70000, percent: 35 }, rateLimits: [{ kind: 'five_hour', percentUsed: 28 }] } }))
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('command.register', () => ({ value: { command: 'cronicas' } }))
+  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
+  const cmd = (args: string) => $.command.run({ command: 'cronicas', args, origin: { kind: 'composer' }, presentation: { isFullscreen: false, columns: 120 } })
+  for (const cols of [120]) {
+    const ui = await $.ui.mount({ plugin: 'cronicas-de-lua', component: 'AbovePrompt', surface: 'desktop', props: { hasSurvey: false, isCollapsed: false, isWorking: true, maxRows: 20, bodyColumns: cols, scroll: { offset: 0, bodyRows: 20 }, view: {} } } as const)
+    for (const nome of ['relojoeiro', 'ignis']) {
+      await cmd(`chefao ${nome}`)
+      await clock.advance(1500)
+      const arvore = JSON.stringify(await ui.drawn())
+      expect(arvore.length).toBeLessThan(TETO_ARVORE)
+      expect(arvore.includes('h2_')).toBe(true)
+      expect(arvore.includes('id=\\"lua_parada')).toBe(false)
+    }
+    await ui.unmount()
+  }
+})
