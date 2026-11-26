@@ -4,14 +4,33 @@
 
 # 🌙 Lua クロニクル · *As Crônicas de Lua*
 
-Claude Code 用のピクセルアート RPG Mod です。ツールを呼ぶたびにモンスターが現れ、コンテキストウィンドウはリュック、利用上限はマナ。Claude が作業しているあいだ、小さな月の魔法使い Lua がそれをぜんぶ相手にします。ボス戦、経験値、レベル、そしてモンスター図鑑つき。これでも一応、コーディング中です。
+<p align="center"><b>Claude Code、でも RPG。</b><br>ツールを呼ぶたびにモンスター。ToDo リストはボス戦。それでも、ちゃんとコーディング中です。</p>
 
-![Claude の作業中にモンスターと戦う Lua](previa_luta.gif)
+<p align="center">
+  <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/blob/main/CHANGELOG.md"><img alt="version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fgeoaltran%2Fcronicas-de-lua-claude-code%2Fmain%2Fmod%2Fcronicas-de-lua%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=f2c45a"></a>
+  <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/geoaltran/cronicas-de-lua-claude-code?style=flat&color=6e5ac8"></a>
+  <img alt="code: MIT" src="https://img.shields.io/badge/code-MIT-3b82f6">
+  <img alt="art: CC BY-NC 4.0" src="https://img.shields.io/badge/art-CC%20BY--NC%204.0-d97757">
+  <img alt="8 languages" src="https://img.shields.io/badge/languages-8-8a6a3a">
+</p>
+
+<p align="center"><a href="#インストール">インストール</a> · <a href="#コマンド">コマンド</a> · <a href="CHANGELOG.md">更新履歴</a> · <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/issues/new?title=Idea:%20">ボスやバイオームを提案</a> · <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/issues/new?title=Bug:%20">不具合を報告</a></p>
+
+![時計職人に会心の一撃を決める Lua](previa_chefao_relojoeiro.gif)
+
+Lua はメッセージ入力欄のすぐ上に住む、小さな月の魔法使いです。Claude がファイルを読むと Vespera と戦い、コードを編集すると時計職人が現れ、時間のかかるコマンドでは呪文を溜め、ツールが失敗すると吹き飛ばされます。ToDo リストを作るとボスが登場。タスクを 1 つ終えるたびに体力のブロックが 1 つ砕け、最後の 1 つは**会心の一撃**。Claude を待つ数分間の、小さな冒険です。
+
+- **ツールを呼ぶたびにバトル**：読み込み、編集、ターミナル、Web、MCP、サブエージェントにそれぞれのモンスター。
+- **ToDo リストはボス戦**：ブロック状の体力、シールド、会心の一撃を持つ 10 体のボス。
+- **パララックスで動く 9 つのバイオーム**：ボスごとに 1 つ。満月の海から火山、日食まで。
+- **正直な HUD**：月光はプロンプトキャッシュ、マナはプランの上限、リュックはコンテキストウィンドウ。
+- **経験値、レベル、Lua の本**：図鑑、トロフィー棚（直したエラーがトロフィーに）、Claude のツールの魔導書。
+- **8 言語**：English, Português, Español, Français, Deutsch, 中文, 日本語, 한국어。
 
 ## どんなもの？
 メッセージ入力欄のすぐ上に表示される帯です。Claude が作業しているあいだ、Lua はパララックスで動く 9 つのバイオームを旅し、Claude がツールを使うたびにモンスターが現れて戦います。ゲームの裏側では、この帯がセッションの状態を正直に映すダッシュボードになっています。プロンプトキャッシュがどれだけ温かいか、プランの上限があとどれだけ残っているか、コンテキストウィンドウがどれだけ埋まっているか。
 
-![森を歩く Lua](previa_caminhada.gif)
+![Claude の作業中にモンスターと戦う Lua](previa_luta.gif)
 
 ## インストール
 Claude Code のセッションで次のように入力します。

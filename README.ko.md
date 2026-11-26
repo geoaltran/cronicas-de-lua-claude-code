@@ -4,14 +4,33 @@
 
 # 🌙 Lua 연대기 · *As Crônicas de Lua*
 
-Claude Code를 위한 픽셀 아트 RPG 모드입니다. 도구를 호출할 때마다 몬스터가 나타나고, 컨텍스트 창은 배낭, 사용 한도는 마나가 됩니다. Claude가 일하는 동안 작은 달의 마법사 Lua가 그 모두와 맞서 싸웁니다. 보스전, 경험치, 레벨, 몬스터 도감까지. 엄밀히 말하면 당신은 여전히 코딩 중입니다.
+<p align="center"><b>Claude Code, 그런데 RPG.</b><br>도구를 호출할 때마다 몬스터. 할 일 목록은 보스전. 그래도 엄연히 코딩 중입니다.</p>
 
-![Claude가 일하는 동안 몬스터와 싸우는 Lua](previa_luta.gif)
+<p align="center">
+  <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/blob/main/CHANGELOG.md"><img alt="version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fgeoaltran%2Fcronicas-de-lua-claude-code%2Fmain%2Fmod%2Fcronicas-de-lua%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=f2c45a"></a>
+  <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/geoaltran/cronicas-de-lua-claude-code?style=flat&color=6e5ac8"></a>
+  <img alt="code: MIT" src="https://img.shields.io/badge/code-MIT-3b82f6">
+  <img alt="art: CC BY-NC 4.0" src="https://img.shields.io/badge/art-CC%20BY--NC%204.0-d97757">
+  <img alt="8 languages" src="https://img.shields.io/badge/languages-8-8a6a3a">
+</p>
+
+<p align="center"><a href="#설치">설치</a> · <a href="#명령어">명령어</a> · <a href="CHANGELOG.md">변경 기록</a> · <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/issues/new?title=Idea:%20">보스나 바이옴 제안하기</a> · <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/issues/new?title=Bug:%20">버그 신고</a></p>
+
+![시계공에게 치명타를 날리는 Lua](previa_chefao_relojoeiro.gif)
+
+Lua는 메시지 입력창 바로 위에 사는 작은 달의 마법사입니다. Claude가 파일을 읽으면 Vespera와 싸우고, 코드를 편집하면 시계공이 나타나며, 오래 걸리는 명령에서는 주문을 모으고, 도구가 실패하면 뒤로 밀려납니다. 할 일 목록을 만들면 보스가 등장합니다. 작업을 하나 끝낼 때마다 체력 블록이 하나씩 깨지고, 마지막 하나는 **치명타**입니다. Claude를 기다리는 몇 분 동안의 작은 모험이에요.
+
+- **도구 호출마다 전투**: 읽기, 편집, 터미널, 웹, MCP, 서브에이전트마다 각자의 몬스터가 있습니다.
+- **할 일 목록은 보스전**: 블록으로 나뉜 체력, 방패, 치명타를 가진 10명의 보스.
+- **패럴랙스로 움직이는 9개의 바이옴**: 보스마다 하나씩, 보름달 아래 바다부터 화산과 일식까지.
+- **정직한 HUD**: 달빛은 프롬프트 캐시, 마나는 요금제 한도, 배낭은 컨텍스트 창입니다.
+- **경험치, 레벨, Lua의 책**: 도감, 트로피 선반(고친 오류가 트로피가 됩니다), Claude 도구의 마법서.
+- **8개 언어**: English, Português, Español, Français, Deutsch, 中文, 日本語, 한국어.
 
 ## 이게 뭔가요?
 메시지 입력창 바로 위에 뜨는 띠입니다. Claude가 일하는 동안 Lua는 패럴랙스로 움직이는 9개의 바이옴을 여행하고, Claude가 도구를 쓸 때마다 몬스터가 나타나 Lua와 싸웁니다. 게임 뒤에서 이 띠는 세션 상태를 솔직하게 보여 주는 대시보드입니다. 프롬프트 캐시가 아직 얼마나 따뜻한지, 요금제 한도가 얼마나 남았는지, 컨텍스트 창이 얼마나 찼는지를요.
 
-![숲을 걷는 Lua](previa_caminhada.gif)
+![Claude가 일하는 동안 몬스터와 싸우는 Lua](previa_luta.gif)
 
 ## 설치
 Claude Code 세션에서 다음을 입력하세요.

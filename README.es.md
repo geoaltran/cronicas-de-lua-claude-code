@@ -4,14 +4,33 @@
 
 # 🌙 Las Crónicas de Lua · *As Crônicas de Lua*
 
-Un mod RPG en pixel art para Claude Code. Cada herramienta es un monstruo, tu ventana de contexto es una mochila, tu límite de uso es maná, y Lua, una pequeña maga lunar, se enfrenta a todos mientras Claude trabaja. Jefes, XP, niveles y un bestiario. Técnicamente, sigues programando.
+<p align="center"><b>Claude Code, pero es un RPG.</b><br>Cada herramienta es un monstruo. Tu lista de tareas es una pelea contra un jefe. Técnicamente, sigues programando.</p>
 
-![Lua luchando contra un monstruo mientras Claude trabaja](previa_luta.gif)
+<p align="center">
+  <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/blob/main/CHANGELOG.md"><img alt="version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fgeoaltran%2Fcronicas-de-lua-claude-code%2Fmain%2Fmod%2Fcronicas-de-lua%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=f2c45a"></a>
+  <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/geoaltran/cronicas-de-lua-claude-code?style=flat&color=6e5ac8"></a>
+  <img alt="code: MIT" src="https://img.shields.io/badge/code-MIT-3b82f6">
+  <img alt="art: CC BY-NC 4.0" src="https://img.shields.io/badge/art-CC%20BY--NC%204.0-d97757">
+  <img alt="8 languages" src="https://img.shields.io/badge/languages-8-8a6a3a">
+</p>
+
+<p align="center"><a href="#instalación">Instalar</a> · <a href="#comandos">Comandos</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/issues/new?title=Idea:%20">Sugerir un jefe o un bioma</a> · <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/issues/new?title=Bug:%20">Reportar un error</a></p>
+
+![Lua asesta un golpe crítico al Relojero](previa_chefao_relojoeiro.gif)
+
+Lua es una pequeña maga lunar que vive justo encima de tu caja de mensajes. Cuando Claude lee archivos, ella se enfrenta a una Vespera; cuando edita código, aparece el Relojero; un comando largo la hace canalizar un hechizo, y una herramienta que falla la hace retroceder. Crea una lista de tareas y aparece un jefe: cada tarea terminada rompe un bloque de su vida, y la última es un **golpe crítico**. Una pequeña aventura para los minutos en que esperas a Claude.
+
+- **Cada herramienta es una pelea**: leer, editar, la terminal, la web, MCP y los subagentes traen cada uno su monstruo.
+- **Las listas de tareas son peleas contra jefes**: 10 jefes con la vida en bloques, escudo y golpe crítico.
+- **9 biomas en parallax**: uno por cada jefe, desde un mar bajo la luna llena hasta un volcán y un eclipse.
+- **Un HUD honesto**: la luz de luna es la caché del prompt, el maná es el límite de tu plan, la mochila es la ventana de contexto.
+- **XP, niveles y el Libro de Lua**: bestiario, estante de trofeos (los errores corregidos se vuelven trofeos) y un grimorio con las herramientas de Claude.
+- **8 idiomas**: English, Português, Español, Français, Deutsch, 中文, 日本語, 한국어.
 
 ## Qué es
 Una franja justo encima de la caja de mensajes. Mientras Claude trabaja, Lua recorre 9 biomas en parallax; cada vez que Claude usa una herramienta, aparece un monstruo y ella lo combate. Detrás del juego, la franja es un panel honesto de tu sesión: qué tan caliente sigue la caché del prompt, cuánto queda del límite de tu plan y qué tan llena está la ventana de contexto.
 
-![Lua caminando por el bosque](previa_caminhada.gif)
+![Lua luchando contra un monstruo mientras Claude trabaja](previa_luta.gif)
 
 ## Instalación
 En una sesión de Claude Code, escribe:

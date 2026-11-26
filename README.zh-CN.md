@@ -4,14 +4,33 @@
 
 # 🌙 Lua 编年史 · *As Crônicas de Lua*
 
-一款为 Claude Code 打造的像素风 RPG 模组。每次工具调用都是一只怪物，上下文窗口是你的背包，用量限额是你的法力，而小小的月之法师 Lua 会在 Claude 干活的时候把它们一一打倒。有 Boss 战、经验值、等级，还有怪物图鉴。严格来说，你仍然在写代码。
+<p align="center"><b>Claude Code，但它是一款 RPG。</b><br>每次工具调用都是一只怪物。你的待办清单就是一场首领战。严格来说，你还在写代码。</p>
 
-![Claude 工作时，Lua 正在和怪物战斗](previa_luta.gif)
+<p align="center">
+  <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/blob/main/CHANGELOG.md"><img alt="version" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fgeoaltran%2Fcronicas-de-lua-claude-code%2Fmain%2Fmod%2Fcronicas-de-lua%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=f2c45a"></a>
+  <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/geoaltran/cronicas-de-lua-claude-code?style=flat&color=6e5ac8"></a>
+  <img alt="code: MIT" src="https://img.shields.io/badge/code-MIT-3b82f6">
+  <img alt="art: CC BY-NC 4.0" src="https://img.shields.io/badge/art-CC%20BY--NC%204.0-d97757">
+  <img alt="8 languages" src="https://img.shields.io/badge/languages-8-8a6a3a">
+</p>
+
+<p align="center"><a href="#安装">安装</a> · <a href="#命令">命令</a> · <a href="CHANGELOG.md">更新日志</a> · <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/issues/new?title=Idea:%20">推荐首领或生物群系</a> · <a href="https://github.com/geoaltran/cronicas-de-lua-claude-code/issues/new?title=Bug:%20">报告问题</a></p>
+
+![Lua 对钟表匠打出暴击](previa_chefao_relojoeiro.gif)
+
+Lua 是一位小小的月之法师，就住在你的消息输入框上方。Claude 读取文件时，她迎战 Vespera；Claude 编辑代码时，钟表匠登场；耗时的命令让她吟唱法术，工具出错时她会被击退。创建一份待办清单，首领就会出现：每完成一项任务，就击碎它一格血量，最后一项是**暴击**。在等待 Claude 的那几分钟里，来一场小小的冒险。
+
+- **每次工具调用都是一场战斗**：读取、编辑、终端、网页、MCP 和子代理各有自己的怪物。
+- **待办清单就是首领战**：10 位首领，血量分格，有护盾，还有暴击。
+- **9 个视差生物群系**：每位首领一个，从满月下的大海到火山和日食。
+- **真实的状态栏**：月光是提示缓存，法力是套餐额度，背包是上下文窗口。
+- **经验、等级和 Lua 之书**：怪物图鉴、奖杯架（修好的错误会变成奖杯）和收录 Claude 工具的魔法书。
+- **8 种语言**：English, Português, Español, Français, Deutsch, 中文, 日本語, 한국어。
 
 ## 这是什么
 一条横幅，就在输入框正上方。Claude 工作时，Lua 会走过 9 个视差滚动的生物群系；Claude 每用一次工具，就会冒出一只怪物，她便上前迎战。在游戏背后，这条横幅如实反映着你的会话状态：提示词缓存还有多"热"、套餐限额还剩多少、上下文窗口已经装了多满。
 
-![Lua 在森林里漫步](previa_caminhada.gif)
+![Claude 工作时，Lua 正在和怪物战斗](previa_luta.gif)
 
 ## 安装
 在 Claude Code 会话中输入：
