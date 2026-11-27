@@ -2,6 +2,9 @@
 
 What changed in each version of The Chronicles of Lua. To update, run `/plugin marketplace update cronicas-de-lua` and then `/plugin update cronicas-de-lua@cronicas-de-lua` (`/cronicas updates` shows the same).
 
+## 1.1.4 · 2026-11-27
+- **Fix:** the Moonlight countdown ("57 MIN") no longer blinks during fights. Each redraw of the scene used to hide the number for a frame.
+
 ## 1.1.3 · 2026-11-26
 - **Narrow bands look cleaner.** The bars switch to a smaller pixel font and the buttons shrink to sit beside them; on very narrow bands the small buttons move into the scene, bottom right, so they never cover the characters' heads. Their tooltips now open above them and point at the right button.
 - **Fix:** after a boss falls, the old biome no longer flickers into the next one before the stage transition.
