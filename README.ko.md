@@ -45,7 +45,7 @@ Claude Code 세션에서 다음을 입력하세요.
 
 이 모드는 컴퓨터에서 읽기 전용 명령 두 개만 실행합니다: `ps`(앱이 다시 시작됐는지 알아 오프닝을 보여 주기 위해)와 macOS에서 `defaults read -g AppleLanguages`(시스템 언어).
 
-**업데이트.** 하루에 한 번, 첫 세션에서 모드는 이 저장소에 공개된 버전 번호도 읽습니다 (GitHub의 공개 파일). 당신이나 대화에 관한 정보는 전혀 보내지 않으며, 저절로 내려받거나 설치하지도 않습니다. 새 버전이 나오면 책 버튼에 작은 별이 붙고 말풍선이 알려 줍니다. 업데이트하려면 `/plugin marketplace update cronicas-de-lua`, 이어서 `/plugin update cronicas-de-lua@cronicas-de-lua` 를 입력하고 새 세션을 여세요. `/cronicas updates off` 로 확인을 끌 수 있습니다 (`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 가 설정되어 있을 때도 꺼져 있습니다). 업데이트가 저절로 오기를 원한다면 Claude Code 자체에 마켓플레이스 자동 업데이트 옵션이 있습니다.
+**업데이트.** 하루에 한 번, 첫 세션에서 모드는 이 저장소에 공개된 버전 번호도 읽습니다 (GitHub의 공개 파일). 당신이나 대화에 관한 정보는 전혀 보내지 않으며, 저절로 내려받거나 설치하지도 않습니다. 새 버전이 나오면 책 버튼에 작은 별이 붙고 말풍선이 알려 줍니다. 업데이트하려면 `/plugin marketplace update cronicas-de-lua`, 이어서 `/plugin update cronicas-de-lua@cronicas-de-lua` (데스크톱 앱에서는 `/plugin` 이 플러그인 창만 열기 때문에, 터미널에서 `claude plugin marketplace update cronicas-de-lua` 과 `claude plugin update cronicas-de-lua@cronicas-de-lua` 를 실행하세요) 를 입력하고 새 세션을 여세요. `/cronicas updates off` 로 확인을 끌 수 있습니다 (`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 가 설정되어 있을 때도 꺼져 있습니다). 업데이트가 저절로 오기를 원한다면 Claude Code 자체에 마켓플레이스 자동 업데이트 옵션이 있습니다.
 
 ## 어디서 실행되나요
 | 화면 | 제공 기능 |

@@ -45,7 +45,7 @@ Mod に対応した最新の Claude Code が必要です（2.1.331 で開発・�
 
 この Mod があなたのマシンで実行するのは、読み取り専用の 2 つのコマンドだけです：`ps`（アプリの再起動を検知してオープニングを出すため）と、macOS では `defaults read -g AppleLanguages`（システムの言語）。
 
-**アップデート。** 1日に1回、最初のセッションで、Mod はこのリポジトリに公開されているバージョン番号も読みます（GitHub 上の公開ファイル）。あなたや会話についての情報は何も送られず、勝手にダウンロードやインストールもしません。新しいバージョンが出ると、本のボタンに小さな星が付き、吹き出しでお知らせします。更新するには `/plugin marketplace update cronicas-de-lua`、続けて `/plugin update cronicas-de-lua@cronicas-de-lua` と入力し、新しいセッションを開いてください。`/cronicas updates off` で確認をオフにできます（`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` が設定されているときもオフのままです）。アップデートを自動で受け取りたい場合は、Claude Code 自体にマーケットプレイスの自動更新オプションがあります。
+**アップデート。** 1日に1回、最初のセッションで、Mod はこのリポジトリに公開されているバージョン番号も読みます（GitHub 上の公開ファイル）。あなたや会話についての情報は何も送られず、勝手にダウンロードやインストールもしません。新しいバージョンが出ると、本のボタンに小さな星が付き、吹き出しでお知らせします。更新するには `/plugin marketplace update cronicas-de-lua`、続けて `/plugin update cronicas-de-lua@cronicas-de-lua`（デスクトップアプリでは `/plugin` がプラグインの画面を開くだけなので、ターミナルで `claude plugin marketplace update cronicas-de-lua` と `claude plugin update cronicas-de-lua@cronicas-de-lua` を実行してください） と入力し、新しいセッションを開いてください。`/cronicas updates off` で確認をオフにできます（`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` が設定されているときもオフのままです）。アップデートを自動で受け取りたい場合は、Claude Code 自体にマーケットプレイスの自動更新オプションがあります。
 
 ## 動作する場所
 | 画面 | できること |

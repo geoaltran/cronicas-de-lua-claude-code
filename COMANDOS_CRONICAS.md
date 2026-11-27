@@ -52,7 +52,7 @@ Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idi
 
 | Comando | O que faz |
 |---|---|
-| `/cronicas updates` | Mostra a **sua versão** e se **saiu uma nova**, com o jeito de atualizar (os dois comandos do Claude Code, um de cada vez: `/plugin marketplace update cronicas-de-lua` e depois `/plugin update cronicas-de-lua@cronicas-de-lua`; depois, abrir uma sessão nova). Também funciona como `/cronicas atualizacao`. |
+| `/cronicas updates` | Mostra a **sua versão** e se **saiu uma nova**, com o jeito de atualizar (os dois comandos do Claude Code, um de cada vez: `/plugin marketplace update cronicas-de-lua` e depois `/plugin update cronicas-de-lua@cronicas-de-lua`; no app desktop, onde o `/plugin` só abre a janela de plugins, os mesmos pelo Terminal: `claude plugin marketplace update cronicas-de-lua` e `claude plugin update cronicas-de-lua@cronicas-de-lua`; depois, abrir uma sessão nova). Também funciona como `/cronicas atualizacao`. |
 | `/cronicas updates check` | Confere **agora** no GitHub (sem esperar o dia seguinte). Também aceita `conferir`/`verificar`. |
 | `/cronicas updates off` · `on` | Desliga (ou liga de novo) a conferência. Desligada, o mod **não consulta mais o GitHub**. Também aceita `desligar`/`ligar`. |
 | `/cronicas updates test` | Mostra a **estrelinha** e o balão de uma versão nova **de mentira**, só nesta sessão, para ver como fica (não consulta nada). |
@@ -129,4 +129,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 25/11/2026 (`/cronicas updates` e a página Comandos do Livro).*
+*Última atualização: 27/11/2026 (`/cronicas updates` com os comandos do Terminal para o app desktop).*

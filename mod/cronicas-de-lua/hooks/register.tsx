@@ -8,7 +8,7 @@ import { ABERTURA, BOTOES, FIM_ABERTURA, FIM_PASSAGEM, PASSAGEM, biomaDaPagina, 
 import { type Pedaco, linhaAcao, linhaHud } from './texto'
 import { usarH2 } from './base'
 import { LINGUAS, codigoDe, idioma, idiomaDoSistema, nomeDaLingua, t as tx, temTraducao, tp, usarIdioma } from './t'
-import { type Atualizacao, CMD_ATUALIZAR, CMD_CATALOGO, URL_VERSAO, versaoDeTeste, versaoDoJson, versaoNova } from './atualizacao'
+import { type Atualizacao, CMD_ATUALIZAR, CMD_ATUALIZAR_TERMINAL, CMD_CATALOGO, CMD_CATALOGO_TERMINAL, URL_VERSAO, versaoDeTeste, versaoDoJson, versaoNova } from './atualizacao'
 import { DEMORADA_MS, ELITE, ELITE_XP, ENTRA, JUNTA_MS, PREVIA, TIPOS_TROFEU, alvoDe, danoDe, lutaDaVez, marcos, nomeDoErro, papelDe, personagemDe, previaDoChefao, quandoAcerta, roteiro, tipoTrofeu, xpDaFerramenta } from './luta'
 import { A_CADA, JORNADA, NOME_CHEFAO, QUEDA_MS, chefaoPeloNome, crescer, critico, defesa, ferir, lerTarefas, novoChefao, paginasNoCiclo, proximoChefao, vidaEmTarefas, xpDoChefao } from './chefao'
 
@@ -307,7 +307,7 @@ function textoAtualizacao(c: Conferencia, st: Atualizacao): string {
   }
   const linhas = [
     c.nova !== null
-      ? tx('comando.atualizacao.tem_nova', { nova: c.nova, local, cmd1: CMD_CATALOGO, cmd2: CMD_ATUALIZAR })
+      ? tx('comando.atualizacao.tem_nova', { nova: c.nova, local, cmd1: CMD_CATALOGO, cmd2: CMD_ATUALIZAR, cmd3: CMD_CATALOGO_TERMINAL, cmd4: CMD_ATUALIZAR_TERMINAL })
       : c.resultado === 'bloqueado'
         ? tx('comando.atualizacao.bloqueado', { local })
         : c.resultado === 'falhou'

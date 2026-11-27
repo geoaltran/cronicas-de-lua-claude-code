@@ -45,7 +45,7 @@ Lua 是一位小小的月之法师，就住在你的消息输入框上方。Clau
 
 本模组只会在你的电脑上运行两个只读命令：`ps`（用于判断应用是否重启，以显示开场动画），以及在 macOS 上运行 `defaults read -g AppleLanguages`（读取系统语言）。
 
-**更新。** 每天第一次会话时，模组还会读取本仓库公开的版本号（GitHub 上的一个公开文件）。不会发送任何关于你或你对话的信息，也不会自动下载或安装任何东西。有新版本时，“书”按钮上会出现一颗小星星，它的气泡会提醒你；要更新，请输入 `/plugin marketplace update cronicas-de-lua`，再输入 `/plugin update cronicas-de-lua@cronicas-de-lua`，然后打开一个新会话。`/cronicas updates off` 关闭检查（设置了 `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 时也不会检查）。如果你希望更新自动到来，Claude Code 本身也有市场（marketplace）自动更新的选项。
+**更新。** 每天第一次会话时，模组还会读取本仓库公开的版本号（GitHub 上的一个公开文件）。不会发送任何关于你或你对话的信息，也不会自动下载或安装任何东西。有新版本时，“书”按钮上会出现一颗小星星，它的气泡会提醒你；要更新，请输入 `/plugin marketplace update cronicas-de-lua`，再输入 `/plugin update cronicas-de-lua@cronicas-de-lua`（桌面应用里 `/plugin` 只会打开插件窗口，请在终端里运行 `claude plugin marketplace update cronicas-de-lua` 和 `claude plugin update cronicas-de-lua@cronicas-de-lua`），然后打开一个新会话。`/cronicas updates off` 关闭检查（设置了 `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 时也不会检查）。如果你希望更新自动到来，Claude Code 本身也有市场（marketplace）自动更新的选项。
 
 ## 在哪里运行
 | 界面 | 效果 |

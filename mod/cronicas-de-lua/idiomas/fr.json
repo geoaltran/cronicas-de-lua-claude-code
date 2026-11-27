@@ -420,7 +420,7 @@
       "desconhecido": "Je ne connais pas le biome « {pedido} ». Les biomes : {lista}."
     },
     "atualizacao": {
-      "tem_nova": "Nouvelle version des Chroniques de Lua : {nova} (la vôtre est {local}). Pour mettre à jour, tapez dans la zone de message, l'une après l'autre :\n{cmd1}\n{cmd2}\nPuis ouvrez une nouvelle session. Tant qu'il y a une nouvelle version, le bouton du Livre affiche une petite étoile.",
+      "tem_nova": "Nouvelle version des Chroniques de Lua : {nova} (la vôtre est {local}). Pour mettre à jour, tapez dans la zone de message, l'une après l'autre :\n{cmd1}\n{cmd2}\nSi /plugin ouvre seulement la fenêtre des plugins (app de bureau), lancez dans le Terminal de l'ordinateur, l'une après l'autre :\n{cmd3}\n{cmd4}\nPuis ouvrez une nouvelle session. Tant qu'il y a une nouvelle version, le bouton du Livre affiche une petite étoile.",
       "em_dia": "Vous avez la version la plus récente des Chroniques de Lua ({local}).",
       "sem_resposta": "Impossible de vérifier pour l'instant (pas d'internet ou accès bloqué). La version installée est {local}.",
       "bloqueado": "La vérification est bloquée sur cet ordinateur (CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC) : le mod ne contacte pas GitHub. La version installée est {local}.",

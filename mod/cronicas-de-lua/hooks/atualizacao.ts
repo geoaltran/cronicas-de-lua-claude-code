@@ -19,6 +19,9 @@ export const URL_VERSAO = 'https://raw.githubusercontent.com/geoaltran/cronicas-
 /** Os dois comandos do Claude Code que atualizam (catálogo, depois o mod). */
 export const CMD_CATALOGO = '/plugin marketplace update cronicas-de-lua'
 export const CMD_ATUALIZAR = '/plugin update cronicas-de-lua@cronicas-de-lua'
+// No app desktop o /plugin abre a janela de plugins e não atualiza: o mesmo pelo Terminal.
+export const CMD_CATALOGO_TERMINAL = 'claude plugin marketplace update cronicas-de-lua'
+export const CMD_ATUALIZAR_TERMINAL = 'claude plugin update cronicas-de-lua@cronicas-de-lua'
 
 /** O que fica guardado entre sessões (no `$.store`, chave 'atualizacao'). */
 export type Atualizacao = {

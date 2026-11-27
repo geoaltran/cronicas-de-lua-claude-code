@@ -420,7 +420,7 @@
       "desconhecido": "I don't know the biome \"{pedido}\". Biomes: {lista}."
     },
     "atualizacao": {
-      "tem_nova": "New version of The Chronicles of Lua: {nova} (yours is {local}). To update, type these in the message box, one at a time:\n{cmd1}\n{cmd2}\nThen open a new session. While there is a new version, the Book button shows a little star.",
+      "tem_nova": "New version of The Chronicles of Lua: {nova} (yours is {local}). To update, type these in the message box, one at a time:\n{cmd1}\n{cmd2}\nIf /plugin only opens the plugins window (desktop app), run these in your computer's Terminal, one at a time:\n{cmd3}\n{cmd4}\nThen open a new session. While there is a new version, the Book button shows a little star.",
       "em_dia": "You have the latest version of The Chronicles of Lua ({local}).",
       "sem_resposta": "Couldn't check right now (offline or access blocked). Your installed version is {local}.",
       "bloqueado": "Checking is blocked on this computer (CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC): the mod doesn't contact GitHub. Your installed version is {local}.",

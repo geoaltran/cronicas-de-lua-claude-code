@@ -420,7 +420,7 @@
       "desconhecido": "我不认识地区“{pedido}”。地区有：{lista}。"
     },
     "atualizacao": {
-      "tem_nova": "露娜编年史有新版本：{nova}（你的是 {local}）。要更新，请在消息框里依次输入：\n{cmd1}\n{cmd2}\n然后打开一个新会话。有新版本时，“书”按钮上会显示一颗小星星。",
+      "tem_nova": "露娜编年史有新版本：{nova}（你的是 {local}）。要更新，请在消息框里依次输入：\n{cmd1}\n{cmd2}\n如果 /plugin 只打开插件窗口（桌面应用），请在电脑的终端里依次运行：\n{cmd3}\n{cmd4}\n然后打开一个新会话。有新版本时，“书”按钮上会显示一颗小星星。",
       "em_dia": "你用的是露娜编年史的最新版本（{local}）。",
       "sem_resposta": "现在无法检查（没有网络或访问被阻止）。已安装的版本是 {local}。",
       "bloqueado": "这台电脑上的检查被阻止了（CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC）：模组不会访问 GitHub。已安装的版本是 {local}。",

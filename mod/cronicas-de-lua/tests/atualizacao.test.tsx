@@ -63,6 +63,7 @@ test('versão nova: uma consulta no começo da sessão, sem nada da pessoa no pe
   const t = (await cmd('updates')).text ?? ''
   expect(t).toContain('1.2.0')
   expect(t).toContain('/plugin update cronicas-de-lua@cronicas-de-lua')
+  expect(t).toContain('claude plugin update cronicas-de-lua@cronicas-de-lua')
   // no mesmo dia, sem "check", não consulta de novo
   expect(r.pedidos.length).toBe(1)
   await cmd('updates check')

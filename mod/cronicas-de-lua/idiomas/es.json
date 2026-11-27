@@ -420,7 +420,7 @@
       "desconhecido": "No conozco el bioma \"{pedido}\". Los biomas: {lista}."
     },
     "atualizacao": {
-      "tem_nova": "Versión nueva de Las Crónicas de Lua: {nova} (la tuya es {local}). Para actualizar, escribe en la caja de mensajes, uno a la vez:\n{cmd1}\n{cmd2}\nDespués abre una sesión nueva. Mientras haya una versión nueva, el botón del Libro muestra una estrellita.",
+      "tem_nova": "Versión nueva de Las Crónicas de Lua: {nova} (la tuya es {local}). Para actualizar, escribe en la caja de mensajes, uno a la vez:\n{cmd1}\n{cmd2}\nSi /plugin solo abre la ventana de plugins (app de escritorio), ejecuta en la Terminal del ordenador, uno a la vez:\n{cmd3}\n{cmd4}\nDespués abre una sesión nueva. Mientras haya una versión nueva, el botón del Libro muestra una estrellita.",
       "em_dia": "Tienes la versión más nueva de Las Crónicas de Lua ({local}).",
       "sem_resposta": "No se pudo comprobar ahora (sin internet o acceso bloqueado). La versión instalada es {local}.",
       "bloqueado": "La comprobación está bloqueada en este equipo (CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC): el mod no consulta GitHub. La versión instalada es {local}.",
