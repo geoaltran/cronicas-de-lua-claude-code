@@ -402,8 +402,14 @@ async function comecarPassagem($: $, ch: Chefao | null, at: number, destino?: Om
   }
   const h = await read($, hud)
   const de = destino?.de ?? biomaDe({ agora: ch?.caiu ?? at, hud: h, ...(ch === null ? {} : { chefao: ch }) })
-  const para = destino?.para ?? biomaDe({ agora, hud: h })
-  const pagina = destino?.pagina ?? (h.jogo.paginas % 10) + 1
+  // na demonstração, a passagem da queda já leva ao bioma do próximo chefão dela
+  // (trocar o destino depois que a Lua começou a sair a fazia voltar ao começo)
+  const daDemo = destino === undefined ? destinoDaDemo() : undefined
+  const para = destino?.para ?? daDemo?.para ?? biomaDe({ agora, hud: h })
+  const pagina = destino?.pagina ?? daDemo?.pagina ?? (h.jogo.paginas % 10) + 1
+  if (daDemo !== undefined) {
+    await update($, visita, () => daDemo.para)
+  }
   for (const t of alarmesPassagem) {
     t.cancel()
   }
@@ -813,6 +819,155 @@ async function golpeDeComando($: $, ch: Chefao): Promise<void> {
 
 /** Dano do golpe do comando: o de uma leitura média (o número branco na cena). */
 const DANO_COMANDO = 17
+
+// ---------------------------------------------------------------- demo
+
+/** `/cronicas fase`: a Lua sai, o bioma `para` entra (não conta página). */
+async function irParaFase($: $, de: string, para: string, agora: number): Promise<void> {
+  const i = Array.from({ length: 10 }, (_, k) => k).find(k => biomaDaPagina(k) === para) ?? 0
+  await update($, caminho, c => ({ andando: false, desde: agora, dist0: distancia(c, agora) }))
+  await comecarPassagem($, null, agora, { de, para, pagina: i + 1 })
+  await update($, visita, () => para)
+}
+
+/** `/cronicas passear`: a Lua anda `seg` segundos e para respirando. */
+async function passearAgora($: $, seg: number, agora: number): Promise<void> {
+  await update($, caminho, c => ({ andando: true, desde: agora, dist0: distancia(c, agora), ate: agora + seg * 1000 }))
+  $.clock.after(seg * 1000 + 20, () => {
+    void update($, tique, x => x + 1)
+  })
+}
+
+/** Os chefões da demonstração: um por bioma, na ordem da jornada (a Dama Penumbra divide a floresta com a Vespera). */
+const DEMO_CHEFOES: readonly string[] = JORNADA.filter(n => n !== 'dama_penumbra')
+/** As "ferramentas" de cada chefão, nesta ordem: uma leitura e uma edição batem no escudo. */
+const DEMO_FERRAMENTAS = ['Read', 'Edit'] as const
+/** Quanto a ferramenta de mentira "roda" antes de voltar. */
+const DEMO_LUTA_MS = 1400
+/** O passeio de abertura, antes do primeiro chefão. */
+const DEMO_PASSEIO_S = 2
+/** Num chefão (o do vulcão), a edição dá erro: o monstro contra-ataca. */
+const DEMO_ERRO = 'ignis'
+
+type Demo = { fila: string[]; andou: boolean; lutas: number }
+// (andou: o passeio de abertura, antes do primeiro chefão; entre um e outro a passagem já mostra a Lua andando)
+/** A demonstração que está rodando (some quando o mod recarrega). */
+let demo: Demo | null = null
+/** Cada demonstração tem um número: um alarme de uma demonstração parada não faz nada. */
+let demoId = 0
+
+function biomaDoChefao(nome: string): string {
+  return biomaDaPagina(Math.max(0, (JORNADA as readonly string[]).indexOf(nome)))
+}
+
+/** Com a demonstração rodando, para onde a próxima passagem vai: o bioma do próximo chefão dela. */
+function destinoDaDemo(): { para: string; pagina: number } | undefined {
+  const prox = demo?.fila[0]
+  if (prox === undefined) {
+    return undefined
+  }
+  const para = biomaDoChefao(prox)
+  const i = Array.from({ length: 10 }, (_, k) => k).find(k => biomaDaPagina(k) === para) ?? 0
+  return { para, pagina: i + 1 }
+}
+
+/** Uma luta como se o Claude usasse `tool` agora; ela volta (bem ou com erro) em DEMO_LUTA_MS. */
+async function lutaDeMentira($: $, tool: string, ok: boolean, dano: number): Promise<void> {
+  const agora = await $.clock.now()
+  const ch0 = await read($, chefao)
+  let n = 0
+  let nova: Luta | null = null
+  await update($, lutas, s => {
+    const r = entrar(s, agora, tool, ch0)
+    n = r.n
+    nova = r.nova
+    return r.s
+  })
+  const comeco = nova as Luta | null
+  if (comeco !== null && comeco.t0 <= agora) {
+    await update($, caminho, c => (c.andando ? { ...c, ate: comeco.t0 + ENTRA } : c))
+  }
+  await revisar($)
+  $.clock.after(DEMO_LUTA_MS, () => {
+    void (async () => {
+      const fim = await $.clock.now()
+      await update($, lutas, s => golpear(s, n, { at: fim, ok, dano }))
+      if (ok) {
+        await golpeNoChefao($, tool, {}, n, fim, dano)
+      }
+      await revisar($)
+    })().catch(() => undefined)
+  })
+}
+
+/**
+ * Um passo da demonstração (`/cronicas demo`): espera a cena ficar livre e faz
+ * a próxima coisa. Sem chefão: vai ao bioma do próximo (passagem de fase; a
+ * da queda já é redirecionada para ele), a Lua passeia na abertura e ele entra com uma lista de 3 tarefas. Com ele de pé: duas
+ * ferramentas batem no escudo e três golpes concluem as tarefas (o último é o
+ * crítico). Depois do último chefão, a demonstração acaba.
+ */
+async function passoDemo($: $, id: number): Promise<void> {
+  const d = demo
+  if (id !== demoId || d === null) {
+    return
+  }
+  const agora = await $.clock.now()
+  // tira de cena as lutas que acabaram e o chefão que já caiu (como o tique da cena faz)
+  const antes = await read($, chefao)
+  if ((await read($, lutas)).lista.length > 0 || (antes !== null && antes.caiu !== undefined)) {
+    await revisar($)
+  }
+  const ch = await read($, chefao)
+  const ocupada = (await read($, passagem)) !== null || lutaDaVez((await read($, lutas)).lista, agora) !== undefined
+  let espera = 500
+  if (ocupada || (ch !== null && !dePe(ch))) {
+    // uma luta, uma passagem ou um chefão caindo: espera
+  } else if (dePe(ch)) {
+    if (d.lutas < DEMO_FERRAMENTAS.length) {
+      const tool = DEMO_FERRAMENTAS[d.lutas] ?? 'Read'
+      const ok = !(ch.nome === DEMO_ERRO && tool === 'Edit')
+      await lutaDeMentira($, tool, ok, 11 + ((d.lutas * 7 + d.fila.length * 3) % 13))
+      d.lutas += 1
+      espera = DEMO_LUTA_MS + 400
+    } else {
+      await golpeDeComando($, ch)
+      espera = 900
+    }
+  } else if (d.fila.length === 0) {
+    demo = null
+    return
+  } else {
+    const prox = d.fila[0] ?? 'vespera'
+    const para = biomaDoChefao(prox)
+    const de = (await read($, visita)) ?? biomaDe({ agora, hud: await read($, hud) })
+    if (de !== para) {
+      await irParaFase($, de, para, agora)
+      espera = 900
+    } else if (!d.andou) {
+      await passearAgora($, DEMO_PASSEIO_S, agora)
+      d.andou = true
+      espera = DEMO_PASSEIO_S * 1000 + 300
+    } else {
+      await chamarChefao($, 'lista', { total: 3, feitas: 0 }, prox, true)
+      await revisar($)
+      d.fila = d.fila.slice(1)
+      d.lutas = 0
+      espera = ENTRA + 900
+    }
+  }
+  agendarDemo($, id, espera)
+}
+
+/** O próximo passo da demonstração daqui a `ms`; um erro aparece num aviso (e a demonstração para). */
+function agendarDemo($: $, id: number, ms: number): void {
+  $.clock.after(ms, () => {
+    void passoDemo($, id).catch((err: unknown) => {
+      demo = null
+      void $.ui.toast(`/cronicas demo: ${String(err instanceof Error ? err.message : err).slice(0, 200)}`)
+    })
+  })
+}
 
 /**
  * Elite: guarda o erro de cada ação (ferramenta + alvo); quando a mesma ação
@@ -1747,10 +1902,7 @@ export const register: Register = on => {
         return { text: tx('comando.passear.ocupada') }
       }
       const seg = Number.isFinite(n) && n > 0 ? Math.min(PASSEIO_MAX, Math.round(n)) : PASSEIO_S
-      await update($, caminho, c => ({ andando: true, desde: agora, dist0: distancia(c, agora), ate: agora + seg * 1000 }))
-      $.clock.after(seg * 1000 + 20, () => {
-        void update($, tique, x => x + 1)
-      })
+      await passearAgora($, seg, agora)
       return { text: tx('comando.passear.anda', { s: seg }) }
     } else if (chave === 'fase') {
       // passagem de fase só para ver: a Lua sai, o próximo bioma (ou o pedido) entra; não conta página
@@ -1769,11 +1921,30 @@ export const register: Register = on => {
       if (para === undefined) {
         return { text: tx('comando.fase.desconhecido', { pedido, lista: ORDEM_BIOMAS.map(b => tx(`chefao.biomas.${b}`)).join(', ') }) }
       }
-      const i = Array.from({ length: 10 }, (_, k) => k).find(k => biomaDaPagina(k) === para) ?? 0
-      await update($, caminho, c => ({ andando: false, desde: agora, dist0: distancia(c, agora) }))
-      await comecarPassagem($, null, agora, { de, para, pagina: i + 1 })
-      await update($, visita, () => para)
+      await irParaFase($, de, para, agora)
       return { text: tx('comando.fase.vai', { de: tx(`chefao.biomas.${de}`), para: tx(`chefao.biomas.${para}`) }) }
+    } else if (chave === 'demo') {
+      // demonstração para gravar a divulgação (fora da ajuda e da lista de comandos): os 9 biomas,
+      // cada um com o seu chefão, lutas no escudo e o crítico
+      demoId += 1
+      if (['stop', 'parar', 'para', 'off'].includes((valor ?? '').toLowerCase())) {
+        const tinha = demo !== null
+        demo = null
+        return { text: tx(tinha ? 'comando.demo.parou' : 'comando.demo.nenhuma') }
+      }
+      demo = { fila: [...DEMO_CHEFOES], andou: false, lutas: 0 }
+      // uma luta que ficou pendurada (ferramenta cortada por um recarregamento, por exemplo)
+      // seguraria a demonstração para sempre: ela começa com a cena limpa
+      await update($, lutas, s => ({ ...s, lista: [] }))
+      await revisar($)
+      // o primeiro passo roda aqui mesmo; os outros, em alarmes
+      try {
+        await passoDemo($, demoId)
+      } catch (err) {
+        demo = null
+        return { text: `/cronicas demo: ${String(err instanceof Error ? err.message : err).slice(0, 300)}` }
+      }
+      return { text: tx('comando.demo.comeca', { n: DEMO_CHEFOES.length }) }
     } else if (chave === 'elite') {
       // para ver o elite sem esperar um erro de verdade: a próxima ferramenta chama o Golem
       // cada teste traz o próximo dos 4 troféus, para ver todos

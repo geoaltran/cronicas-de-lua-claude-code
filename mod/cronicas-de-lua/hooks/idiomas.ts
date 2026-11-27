@@ -287,7 +287,10 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.atualizacao.como": "So funktioniert es: Einmal am Tag, in der ersten Sitzung, liest der Mod nur die Versionsnummer, die auf GitHub veröffentlicht ist (eine öffentliche Datei). Nichts über dich oder deine Gespräche wird gesendet, und nichts wird von selbst heruntergeladen oder installiert: Du entscheidest, wann du aktualisierst. /cronicas updates off schaltet es aus; /cronicas updates check prüft sofort.",
   "comando.atualizacao.ligada": "Hinweis auf neue Versionen an: Einmal am Tag prüft der Mod, ob eine neue Version da ist. /cronicas updates off schaltet ihn aus.",
   "comando.atualizacao.desligada": "Hinweis auf neue Versionen aus: Der Mod fragt GitHub nicht mehr ab. /cronicas updates on schaltet ihn wieder ein.",
-  "comando.atualizacao.teste": "Test: Das Buch zeigt bis zur nächsten Sitzung das Sternchen einer erfundenen neuen Version ({versao}). Fahr mit der Maus über das Buch, um die Sprechblase zu sehen."
+  "comando.atualizacao.teste": "Test: Das Buch zeigt bis zur nächsten Sitzung das Sternchen einer erfundenen neuen Version ({versao}). Fahr mit der Maus über das Buch, um die Sprechblase zu sehen.",
+  "comando.demo.comeca": "Demo gestartet: {n} Biome, jedes mit seinem Boss, Kämpfe gegen den Schild und der kritische Treffer (etwa 5 Min.). Gut für Bildschirmaufnahmen. Zum Stoppen: /cronicas demo stop.",
+  "comando.demo.parou": "Demo gestoppt.",
+  "comando.demo.nenhuma": "Es läuft keine Demo. Zum Starten: /cronicas demo."
  },
  "en": {
   "chefoes.vespera": "Vespera",
@@ -575,7 +578,10 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.atualizacao.como": "How it works: once a day, in the first session, the mod reads only the version number published on GitHub (a public file). Nothing about you or your conversations is sent, and nothing is downloaded or installed on its own: you decide when to update. /cronicas updates off turns it off; /cronicas updates check checks now.",
   "comando.atualizacao.ligada": "New-version notice on: once a day the mod checks whether a new version is out. /cronicas updates off turns it off.",
   "comando.atualizacao.desligada": "New-version notice off: the mod no longer contacts GitHub. /cronicas updates on turns it back on.",
-  "comando.atualizacao.teste": "Test: the Book shows the little star of a pretend new version ({versao}) until the next session. Hover over the Book to see the balloon."
+  "comando.atualizacao.teste": "Test: the Book shows the little star of a pretend new version ({versao}) until the next session. Hover over the Book to see the balloon.",
+  "comando.demo.comeca": "Demo started: {n} biomes, each with its boss, shield fights and the critical hit (about 5 min). Good for screen recording. To stop: /cronicas demo stop.",
+  "comando.demo.parou": "Demo stopped.",
+  "comando.demo.nenhuma": "No demo is running. To start one: /cronicas demo."
  },
  "es": {
   "chefoes.vespera": "Vespera",
@@ -863,7 +869,10 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.atualizacao.como": "Cómo funciona: una vez al día, en la primera sesión, el mod lee solo el número de la versión publicada en GitHub (un archivo público). No se envía nada sobre ti ni sobre tus conversaciones, y nada se descarga ni se instala solo: quien actualiza eres tú. /cronicas updates off lo desactiva; /cronicas updates check comprueba ahora.",
   "comando.atualizacao.ligada": "Aviso de versión nueva activado: una vez al día el mod comprueba si salió una versión nueva. /cronicas updates off lo desactiva.",
   "comando.atualizacao.desligada": "Aviso de versión nueva desactivado: el mod ya no consulta GitHub. /cronicas updates on lo activa de nuevo.",
-  "comando.atualizacao.teste": "Prueba: el Libro muestra la estrellita de una versión nueva de mentira ({versao}) hasta la próxima sesión. Pasa el ratón por el Libro para ver el globo."
+  "comando.atualizacao.teste": "Prueba: el Libro muestra la estrellita de una versión nueva de mentira ({versao}) hasta la próxima sesión. Pasa el ratón por el Libro para ver el globo.",
+  "comando.demo.comeca": "Demostración iniciada: {n} biomas, cada uno con su jefe, luchas contra el escudo y el golpe crítico (unos 5 min). Ideal para grabar la pantalla. Para parar: /cronicas demo stop.",
+  "comando.demo.parou": "Demostración detenida.",
+  "comando.demo.nenhuma": "No hay ninguna demostración en marcha. Para empezar: /cronicas demo."
  },
  "fr": {
   "chefoes.vespera": "Vespera",
@@ -1151,7 +1160,10 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.atualizacao.como": "Comment ça marche : une fois par jour, à la première session, le mod lit seulement le numéro de la version publiée sur GitHub (un fichier public). Rien sur vous ni sur vos conversations n'est envoyé, et rien n'est téléchargé ni installé tout seul : c'est vous qui mettez à jour. /cronicas updates off le désactive ; /cronicas updates check vérifie maintenant.",
   "comando.atualizacao.ligada": "Avis de nouvelle version activé : une fois par jour, le mod vérifie si une nouvelle version est sortie. /cronicas updates off le désactive.",
   "comando.atualizacao.desligada": "Avis de nouvelle version désactivé : le mod ne contacte plus GitHub. /cronicas updates on le réactive.",
-  "comando.atualizacao.teste": "Test : le Livre affiche la petite étoile d'une fausse nouvelle version ({versao}) jusqu'à la prochaine session. Survolez le Livre pour voir la bulle."
+  "comando.atualizacao.teste": "Test : le Livre affiche la petite étoile d'une fausse nouvelle version ({versao}) jusqu'à la prochaine session. Survolez le Livre pour voir la bulle.",
+  "comando.demo.comeca": "Démo lancée : {n} biomes, chacun avec son boss, des combats contre le bouclier et le coup critique (environ 5 min). Idéal pour enregistrer l'écran. Pour arrêter : /cronicas demo stop.",
+  "comando.demo.parou": "Démo arrêtée.",
+  "comando.demo.nenhuma": "Aucune démo en cours. Pour en lancer une : /cronicas demo."
  },
  "ja": {
   "chefoes.vespera": "Vespera",
@@ -1439,7 +1451,10 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.atualizacao.como": "しくみ：1日に1回、最初のセッションで、MODは GitHub に公開されているバージョン番号だけを読みます（公開ファイル）。あなたや会話についての情報は何も送られず、勝手にダウンロードやインストールもしません。更新するかどうかはあなたが決めます。/cronicas updates off でオフ、/cronicas updates check でいますぐ確認。",
   "comando.atualizacao.ligada": "新しいバージョンのお知らせをオンにしました：1日に1回、新しいバージョンが出たか確認します。/cronicas updates off でオフ。",
   "comando.atualizacao.desligada": "新しいバージョンのお知らせをオフにしました：MODはもう GitHub に接続しません。/cronicas updates on でまたオン。",
-  "comando.atualizacao.teste": "テスト：次のセッションまで、本にダミーの新バージョン（{versao}）の小さな星が出ます。本にマウスを乗せると吹き出しが見られます。"
+  "comando.atualizacao.teste": "テスト：次のセッションまで、本にダミーの新バージョン（{versao}）の小さな星が出ます。本にマウスを乗せると吹き出しが見られます。",
+  "comando.demo.comeca": "デモ開始：{n} つのバイオーム、それぞれのボス、シールドとの戦いとクリティカルヒット（約5分）。画面録画にどうぞ。止めるには：/cronicas demo stop",
+  "comando.demo.parou": "デモを止めました。",
+  "comando.demo.nenhuma": "実行中のデモはありません。始めるには：/cronicas demo"
  },
  "ko": {
   "chefoes.vespera": "Vespera",
@@ -1727,7 +1742,10 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.atualizacao.como": "작동 방식: 하루에 한 번, 첫 세션에서 모드는 GitHub에 공개된 버전 번호만 읽어요 (공개 파일). 당신이나 대화에 관한 정보는 전혀 보내지 않고, 저절로 내려받거나 설치하지도 않아요. 업데이트는 당신이 결정해요. /cronicas updates off 로 끄고, /cronicas updates check 로 지금 확인해요.",
   "comando.atualizacao.ligada": "새 버전 알림을 켰어요: 하루에 한 번 새 버전이 나왔는지 확인해요. /cronicas updates off 로 끌 수 있어요.",
   "comando.atualizacao.desligada": "새 버전 알림을 껐어요: 모드는 더 이상 GitHub에 접속하지 않아요. /cronicas updates on 으로 다시 켜요.",
-  "comando.atualizacao.teste": "테스트: 다음 세션까지 책에 가짜 새 버전({versao})의 작은 별이 보여요. 책에 마우스를 올리면 말풍선이 보여요."
+  "comando.atualizacao.teste": "테스트: 다음 세션까지 책에 가짜 새 버전({versao})의 작은 별이 보여요. 책에 마우스를 올리면 말풍선이 보여요.",
+  "comando.demo.comeca": "데모 시작: {n}개 바이옴, 바이옴마다 보스, 방패 전투와 치명타 (약 5분). 화면 녹화에 좋아요. 멈추려면: /cronicas demo stop",
+  "comando.demo.parou": "데모를 멈췄어요.",
+  "comando.demo.nenhuma": "실행 중인 데모가 없어요. 시작하려면: /cronicas demo"
  },
  "pt-BR": {
   "chefoes.vespera": "Vespera",
@@ -2015,7 +2033,10 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.atualizacao.como": "Como funciona: uma vez por dia, na primeira sessão, o mod lê só o número da versão publicada no GitHub (um arquivo público). Nada sobre você ou suas conversas é enviado, e nada é baixado nem instalado sozinho: quem atualiza é você. /cronicas updates off desliga; /cronicas updates check confere agora.",
   "comando.atualizacao.ligada": "Aviso de versão nova ligado: uma vez por dia o mod confere se saiu uma versão nova. /cronicas updates off desliga.",
   "comando.atualizacao.desligada": "Aviso de versão nova desligado: o mod não consulta mais o GitHub. /cronicas updates on liga de novo.",
-  "comando.atualizacao.teste": "Teste: o Livro mostra a estrelinha de uma versão nova de mentira ({versao}) até a próxima sessão. Passe o mouse no Livro para ver o balão."
+  "comando.atualizacao.teste": "Teste: o Livro mostra a estrelinha de uma versão nova de mentira ({versao}) até a próxima sessão. Passe o mouse no Livro para ver o balão.",
+  "comando.demo.comeca": "Demonstração começou: {n} biomas, cada um com o seu chefão, lutas no escudo e o golpe crítico (uns 5 min). Bom para gravar a tela. Para parar: /cronicas demo stop.",
+  "comando.demo.parou": "Demonstração parada.",
+  "comando.demo.nenhuma": "Não há demonstração rodando. Para começar: /cronicas demo."
  },
  "zh-CN": {
   "chefoes.vespera": "Vespera",
@@ -2303,6 +2324,9 @@ export const IDIOMAS: Record<string, Record<string, string>> = {
   "comando.atualizacao.como": "工作方式：每天第一次会话时，模组只读取 GitHub 上公开文件里的版本号。不会发送任何关于你或你对话的信息，也不会自动下载或安装任何东西：更新由你决定。/cronicas updates off 关闭；/cronicas updates check 立即检查。",
   "comando.atualizacao.ligada": "新版本提醒已打开：模组每天检查一次是否有新版本。/cronicas updates off 可关闭。",
   "comando.atualizacao.desligada": "新版本提醒已关闭：模组不再访问 GitHub。/cronicas updates on 可重新打开。",
-  "comando.atualizacao.teste": "测试：在下次会话之前，“书”会显示一个假的新版本（{versao}）的小星星。把鼠标移到“书”上就能看到气泡。"
+  "comando.atualizacao.teste": "测试：在下次会话之前，“书”会显示一个假的新版本（{versao}）的小星星。把鼠标移到“书”上就能看到气泡。",
+  "comando.demo.comeca": "演示开始：{n} 个生物群系，每个都有自己的首领、护盾战斗和暴击（约 5 分钟）。适合录屏。停止：/cronicas demo stop。",
+  "comando.demo.parou": "演示已停止。",
+  "comando.demo.nenhuma": "没有正在运行的演示。开始：/cronicas demo。"
  }
 }

@@ -430,6 +430,11 @@
       "ligada": "새 버전 알림을 켰어요: 하루에 한 번 새 버전이 나왔는지 확인해요. /cronicas updates off 로 끌 수 있어요.",
       "desligada": "새 버전 알림을 껐어요: 모드는 더 이상 GitHub에 접속하지 않아요. /cronicas updates on 으로 다시 켜요.",
       "teste": "테스트: 다음 세션까지 책에 가짜 새 버전({versao})의 작은 별이 보여요. 책에 마우스를 올리면 말풍선이 보여요."
+    },
+    "demo": {
+      "comeca": "데모 시작: {n}개 바이옴, 바이옴마다 보스, 방패 전투와 치명타 (약 5분). 화면 녹화에 좋아요. 멈추려면: /cronicas demo stop",
+      "parou": "데모를 멈췄어요.",
+      "nenhuma": "실행 중인 데모가 없어요. 시작하려면: /cronicas demo"
     }
   }
 }

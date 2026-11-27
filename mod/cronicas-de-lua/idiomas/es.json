@@ -430,6 +430,11 @@
       "ligada": "Aviso de versión nueva activado: una vez al día el mod comprueba si salió una versión nueva. /cronicas updates off lo desactiva.",
       "desligada": "Aviso de versión nueva desactivado: el mod ya no consulta GitHub. /cronicas updates on lo activa de nuevo.",
       "teste": "Prueba: el Libro muestra la estrellita de una versión nueva de mentira ({versao}) hasta la próxima sesión. Pasa el ratón por el Libro para ver el globo."
+    },
+    "demo": {
+      "comeca": "Demostración iniciada: {n} biomas, cada uno con su jefe, luchas contra el escudo y el golpe crítico (unos 5 min). Ideal para grabar la pantalla. Para parar: /cronicas demo stop.",
+      "parou": "Demostración detenida.",
+      "nenhuma": "No hay ninguna demostración en marcha. Para empezar: /cronicas demo."
     }
   }
 }

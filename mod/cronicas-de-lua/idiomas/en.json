@@ -430,6 +430,11 @@
       "ligada": "New-version notice on: once a day the mod checks whether a new version is out. /cronicas updates off turns it off.",
       "desligada": "New-version notice off: the mod no longer contacts GitHub. /cronicas updates on turns it back on.",
       "teste": "Test: the Book shows the little star of a pretend new version ({versao}) until the next session. Hover over the Book to see the balloon."
+    },
+    "demo": {
+      "comeca": "Demo started: {n} biomes, each with its boss, shield fights and the critical hit (about 5 min). Good for screen recording. To stop: /cronicas demo stop.",
+      "parou": "Demo stopped.",
+      "nenhuma": "No demo is running. To start one: /cronicas demo."
     }
   }
 }

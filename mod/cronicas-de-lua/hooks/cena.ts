@@ -1897,6 +1897,13 @@ type Trecho = [number, number, string]
 function textoNoTempo(trechos: readonly Trecho[], desenha: (t: Trecho) => string): string {
   return trechos
     .map(t => {
+      if (t[0] <= 0) {
+        // o trecho de agora já nasce visível: se ele nascesse escondido e só aparecesse
+        // no instante 0, cada redesenho da cena (na luta são muitos) apagaria o número
+        // por um quadro, e ele piscava
+        const some = Number.isFinite(t[1]) ? `<set attributeName="visibility" to="hidden" begin="${t[1].toFixed(1)}s"/>` : ''
+        return `<g>${some}${desenha(t)}</g>`
+      }
       const fimAttr = Number.isFinite(t[1]) ? ` end="${t[1].toFixed(1)}s"` : ''
       return `<g visibility="hidden"><set attributeName="visibility" to="visible" begin="${t[0].toFixed(1)}s"${fimAttr}/>${desenha(t)}</g>`
     })

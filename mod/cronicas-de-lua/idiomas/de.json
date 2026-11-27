@@ -430,6 +430,11 @@
       "ligada": "Hinweis auf neue Versionen an: Einmal am Tag prüft der Mod, ob eine neue Version da ist. /cronicas updates off schaltet ihn aus.",
       "desligada": "Hinweis auf neue Versionen aus: Der Mod fragt GitHub nicht mehr ab. /cronicas updates on schaltet ihn wieder ein.",
       "teste": "Test: Das Buch zeigt bis zur nächsten Sitzung das Sternchen einer erfundenen neuen Version ({versao}). Fahr mit der Maus über das Buch, um die Sprechblase zu sehen."
+    },
+    "demo": {
+      "comeca": "Demo gestartet: {n} Biome, jedes mit seinem Boss, Kämpfe gegen den Schild und der kritische Treffer (etwa 5 Min.). Gut für Bildschirmaufnahmen. Zum Stoppen: /cronicas demo stop.",
+      "parou": "Demo gestoppt.",
+      "nenhuma": "Es läuft keine Demo. Zum Starten: /cronicas demo."
     }
   }
 }

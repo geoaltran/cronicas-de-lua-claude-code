@@ -430,6 +430,11 @@
       "ligada": "Avis de nouvelle version activé : une fois par jour, le mod vérifie si une nouvelle version est sortie. /cronicas updates off le désactive.",
       "desligada": "Avis de nouvelle version désactivé : le mod ne contacte plus GitHub. /cronicas updates on le réactive.",
       "teste": "Test : le Livre affiche la petite étoile d'une fausse nouvelle version ({versao}) jusqu'à la prochaine session. Survolez le Livre pour voir la bulle."
+    },
+    "demo": {
+      "comeca": "Démo lancée : {n} biomes, chacun avec son boss, des combats contre le bouclier et le coup critique (environ 5 min). Idéal pour enregistrer l'écran. Pour arrêter : /cronicas demo stop.",
+      "parou": "Démo arrêtée.",
+      "nenhuma": "Aucune démo en cours. Pour en lancer une : /cronicas demo."
     }
   }
 }

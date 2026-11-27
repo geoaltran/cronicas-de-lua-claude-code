@@ -430,6 +430,11 @@
       "ligada": "新版本提醒已打开：模组每天检查一次是否有新版本。/cronicas updates off 可关闭。",
       "desligada": "新版本提醒已关闭：模组不再访问 GitHub。/cronicas updates on 可重新打开。",
       "teste": "测试：在下次会话之前，“书”会显示一个假的新版本（{versao}）的小星星。把鼠标移到“书”上就能看到气泡。"
+    },
+    "demo": {
+      "comeca": "演示开始：{n} 个生物群系，每个都有自己的首领、护盾战斗和暴击（约 5 分钟）。适合录屏。停止：/cronicas demo stop。",
+      "parou": "演示已停止。",
+      "nenhuma": "没有正在运行的演示。开始：/cronicas demo。"
     }
   }
 }
