@@ -2,6 +2,9 @@
 
 What changed in each version of The Chronicles of Lua. To update, run `/plugin marketplace update cronicas-de-lua` and then `/plugin update cronicas-de-lua@cronicas-de-lua`; in the desktop app, where `/plugin` only opens the plugins window, run `claude plugin marketplace update cronicas-de-lua` and `claude plugin update cronicas-de-lua@cronicas-de-lua` in the Terminal (`/cronicas updates` shows the same).
 
+## 1.1.5 · 2026-11-27
+- **Fix:** `/cronicas updates` now also shows how to update from the Terminal (`claude plugin marketplace update cronicas-de-lua`, then `claude plugin update cronicas-de-lua@cronicas-de-lua`). In the desktop app, `/plugin` only opens the plugins window and doesn't update.
+
 ## 1.1.4 · 2026-11-27
 - **Fix:** the Moonlight countdown ("57 MIN") no longer blinks during fights. Each redraw of the scene used to hide the number for a frame.
 
