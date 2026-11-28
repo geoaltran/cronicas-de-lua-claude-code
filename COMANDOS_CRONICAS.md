@@ -66,7 +66,7 @@ Todo subcomando também tem um **nome em inglês**, que funciona em qualquer idi
 | `/cronicas escala 1` · `2` · `3` | Tamanho do pixel da cena: 1x, 2x ou 3x. |
 | `/cronicas regua` | Liga uma régua embaixo da cena pra medir a largura da faixa. Digite de novo pra desligar. |
 | `/cronicas largura <px> [vscode\|celular\|desktop]` | Calibra a largura com o número que a régua mostrou inteiro na borda direita (ex.: `/cronicas largura 752`). A cena passa a acompanhar a largura da faixa e a régua desliga sozinha. **Cada lugar tem a sua calibração** (app, VS Code, celular); sem o nome no fim, vale o lugar onde a faixa apareceu por último. |
-| `/cronicas coluna <px>` | Ajuste fino: quantos pixels mede cada coluna de texto da faixa (de 4 a 20; o padrão é 8,9). Normalmente não precisa: use a régua e a largura. |
+| `/cronicas coluna <px>` | Ajuste fino: quantos pixels mede cada coluna de texto da faixa (de 4 a 20; o padrão é 8,9 no Mac e 7,9 no Windows). Normalmente não precisa: use a régua e a largura. |
 | `/cronicas imagem` | Modo **imagem** (o padrão): mostra toda a arte e as animações, e os balões de explicação aparecem ao passar o mouse nas barras e no selo de nível. |
 | `/cronicas quadro` | Modo **quadro** (antigo): balões feitos dentro do desenho, mas no app esse modo não mostra as imagens. Só para testes. |
 | `/cronicas teste` | Mostra a faixa duas vezes, uma em cada modo, pra comparar. Digite de novo pra desligar. |
@@ -129,4 +129,4 @@ Clique direto no ícone em pixel art. Passando o mouse, aparece o balão com o q
 | **Arrumar a mochila** / **Agora não** | Aparecem depois do clique na Mochila. |
 
 ---
-*Última atualização: 27/11/2026 (`/cronicas updates` com os comandos do Terminal para o app desktop).*
+*Última atualização: 27/11/2026 (padrão de 7,9 px por coluna no Windows).*

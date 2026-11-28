@@ -126,13 +126,33 @@ function supDoTexto(t: string | undefined): Sup | undefined {
 // 20 px por linha: medido no app desktop (print da prova técnica, 22/11/2026)
 const AJUSTES0: Ajustes = { escala: 1, pxColuna: 8.9, quadro: false, teste: false, regua: false, prova: false, pxLinha: 20 }
 
+/**
+ * px por coluna no app desktop do Windows até a régua calibrar: a coluna lá é
+ * mais estreita (print de um jogador, 27/11/2026: a cena saía com ~836 px numa
+ * faixa de ~752, uns 8,0 px por coluna), com a mesma folga do Mac.
+ */
+const PX_COLUNA_WINDOWS = 7.9
+
 type $ = EngineInterface
 
+/** O sistema onde a sessão roda (uma consulta por sessão); undefined se a API não disser. */
+let plataforma: Promise<string | undefined> | undefined
+const plataformaDe = ($: $): Promise<string | undefined> =>
+  (plataforma ??= $.session.info().then(
+    i => i.platform,
+    () => undefined,
+  ))
+
 async function lerAjustes($: $): Promise<Ajustes> {
-  const v = { ...((await $.store.get('ajustes')) as Partial<Ajustes> | undefined) }
+  const [salvo, sistema] = await Promise.all([$.store.get('ajustes'), plataformaDe($)])
+  const v = { ...(salvo as Partial<Ajustes> | undefined) }
   if (v.pxLinha === 18) {
     // 18 era o palpite da 1ª prova técnica, gravado junto com os ajustes; o medido é 20
     delete v.pxLinha
+  }
+  if (sistema === 'windows' && (v.pxColuna === undefined || v.pxColuna === AJUSTES0.pxColuna)) {
+    // 8,9 gravado é o padrão do Mac (vai junto com qualquer ajuste), não uma calibração
+    v.pxColuna = PX_COLUNA_WINDOWS
   }
   return { ...AJUSTES0, ...v }
 }
